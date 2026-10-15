@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        h2{
+            text-align: center;
+            margin:20px 0;
+        }
+        .flex{
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .flex li{
+            width: 40%;
+            height: 300px;
+            border:1px solid #333;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap:10px;
+        }
+        .box{
+            width: 70px;
+            height: 70px;
+            background-color: #f2f3f4;
+            border:1px solid #999;
+        }
+        /* 第1个：居中1个方块 */
+        .flex li:nth-child(1){
+            flex-direction: row;
+        }
+        /* 第2个：上下2个方块 */
+        .flex li:nth-child(2){
+            flex-direction: column;
+        }
+        /* 第3个：2行2列四个方块 */
+        .flex li:nth-child(3) {
+            flex-wrap: wrap;
+            flex-direction: row;
+        }
+        .flex li:nth-child(3) .box{
+            width: 40%;
+        }
+        /* 第4个：上面1个通栏，下面并排2个 */
+        .flex li:nth-child(4){
+            flex-direction: column;
+        }
+        .flex li:nth-child(4) .box-top{
+            width:90%;
+            height:70px;
+            background-color: #f2f3f4;
+            border:1px solid #999;
+        }
+        .flex li:nth-child(4) .bottom-group{
+            display:flex;
+            width:90%;
+            justify-content: space-between;
+        }
+        .flex li:nth-child(4) .bottom-group .box{
+            width:49%;
+        }
+    </style>
+</head>
+<body>
+    <h2>解浩帅的Flex</h2>
+    <ul class="flex">    
+        <li>
+            <div class="box"></div>
+        </li>
+        <li>
+            <div class="box"></div>
+            <div class="box"></div>
+        </li>
+        <li>
+            <div class="box"></div>
+            <div class="box"></div>
+            <div class="box"></div>
+            <div class="box"></div>
+        </li>
+        <li>
+            <div class="box-top"></div>
+            <div class="bottom-group">
+                <div class="box"></div>
+                <div class="box"></div>
+            </div>
+        </li>
+    </ul>
+</body>
+</html>

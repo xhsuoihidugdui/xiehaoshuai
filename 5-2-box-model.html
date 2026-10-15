@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>盒模型，框模型，box model</title>
+    <style>
+        body,ul,p,h1,h2,h3,h4,h5,h6{
+           margin:0; 
+           padding: 0;
+        }
+        .a{
+            width: 200px;
+            height: 200px;
+            border: 2px dotted #039;
+            padding: 70px 60px 50px 40px;/* 上 右 下 左 */
+            margin: 40px auto;
+            /* 上下 左右margin为audo则盒子居中 */
+        }
+        /* 盒子的高度：内容的高度+上下边框的高度+上下padding的高度+上下margin的高度 */
+        .b{
+            width: 500px;
+            height: 300px;
+            border: 2px dashed #039;
+            margin:50px auto 40px;
+        }
+        .c{
+             width: 300px;
+            height: 150px;
+            /* 边框 双实线 */
+            border: 3px solid #039;
+            /* padding 上右下左 */
+            padding: 30px 20px;
+            /* margin：上，左右auto居中，下外边距 */
+            margin: 30px auto 60px;
+            background-color: #e8f2fc;
+        }
+    </style>
+</head>
+<body>
+    <div class="a">110解浩帅</div>
+    <div class="b">110解浩帅</div>
+    <div class="c">110解浩帅</div>
+</body>
+</html>

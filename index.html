@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>解浩帅的《高级网页设计》课堂实践</title>
+<style>
+    /* ===== 全局 ===== */
+    :root{
+        --primary:#1e6fd9;
+        --primary-dark:#144f9e;
+        --accent:#f5a623;
+        --dark:#12283f;
+        --light:#f4f7fb;
+        --ink:#2b2b2b;
+        --muted:#5a6b7c;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{
+        font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB",Arial,sans-serif;
+        background:var(--light);
+        color:var(--ink);
+        line-height:1.7;
+    }
+    a{color:inherit;}
+
+    /* ===== 顶部横幅 ===== */
+    .hero{
+        background:linear-gradient(135deg,#0b1f3a 0%,#123a6b 55%,#1e6fd9 100%);
+        color:#fff;
+        padding:76px 24px 100px;
+        text-align:center;
+        position:relative;
+        overflow:hidden;
+    }
+    /* 背景装饰：HTML 代码行与光斑 */
+    .hero::before{
+        content:"";
+        position:absolute;
+        top:-70%;left:-15%;
+        width:55%;height:240%;
+        background:radial-gradient(circle,rgba(255,255,255,.14) 0%,transparent 62%);
+        transform:rotate(20deg);
+        pointer-events:none;
+    }
+    .code-deco{
+        position:absolute;
+        inset:0;
+        font-family:Consolas,"Courier New",monospace;
+        font-size:15px;
+        line-height:2;
+        color:rgba(255,255,255,.10);
+        letter-spacing:1px;
+        pointer-events:none;
+        user-select:none;
+        text-align:left;
+        padding:26px 34px;
+        white-space:pre;
+        overflow:hidden;
+    }
+    .hero .badge{
+        position:relative;
+        display:inline-block;
+        background:rgba(255,255,255,.15);
+        border:1px solid rgba(255,255,255,.35);
+        padding:6px 20px;
+        border-radius:999px;
+        font-size:14px;
+        letter-spacing:4px;
+        margin-bottom:22px;
+    }
+    .hero h1{
+        position:relative;
+        font-size:44px;
+        font-weight:800;
+        letter-spacing:2px;
+        text-shadow:0 4px 18px rgba(0,0,0,.35);
+    }
+    .hero h1 span{color:var(--accent);}
+    .hero p.sub{
+        position:relative;
+        margin-top:16px;
+        font-size:16px;
+        color:rgba(255,255,255,.85);
+        letter-spacing:1px;
+    }
+    .hero .meta{
+        position:relative;
+        margin-top:22px;
+        display:inline-flex;
+        flex-wrap:wrap;
+        justify-content:center;
+        gap:8px;
+    }
+    .hero .meta i{
+        font-style:normal;
+        font-size:13px;
+        background:rgba(255,255,255,.12);
+        border:1px solid rgba(255,255,255,.25);
+        padding:4px 14px;
+        border-radius:999px;
+        letter-spacing:1px;
+    }
+
+    /* ===== 目录标题 ===== */
+    .section-title{
+        max-width:1080px;
+        margin:-58px auto 32px;
+        padding:0 24px;
+        display:flex;
+        align-items:center;
+        gap:14px;
+    }
+    .section-title .line{flex:1;height:2px;background:linear-gradient(90deg,var(--primary),transparent);}
+    .section-title h2{font-size:26px;color:var(--dark);white-space:nowrap;}
+    .section-title h2 em{font-style:normal;color:var(--primary);}
+
+    /* ===== 卡片网格 ===== */
+    .cards{
+        max-width:1080px;
+        margin:0 auto 44px;
+        padding:0 24px;
+        display:grid;
+        grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+        gap:24px;
+    }
+    .card{
+        background:#fff;
+        border-radius:16px;
+        padding:26px 24px 20px;
+        box-shadow:0 6px 24px rgba(18,40,63,.08);
+        border-top:4px solid var(--primary);
+        position:relative;
+        transition:transform .25s ease,box-shadow .25s ease;
+        display:flex;
+        flex-direction:column;
+    }
+    .card:hover{
+        transform:translateY(-6px);
+        box-shadow:0 14px 34px rgba(18,40,63,.16);
+    }
+    .card .num{
+        position:absolute;
+        top:8px;right:18px;
+        font-size:54px;font-weight:800;
+        color:rgba(30,111,217,.10);
+        font-family:Georgia,"Times New Roman",serif;
+        line-height:1;
+    }
+    .card .tag{
+        align-self:flex-start;
+        background:rgba(30,111,217,.10);
+        color:var(--primary-dark);
+        font-size:12px;
+        padding:3px 12px;
+        border-radius:999px;
+        letter-spacing:1px;
+        margin-bottom:12px;
+    }
+    .card h3{font-size:20px;color:var(--dark);margin-bottom:8px;padding-right:40px;}
+    .card .desc{font-size:14px;color:var(--muted);flex:1;margin-bottom:14px;}
+    .card .tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+    .card .tags i{
+        font-style:normal;
+        font-size:12px;
+        background:#eef3fa;
+        color:#3a5570;
+        padding:2px 10px;
+        border-radius:6px;
+    }
+    .card .foot{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+        border-top:1px dashed #e2e8f0;
+        padding-top:12px;
+    }
+    .card .path{
+        font-family:Consolas,"Courier New",monospace;
+        font-size:12px;
+        color:#8aa0b8;
+        word-break:break-all;
+    }
+    .card a.go{
+        display:inline-flex;align-items:center;gap:6px;
+        color:#fff;
+        background:linear-gradient(90deg,var(--primary),#2f8bf0);
+        text-decoration:none;
+        font-size:14px;
+        padding:9px 20px;
+        border-radius:10px;
+        white-space:nowrap;
+        transition:filter .2s ease,box-shadow .2s ease;
+        box-shadow:0 4px 12px rgba(30,111,217,.28);
+    }
+    .card a.go:hover{filter:brightness(1.1);box-shadow:0 6px 16px rgba(30,111,217,.4);}
+    .card a.go .arr{transition:transform .2s ease;}
+    .card a.go:hover .arr{transform:translateX(4px);}
+    .card a.go:focus-visible{
+        outline:3px solid var(--accent);
+        outline-offset:2px;
+    }
+
+    /* ===== 提示词卡片 ===== */
+    .prompt-box{max-width:1080px;margin:0 auto 48px;padding:0 24px;}
+    .prompt-box .inner{
+        background:#fff;
+        border:1px dashed var(--primary);
+        border-radius:16px;
+        padding:26px 30px;
+        box-shadow:0 6px 24px rgba(18,40,63,.06);
+    }
+    .prompt-box .head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+    .prompt-box .dot{
+        width:10px;height:10px;border-radius:50%;
+        background:var(--accent);
+        box-shadow:0 0 0 4px rgba(245,166,35,.2);
+    }
+    .prompt-box h2{font-size:18px;color:var(--dark);}
+    .prompt-box p{
+        font-size:15px;color:#41586e;
+        background:#f6f9fd;
+        padding:16px 20px;
+        border-radius:10px;
+        border-left:4px solid var(--primary);
+    }
+
+    /* ===== 页脚 ===== */
+    footer{
+        background:var(--dark);
+        color:rgba(255,255,255,.75);
+        text-align:center;
+        padding:28px 16px;
+        font-size:13px;
+        letter-spacing:1px;
+    }
+    footer strong{color:#fff;}
+    footer .res{margin-top:8px;font-size:12px;color:rgba(255,255,255,.5);}
+
+    /* ===== 响应式 ===== */
+    @media (max-width:640px){
+        .hero{padding:52px 20px 80px;}
+        .hero h1{font-size:28px;}
+        .cards{grid-template-columns:1fr;}
+        .section-title{margin-top:-44px;}
+        .code-deco{display:none;}
+    }
+    @media (prefers-reduced-motion:reduce){
+        .card{transition:none;}
+        .card a.go{transition:none;}
+    }
+</style>
+</head>
+<body>
+
+<!-- ========== 顶部横幅 ========== -->
+<header class="hero">
+    <div class="code-deco" aria-hidden="true">&lt;!DOCTYPE html&gt;
+&lt;html lang="zh-CN"&gt;
+  &lt;head&gt;
+    &lt;title&gt;高级网页设计&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;课堂实践&lt;/h1&gt;
+    &lt;a href="#"&gt;进入页面&lt;/a&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</div>
+    <div class="badge">WEB DESIGN · 课堂实践</div>
+    <h1>解浩帅的《高级网页设计》<span>课堂实践</span></h1>
+    <p class="sub">HTML · CSS · 表单 · 选择器 · 层叠与继承 —— 从基础到进阶的完整实践记录</p>
+    <div class="meta">
+        <i>学号 110</i>
+        <i>计算机24001班</i>
+        <i>原生 HTML / CSS</i>
+    </div>
+</header>
+
+<!-- ========== 目录标题 ========== -->
+<div class="section-title">
+    <h2>课堂实践<em>目录</em></h2>
+    <div class="line"></div>
+</div>
+
+<!-- ========== 页面卡片 ========== -->
+<main class="cards">
+
+    <article class="card">
+        <span class="num">01</span>
+        <span class="tag">HTML 基础</span>
+        <h3>2-1 HTML 基础入门</h3>
+        <p class="desc">认识 HTML 的基本结构——开始标签、内容与结束标记；通过《山居秋暝》、阅兵武器列表与三色姓名盒，实践内容与样式相分离。</p>
+        <div class="tags">
+            <i>标签结构</i><i>内容与样式分离</i><i>无序列表</i><i>内联样式</i>
+        </div>
+        <div class="foot">
+            <span class="path">./2-1.html</span>
+            <a class="go" href="./2-1.html">进入页面<span class="arr">→</span></a>
+        </div>
+    </article>
+
+    <article class="card">
+        <span class="num">02</span>
+        <span class="tag">HTML 进阶</span>
+        <h3>2-2 超链接 · 图片 · 表格</h3>
+        <p class="desc">练习超链接的多种写法（外部链接、新窗口打开、相对路径），掌握 img 图片标签的常用属性，并完成一个带表头的四行三列表格。</p>
+        <div class="tags">
+            <i>超链接</i><i>相对路径</i><i>img 图片</i><i>表格 table</i>
+        </div>
+        <div class="foot">
+            <span class="path">./2-2.html</span>
+            <a class="go" href="./2-2.html">进入页面<span class="arr">→</span></a>
+        </div>
+    </article>
+
+    <article class="card">
+        <span class="num">03</span>
+        <span class="tag">表单 Form</span>
+        <h3>3-1 表单综合实践</h3>
+        <p class="desc">综合表单练习：用户名、密码、性别单选、爱好复选、籍贯下拉框、个人介绍文本域、出生日期、多文件上传，以及普通 / 提交 / 重置按钮。</p>
+        <div class="tags">
+            <i>input 控件</i><i>单选 / 复选</i><i>下拉框</i><i>文本域</i><i>文件上传</i>
+        </div>
+        <div class="foot">
+            <span class="path">./3-1from.html</span>
+            <a class="go" href="./3-1from.html">进入页面<span class="arr">→</span></a>
+        </div>
+    </article>
+
+    <article class="card">
+        <span class="num">04</span>
+        <span class="tag">CSS 基础</span>
+        <h3>3-2 层叠样式表 CSS</h3>
+        <p class="desc">通过内嵌样式表实践 CSS 基础：元素选择器、类选择器、id 选择器的写法，以及彩色文字与盒子的宽高、背景颜色设置。</p>
+        <div class="tags">
+            <i>元素选择器</i><i>类选择器</i><i>id 选择器</i><i>盒子样式</i>
+        </div>
+        <div class="foot">
+            <span class="path">./3-2css.html</span>
+            <a class="go" href="./3-2css.html">进入页面<span class="arr">→</span></a>
+        </div>
+    </article>
+
+    <article class="card">
+        <span class="num">05</span>
+        <span class="tag">CSS 进阶</span>
+        <h3>4-1 群组与后代选择器</h3>
+        <p class="desc">进阶 CSS 选择器：使用群组选择器统一初始化边距，用后代选择器控制盒子内元素的间距、行高、首行缩进与文字颜色。</p>
+        <div class="tags">
+            <i>群组选择器</i><i>后代选择器</i><i>文本样式</i>
+        </div>
+        <div class="foot">
+            <span class="path">./4-1-css2.html</span>
+            <a class="go" href="./4-1-css2.html">进入页面<span class="arr">→</span></a>
+        </div>
+    </article>
+
+    <article class="card">
+        <span class="num">06</span>
+        <span class="tag">CSS 核心机制</span>
+        <h3>5-1 层叠与继承</h3>
+        <p class="desc">结合外部样式表 css.css 与内嵌样式，验证 CSS 层叠规则与选择器优先级（id &gt; class &gt; 标签），并理解 !important 的作用。</p>
+        <div class="tags">
+            <i>选择器优先级</i><i>层叠规则</i><i>!important</i><i>外部样式表</i>
+        </div>
+        <div class="foot">
+            <span class="path">./5-1-cascade.html</span>
+            <a class="go" href="./5-1-cascade.html">进入页面<span class="arr">→</span></a>
+        </div>
+    </article>
+
+    <article class="card">
+        <span class="num">07</span>
+        <span class="tag">CSS 盒模型</span>
+        <h3>5-2 盒模型</h3>
+        <p class="desc">学习盒模型的核心概念：内容区、内边距、边框与外边距，进一步理解元素尺寸与布局间距的控制方式。</p>
+        <div class="tags">
+            <i>width / height</i><i>padding</i><i>border</i><i>margin</i><i>盒模型</i>
+        </div>
+        <div class="foot">
+            <span class="path">./5-2-box-model.html</span>
+            <a class="go" href="./5-2-box-model.html">进入页面<span class="arr">→</span></a>
+        </div>
+    </article>
+
+    <article class="card">
+        <span class="num">08</span>
+        <span class="tag">CSS 布局</span>
+        <h3>6-1 Flex 弹性布局</h3>
+        <p class="desc">通过弹性布局实现横向排列、居中对齐与间距控制，体验现代网页中常用的布局方式与可维护的 CSS 结构。</p>
+        <div class="tags">
+            <i>display: flex</i><i>justify-content</i><i>align-items</i><i>布局</i>
+        </div>
+        <div class="foot">
+            <span class="path">./6-1-flex.html</span>
+            <a class="go" href="./6-1-flex.html">进入页面<span class="arr">→</span></a>
+        </div>
+    </article>
+
+    <article class="card">
+        <span class="num">09</span>
+        <span class="tag">双栏布局</span>
+        <h3>6-2 一左一右</h3>
+        <p class="desc">练习左右分栏结构的实现，巩固块级元素的排列规则与不同布局样式在实际页面中的组合运用。</p>
+        <div class="tags">
+            <i>左右分栏</i><i>布局结构</i><i>区域划分</i><i>视觉层次</i>
+        </div>
+        <div class="foot">
+            <span class="path">./6-2-two-column.html</span>
+            <a class="go" href="./6-2-two-column.html">进入页面<span class="arr">→</span></a>
+        </div>
+    </article>
+
+    <article class="card">
+        <span class="num">10</span>
+        <span class="tag">内容排版</span>
+        <h3>7-1 上图下文</h3>
+        <p class="desc">通过“图在上、文在下”的版式实践，进一步熟悉图片与文本组合、间距控制和页面内容层级的组织方式。</p>
+        <div class="tags">
+            <i>图片布局</i><i>文本排版</i><i>组合结构</i><i>版式设计</i>
+        </div>
+        <div class="foot">
+            <span class="path">./7-1 上图下文.html</span>
+            <a class="go" href="./7-1 上图下文.html">进入页面<span class="arr">→</span></a>
+        </div>
+    </article>
+
+    <article class="card">
+        <span class="num">11</span>
+        <span class="tag">内容排版</span>
+        <h3>7-1 图文排版（image-top）</h3>
+        <p class="desc">通过图片置顶、正文在下的版式练习，强化元素排列、边距控制及首屏内容展示中的视觉平衡。</p>
+        <div class="tags">
+            <i>image-top</i><i>图文结构</i><i>响应式样式</i><i>排版</i>
+        </div>
+        <div class="foot">
+            <span class="path">./7-1-image-top.html</span>
+            <a class="go" href="./7-1-image-top.html">进入页面<span class="arr">→</span></a>
+        </div>
+    </article>
+
+    <article class="card">
+        <span class="num">12</span>
+        <span class="tag">内容排版</span>
+        <h3>7-2 左图右文</h3>
+        <p class="desc">借助左右双栏排版设计常见文章页结构，掌握图片与正文的布局关系，提升网页内容展示的整体美观度。</p>
+        <div class="tags">
+            <i>左右分栏</i><i>图文布局</i><i>内容展示</i><i>视觉设计</i>
+        </div>
+        <div class="foot">
+            <span class="path">./7-2-image-left.html</span>
+            <a class="go" href="./7-2-image-left.html">进入页面<span class="arr">→</span></a>
+        </div>
+    </article>
+
+    <article class="card">
+        <span class="num">13</span>
+        <span class="tag">CSS3 选择器</span>
+        <h3>8-1 CSS3 选择器</h3>
+        <p class="desc">学习现代 CSS3 选择器的用法，包括属性选择器、伪类与伪元素的搭配，让样式控制更精准、更灵活。</p>
+        <div class="tags">
+            <i>属性选择器</i><i>伪类</i><i>伪元素</i><i>CSS3</i>
+        </div>
+        <div class="foot">
+            <span class="path">./8-1 css3选择器.html</span>
+            <a class="go" href="./8-1 css3选择器.html">进入页面<span class="arr">→</span></a>
+        </div>
+    </article>
+
+    <article class="card">
+        <span class="num">14</span>
+        <span class="tag">过渡动画</span>
+        <h3>9-1 transition 过渡</h3>
+        <p class="desc">综合练习 CSS 过渡动画：hover、变化属性、持续时间与缓动函数的组合应用，增强页面交互感和动态效果。</p>
+        <div class="tags">
+            <i>transition</i><i>hover</i><i>缓动函数</i><i>动画交互</i>
+        </div>
+        <div class="foot">
+            <span class="path">./9-1 transition.html</span>
+            <a class="go" href="./9-1 transition.html">进入页面<span class="arr">→</span></a>
+        </div>
+    </article>
+
+</main>
+
+<!-- ========== 本页任务提示词 ========== -->
+<section class="prompt-box">
+    <div class="inner">
+        <div class="head">
+            <span class="dot"></span>
+            <h2>本页任务提示词</h2>
+        </div>
+        <p>创建一个新页面，包括本目录下的所有网页的超链接，使用原生代码，不使用cdn，新页面名称为index.html，主题为解浩帅的《高级网页设计》课堂实践，美化页面，页面中包括本提示词。</p>
+    </div>
+</section>
+
+<!-- ========== 页脚 ========== -->
+<footer>
+    <strong>解浩帅的《高级网页设计》课堂实践</strong> · 所有页面均为原生 HTML / CSS 编写，未使用任何 CDN 资源
+    <div class="res">配套资源：css.css（外部样式表，被「5-1 层叠与继承」页面引用）</div>
+</footer>
+
+</body>
+</html>

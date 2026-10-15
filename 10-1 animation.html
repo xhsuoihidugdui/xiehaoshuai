@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>CSS 颜色动画</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #f3f3f3;
+    }
+
+    .box {
+      width: 220px;
+      height: 220px;
+      border-radius: 20px;
+      background: #ff6b6b;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+      animation: colorChange 8s ease-in-out infinite;
+    }
+
+    @keyframes colorChange {
+      0% {
+        background: #ff6b6b;   /* 红 */
+      }
+      25% {
+        background: #ffd93d;   /* 黄 */
+      }
+      50% {
+        background: #6c63ff;   /* 蓝 */
+      }
+      75% {
+        background: #2ec4b6;   /* 绿 */
+      }
+      100% {
+        background: #ff6b6b;   /* 回到红 */
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="box"></div>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>12-1 CSS 变量</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        :root{
+            --xie-primary:#1e6fd9;
+            --xie-accent:#f5a623;
+            --xie-dark:#12283f;
+            --xie-light:#f4f7fb;
+            --xie-ink:#2b2b2b;
+            --xie-radius:12px;
+            --xie-shadow:0 8px 30px rgba(0,0,0,.15);
+            --xie-gap:24px;
+            --xie-font:"Microsoft YaHei","PingFang SC",Arial,sans-serif;
+        }
+        body{
+            font-family:var(--xie-font);
+            background:var(--xie-light);
+            color:var(--xie-ink);
+            min-height:100vh;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            padding:60px 20px;
+        }
+        .xie-title{
+            font-size:36px;
+            color:var(--xie-primary);
+            margin-bottom:8px;
+        }
+        .xie-subtitle{
+            font-size:15px;
+            color:var(--xie-accent);
+            margin-bottom:50px;
+            font-weight:bold;
+        }
+        .xie-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+            gap:var(--xie-gap);
+            max-width:1000px;
+            width:100%;
+            margin-bottom:50px;
+        }
+        .xie-card{
+            background:#fff;
+            border-radius:var(--xie-radius);
+            box-shadow:var(--xie-shadow);
+            padding:32px 24px;
+            text-align:center;
+            transition:transform .3s ease,box-shadow .3s ease;
+            border-top:4px solid var(--xie-primary);
+        }
+        .xie-card:hover{
+            transform:translateY(-6px);
+            box-shadow:0 16px 40px rgba(0,0,0,.2);
+        }
+        .xie-card:nth-child(2){border-top-color:var(--xie-accent);}
+        .xie-card:nth-child(3){border-top-color:var(--xie-dark);}
+        .xie-card:nth-child(4){border-top-color:#e74c3c;}
+        .xie-card-label{
+            font-size:13px;
+            color:#888;
+            margin-bottom:8px;
+            text-transform:uppercase;
+            letter-spacing:1px;
+        }
+        .xie-card-value{
+            font-size:28px;
+            font-weight:bold;
+            color:var(--xie-primary);
+        }
+        .xie-card:nth-child(2) .xie-card-value{color:var(--xie-accent);}
+        .xie-card:nth-child(3) .xie-card-value{color:var(--xie-dark);}
+        .xie-card:nth-child(4) .xie-card-value{color:#e74c3c;}
+        .xie-demo{
+            background:var(--xie-dark);
+            border-radius:var(--xie-radius);
+            box-shadow:var(--xie-shadow);
+            padding:40px;
+            max-width:1000px;
+            width:100%;
+            text-align:center;
+        }
+        .xie-demo-title{
+            font-size:16px;
+            color:rgba(255,255,255,.6);
+            margin-bottom:16px;
+        }
+        .xie-demo-text{
+            font-size:42px;
+            font-weight:bold;
+            background:linear-gradient(90deg,var(--xie-primary),var(--xie-accent));
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+            background-clip:text;
+            margin-bottom:24px;
+        }
+        .xie-btn{
+            display:inline-block;
+            padding:14px 40px;
+            border-radius:var(--xie-radius);
+            background:var(--xie-primary);
+            color:#fff;
+            font-size:16px;
+            font-weight:bold;
+            border:none;
+            cursor:pointer;
+            transition:background .3s ease,transform .2s ease;
+        }
+        .xie-btn:hover{
+            background:var(--xie-accent);
+            transform:scale(1.05);
+        }
+        .xie-code{
+            margin-top:40px;
+            background:#1a1a2e;
+            border-radius:var(--xie-radius);
+            padding:24px;
+            max-width:1000px;
+            width:100%;
+            text-align:left;
+            overflow-x:auto;
+        }
+        .xie-code pre{
+            font-family:Consolas,Monaco,monospace;
+            font-size:14px;
+            line-height:1.8;
+            color:#a8d8a8;
+        }
+        .xie-code .xie-comment{color:#6a9955;}
+        .xie-code .xie-prop{color:#9cdcfe;}
+        .xie-code .xie-value{color:#ce9178;}
+    </style>
+</head>
+<body>
+    <h1 class="xie-title">CSS 变量示例</h1>
+    <p class="xie-subtitle">解浩帅</p>
+
+    <div class="xie-grid">
+        <div class="xie-card">
+            <div class="xie-card-label">主色调</div>
+            <div class="xie-card-value">--xie-primary</div>
+        </div>
+        <div class="xie-card">
+            <div class="xie-card-label">强调色</div>
+            <div class="xie-card-value">--xie-accent</div>
+        </div>
+        <div class="xie-card">
+            <div class="xie-card-label">深色</div>
+            <div class="xie-card-value">--xie-dark</div>
+        </div>
+        <div class="xie-card">
+            <div class="xie-card-label">圆角</div>
+            <div class="xie-card-value">--xie-radius</div>
+        </div>
+    </div>
+
+    <div class="xie-demo">
+        <p class="xie-demo-title">使用 CSS 变量实现的文字渐变效果</p>
+        <div class="xie-demo-text">解浩帅</div>
+        <button class="xie-btn">按钮使用变量样式</button>
+    </div>
+
+    <div class="xie-code">
+        <pre><span class="xie-comment">/* :root 中定义变量 */</span>
+<span class="xie-prop">:root</span> {
+  <span class="xie-prop">--xie-primary</span>: <span class="xie-value">#1e6fd9</span>;
+  <span class="xie-prop">--xie-accent</span>: <span class="xie-value">#f5a623</span>;
+  <span class="xie-prop">--xie-radius</span>: <span class="xie-value">12px</span>;
+}
+
+<span class="xie-comment">/* 使用 var() 引用变量 */</span>
+<span class="xie-prop">.xie-card</span> {
+  <span class="xie-prop">border-radius</span>: <span class="xie-value">var(--xie-radius)</span>;
+  <span class="xie-prop">border-top-color</span>: <span class="xie-value">var(--xie-primary)</span>;
+}</pre>
+    </div>
+</body>
+</html>

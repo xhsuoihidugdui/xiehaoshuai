@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>11-4 CSS3 3D 画廊</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        :root{
+            --xie-primary:#1e6fd9;
+            --xie-accent:#f5a623;
+            --xie-dark:#12283f;
+            --xie-light:#f4f7fb;
+            --xie-ink:#2b2b2b;
+        }
+        body{
+            font-family:"Microsoft YaHei","PingFang SC",Arial,sans-serif;
+            background:linear-gradient(180deg,#0b1f3a 0%,#123a6b 60%,var(--xie-dark) 100%);
+            color:var(--xie-ink);
+            min-height:100vh;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            padding:50px 20px;
+            overflow:hidden;
+        }
+        h1{
+            font-size:32px;
+            color:#fff;
+            margin-bottom:8px;
+            text-shadow:0 4px 18px rgba(0,0,0,.35);
+        }
+        .xie-subtitle{
+            font-size:14px;
+            color:rgba(255,255,255,.7);
+            margin-bottom:50px;
+        }
+        .xie-gallery-scene{
+            width:100%;
+            height:400px;
+            perspective:1200px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            overflow:hidden;
+        }
+        .xie-carousel{
+            width:220px;
+            height:280px;
+            position:relative;
+            transform-style:preserve-3d;
+            animation:xie-rotate-gallery 18s linear infinite;
+        }
+        .xie-carousel:hover{
+            animation-play-state:paused;
+        }
+        .xie-slide{
+            position:absolute;
+            width:220px;
+            height:280px;
+            border-radius:12px;
+            overflow:hidden;
+            border:3px solid rgba(255,255,255,.9);
+            box-shadow:0 12px 40px rgba(0,0,0,.5);
+            backface-visibility:hidden;
+        }
+        .xie-slide img{
+            width:100%;
+            height:100%;
+            object-fit:cover;
+            display:block;
+        }
+        .xie-slide:nth-child(1){transform:rotateY(0deg) translateZ(340px);}
+        .xie-slide:nth-child(2){transform:rotateY(60deg) translateZ(340px);}
+        .xie-slide:nth-child(3){transform:rotateY(120deg) translateZ(340px);}
+        .xie-slide:nth-child(4){transform:rotateY(180deg) translateZ(340px);}
+        .xie-slide:nth-child(5){transform:rotateY(240deg) translateZ(340px);}
+        .xie-slide:nth-child(6){transform:rotateY(300deg) translateZ(340px);}
+        @keyframes xie-rotate-gallery{
+            from{transform:rotateY(0deg);}
+            to{transform:rotateY(360deg);}
+        }
+        .xie-wall{
+            display:flex;
+            gap:32px;
+            margin-top:60px;
+            perspective:900px;
+        }
+        .xie-frame{
+            width:200px;
+            height:150px;
+            border-radius:10px;
+            overflow:hidden;
+            border:4px solid rgba(255,255,255,.85);
+            box-shadow:0 8px 30px rgba(0,0,0,.4);
+            transform:rotateX(5deg);
+            transition:transform .5s ease,box-shadow .5s ease;
+            cursor:pointer;
+        }
+        .xie-frame:hover{
+            transform:rotateX(0deg) scale(1.15);
+            box-shadow:0 20px 50px rgba(30,111,217,.4);
+            z-index:10;
+        }
+        .xie-frame img{
+            width:100%;
+            height:100%;
+            object-fit:cover;
+            display:block;
+        }
+        .xie-floor{
+            margin-top:50px;
+            display:flex;
+            gap:28px;
+            perspective:800px;
+        }
+        .xie-floor-item{
+            width:160px;
+            height:110px;
+            border-radius:10px;
+            overflow:hidden;
+            border:3px solid rgba(255,255,255,.7);
+            box-shadow:0 6px 20px rgba(0,0,0,.35);
+            transform:rotateX(55deg);
+            transition:transform .4s ease;
+        }
+        .xie-floor-item:hover{
+            transform:rotateX(35deg) scale(1.1);
+        }
+        .xie-floor-item img{
+            width:100%;
+            height:100%;
+            object-fit:cover;
+            display:block;
+        }
+        .xie-tip{
+            margin-top:40px;
+            font-size:13px;
+            color:rgba(255,255,255,.5);
+        }
+    </style>
+</head>
+<body>
+    <h1>CSS3 3D 画廊</h1>
+    <p class="xie-subtitle">3D 旋转画廊 · 透视墙 · 地面镜像 — 使用 preserve-3d 与 perspective 构建</p>
+
+    <div class="xie-gallery-scene">
+        <div class="xie-carousel">
+            <div class="xie-slide"><img src="./img/1.jpg" alt="画廊图片1"></div>
+            <div class="xie-slide"><img src="./img/2.jpg" alt="画廊图片2"></div>
+            <div class="xie-slide"><img src="./img/3.jpg" alt="画廊图片3"></div>
+            <div class="xie-slide"><img src="./img/a1.png" alt="画廊图片4"></div>
+            <div class="xie-slide"><img src="./img/a2.jpg" alt="画廊图片5"></div>
+            <div class="xie-slide"><img src="./img/a3.jpg" alt="画廊图片6"></div>
+        </div>
+    </div>
+
+    <div class="xie-wall">
+        <div class="xie-frame"><img src="./img/1.jpg" alt="墙面图片1"></div>
+        <div class="xie-frame"><img src="./img/2.jpg" alt="墙面图片2"></div>
+        <div class="xie-frame"><img src="./img/3.jpg" alt="墙面图片3"></div>
+        <div class="xie-frame"><img src="./img/a1.png" alt="墙面图片4"></div>
+    </div>
+
+    <div class="xie-floor">
+        <div class="xie-floor-item"><img src="./img/a2.jpg" alt="地面图片1"></div>
+        <div class="xie-floor-item"><img src="./img/a3.jpg" alt="地面图片2"></div>
+        <div class="xie-floor-item"><img src="./img/1.jpg" alt="地面图片3"></div>
+        <div class="xie-floor-item"><img src="./img/2.jpg" alt="地面图片4"></div>
+    </div>
+
+    <p class="xie-tip">悬停可暂停旋转画廊 / 悬停墙面与地面图片查看交互效果</p>
+</body>
+</html>
