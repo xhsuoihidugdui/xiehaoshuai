@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>iconfont 字体图标 - 移动端底部导航</title>
+    <link rel="stylesheet" href="cdn/iconfont.css">
+    <style>
+        :root {
+            --xie-primary: #3498db;
+            --xie-dark: #2c3e50;
+            --xie-light: #ecf0f1;
+            --xie-nav-bg: #ffffff;
+            --xie-nav-text: #95a5a6;
+            --xie-nav-active: #3498db;
+            --xie-badge: #e74c3c;
+            --xie-dot: #ff3b30;
+            --xie-nav-height: 56px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--xie-light);
+            padding-bottom: var(--xie-nav-height);
+        }
+
+        .xie-header {
+            background: var(--xie-primary);
+            color: #fff;
+            padding: 60px 20px 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .xie-header h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .xie-content {
+            padding: 20px;
+        }
+
+        .xie-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .xie-card h3 {
+            font-size: 16px;
+            color: var(--xie-dark);
+            margin-bottom: 10px;
+        }
+
+        .xie-card p {
+            font-size: 14px;
+            color: #7f8c8d;
+            line-height: 1.6;
+        }
+
+        .xie-demo-text {
+            font-size: 24px;
+            color: var(--xie-primary);
+            margin-top: 10px;
+        }
+
+        .xie-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: var(--xie-nav-height);
+            background: var(--xie-nav-bg);
+            display: flex;
+            border-top: 1px solid #e0e0e0;
+            z-index: 999;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .xie-nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            color: var(--xie-nav-text);
+            text-decoration: none;
+            transition: color 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .xie-nav-item.xie-active {
+            color: var(--xie-nav-active);
+        }
+
+        .xie-nav-icon {
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        .xie-nav-label {
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .xie-badge {
+            position: absolute;
+            top: 6px;
+            right: calc(50% - 26px);
+            min-width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            background: var(--xie-badge);
+            color: #fff;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            line-height: 1;
+        }
+
+        .xie-dot {
+            position: absolute;
+            top: 8px;
+            right: calc(50% - 22px);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--xie-dot);
+        }
+
+        .xie-badge.xie-hidden,
+        .xie-dot.xie-hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="xie-header">
+        <h1>iconfont 字体图标导航</h1>
+    </div>
+
+    <div class="xie-content">
+        <div class="xie-card">
+            <h3>字体图标 (iconfont)</h3>
+            <p>本项目使用 iconfont.cn 导出的字体文件，通过 @font-face 加载字体，使用 :before 伪元素配合 content 属性显示图标。</p>
+            <p class="xie-demo-text">
+                <i class="iconfont icon-shouye-zhihui"></i>
+                <i class="iconfont icon-xiaoxi-zhihui"></i>
+                <i class="iconfont icon-faxian"></i>
+                <i class="iconfont icon-wode"></i>
+            </p>
+        </div>
+        <div class="xie-card">
+            <h3>技术特点</h3>
+            <p>字体图标通过 Unicode 字符映射图标，一个字体文件包含所有图标，体积小，加载快。支持 CSS 的 color、font-size 等属性控制样式。</p>
+        </div>
+        <div class="xie-card">
+            <h3>底部导航说明</h3>
+            <p>底部固定导航使用 flex:1 实现自适应宽度分配，导航项包含数字徽章（消息）和右上角红点（发现）两种状态标记。</p>
+        </div>
+    </div>
+
+    <nav class="xie-bottom-nav">
+        <a class="xie-nav-item xie-active" href="javascript:void(0)">
+            <span class="xie-nav-icon iconfont icon-shouye-zhihui"></span>
+            <span class="xie-nav-label">首页</span>
+        </a>
+        <a class="xie-nav-item" href="javascript:void(0)">
+            <span class="xie-nav-icon iconfont icon-xiaoxi-zhihui"></span>
+            <span class="xie-nav-label">消息</span>
+            <span class="xie-badge">8</span>
+        </a>
+        <a class="xie-nav-item" href="javascript:void(0)">
+            <span class="xie-nav-icon iconfont icon-faxian"></span>
+            <span class="xie-nav-label">发现</span>
+            <span class="xie-dot"></span>
+        </a>
+        <a class="xie-nav-item" href="javascript:void(0)">
+            <span class="xie-nav-icon iconfont icon-wode"></span>
+            <span class="xie-nav-label">我的</span>
+        </a>
+    </nav>
+</body>
+</html>

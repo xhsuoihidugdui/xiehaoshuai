@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>iconfont SVG 图标 - 移动端底部导航</title>
+    <style>
+        :root {
+            --xie-primary: #3498db;
+            --xie-dark: #2c3e50;
+            --xie-light: #ecf0f1;
+            --xie-nav-bg: #ffffff;
+            --xie-nav-text: #95a5a6;
+            --xie-nav-active: #3498db;
+            --xie-badge: #e74c3c;
+            --xie-dot: #ff3b30;
+            --xie-nav-height: 56px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--xie-light);
+            padding-bottom: var(--xie-nav-height);
+        }
+
+        .xie-header {
+            background: var(--xie-primary);
+            color: #fff;
+            padding: 60px 20px 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .xie-header h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .xie-content {
+            padding: 20px;
+        }
+
+        .xie-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .xie-card h3 {
+            font-size: 16px;
+            color: var(--xie-dark);
+            margin-bottom: 10px;
+        }
+
+        .xie-card p {
+            font-size: 14px;
+            color: #7f8c8d;
+            line-height: 1.6;
+        }
+
+        .xie-demo-text {
+            margin-top: 10px;
+            display: flex;
+            gap: 16px;
+        }
+
+        .xie-demo-text svg {
+            width: 28px;
+            height: 28px;
+            color: var(--xie-primary);
+        }
+
+        .xie-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: var(--xie-nav-height);
+            background: var(--xie-nav-bg);
+            display: flex;
+            border-top: 1px solid #e0e0e0;
+            z-index: 999;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .xie-nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            color: var(--xie-nav-text);
+            text-decoration: none;
+            transition: color 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .xie-nav-item.xie-active {
+            color: var(--xie-nav-active);
+        }
+
+        .xie-nav-item svg {
+            width: 26px;
+            height: 26px;
+        }
+
+        .xie-nav-label {
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .xie-badge {
+            position: absolute;
+            top: 6px;
+            right: calc(50% - 26px);
+            min-width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            background: var(--xie-badge);
+            color: #fff;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            line-height: 1;
+        }
+
+        .xie-dot {
+            position: absolute;
+            top: 8px;
+            right: calc(50% - 22px);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--xie-dot);
+        }
+    </style>
+</head>
+<body>
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+        <symbol id="icon-shouye-zhihui" viewBox="0 0 1024 1024"><path d="M468.906667 57.941333a68.394667 68.394667 0 0 1 86.165333 0l399.936 322.624c30.058667 24.234667 35.136 68.693333 11.328 99.328a69.269333 69.269333 0 0 1-37.802667 24.768l-3.712 0.810667 0.021334 361.514667c0 59.370667-44.48 108.48-102.528 113.877333l-4.736 0.362667-4.949334 0.106666H211.370667c-59.84 0-109.056-47.808-112.106667-109.312l-0.106667-5.034666-0.021333-361.514667-2.453333-0.490667c-29.696-6.848-52.16-33.088-53.909334-64.96L42.666667 436.010667c0-21.610667 9.685333-42.026667 26.325333-55.466667z m46.72 50.026667a5.76 5.76 0 0 0-7.253334 0L108.864 431.146667a6.058667 6.058667 0 0 0-2.218667 4.693333c0 3.328 2.624 6.016 5.866667 6.016h18.816c17.536-0.021333 31.744 14.506667 31.744 32.405333v392.533334l0.064 3.392C164.437333 896.533333 185.792 917.333333 211.712 917.333333h599.765333l3.328-0.085333c25.770667-1.322667 46.101333-23.146667 46.101334-49.621333V474.282667c0-17.92 14.208-32.426667 31.744-32.426667h18.816c1.792 0 3.477333-0.832 4.608-2.261333a6.101333 6.101333 0 0 0-0.96-8.426667z m138.133333 564.693333a32 32 0 0 1-3.754667 45.098667C610.858667 750.890667 568.106667 768 522.666667 768c-45.44 0-88.192-17.109333-127.36-50.24a32 32 0 1 1 41.386666-48.853333C464.704 692.650667 493.056 704 522.666667 704c29.589333 0 57.941333-11.349333 85.973333-35.093333a32 32 0 0 1 45.12 3.754666z"/></symbol>
+        <symbol id="icon-xiaoxi-zhihui" viewBox="0 0 1024 1024"><path d="M523.946667 85.333333C802.773333 85.333333 982.826667 307.541333 982.826667 511.338667c0 242.837333-197.397333 448-458.837334 448-84.16 0-150.464-16.597333-221.610666-55.402667l-88.618667 50.197333c-27.797333 8.426667-50.474667 5.162667-68.010667-9.834666-17.557333-14.997333-25.130667-34.730667-22.72-59.2a19570.688 19570.688 0 0 0 29.653334-106.368C123.008 741.76 64 656.426667 64 511.338667 64 307.541333 245.141333 85.333333 523.946667 85.333333z m-1.28 64c-225.706667 0-390.826667 184.746667-390.826667 362.005334 0 126.037333 54.442667 217.813333 122.709333 272.810666l5.845334 4.48 19.029333 108.458667 91.477333-51.797333 8.213334 2.432c55.722667 14.634667 104.874667 20.906667 154.346667 20.906667 17.408 0 34.602667-1.109333 51.541333-3.242667l4.437334-0.554667 3.925333 1.664c59.733333 22.869333 125.098667 33.194667 199.04 33.194667 45.44 0 88.192-7.424 127.36-23.296a32 32 0 1 1 25.002666 58.88c-50.773333 20.650667-108.373333 30.72-172.352 30.72-84.437333 0-157.525333-12.586667-227.669333-36.608l-3.754667-1.28-4.138666 0.64c-22.826667 3.498667-46.08 5.376-69.632 5.376-58.112 0-114.432-7.424-167.424-22.016l-7.765334-2.133333-11.946666 6.912-106.026667 60.416 106.666667-60.416 20.778666 62.549333c23.893333-29.866667 41.6-66.346667 52.352-111.573333l2.773333-11.776 11.008 4.608c38.186667 15.402667 81.152 23.210667 127.445333 23.210667 253.013333 0 426.666667-197.973333 426.666667-416.768 0-218.752-173.653333-416.768-426.666666-416.768z"/></symbol>
+        <symbol id="icon-faxian" viewBox="0 0 1024 1024"><path d="M512 938.666667c235.648 0 426.666667-191.018667 426.666667-426.666667S747.648 85.333333 512 85.333333 85.333333 276.352 85.333333 512s191.018667 426.666667 426.666667 426.666667z m0 64c-271.488 0-490.666667-219.178667-490.666667-490.666667S240.512 21.333333 512 21.333333 1002.666667 240.512 1002.666667 512 783.488 1002.666667 512 1002.666667z m214.997333-677.504a32 32 0 0 1 4.309334 45.141333l-314.197334 338.346667a32 32 0 0 1-40.832 4.309333l-153.6-107.52a32 32 0 1 1 40.832-49.493333l132.352 92.672 285.994666-307.882667a32 32 0 0 1 45.141334-4.309333z"/></symbol>
+        <symbol id="icon-wode" viewBox="0 0 1024 1024"><path d="M512 554.666667c-174.933333 0-318.293333-135.68-330.666667-307.2h661.333334C830.293333 418.986667 686.933333 554.666667 512 554.666667zM181.333333 597.333333h661.333334v-42.666666H181.333333v42.666666z m0 64h661.333334v42.666667H181.333333v-42.666667z m0 128h661.333334v42.666667H181.333333v-42.666667z m170.666667-384c75.52 0 138.666667-63.146667 138.666667-138.666667S427.52 128 352 128s-138.666667 63.146667-138.666667 138.666667 63.146667 138.666666 138.666667 138.666666z m0-42.666667c-52.053333 0-96-43.946667-96-96s43.946667-96 96-96 96 43.946667 96 96-43.946667 96-96 96z m341.333333 21.333334c75.52 0 138.666667 63.146666 138.666667 138.666666V640h-277.333333v-55.466667c0-75.52 63.146667-138.666667 138.666666-138.666667z m0 42.666666c-52.053333 0-96 43.946667-96 96V640h192v-55.466667c0-52.053333-43.946667-96-96-96z"/></symbol>
+    </svg>
+
+    <div class="xie-header">
+        <h1>iconfont SVG 图标导航</h1>
+    </div>
+
+    <div class="xie-content">
+        <div class="xie-card">
+            <h3>SVG 图标 (iconfont)</h3>
+            <p>使用 iconfont.cn 导出的 SVG symbol 定义，通过 SVG use 元素引用图标。每个图标是独立的矢量图形，支持 CSS fill 属性控制颜色。</p>
+            <div class="xie-demo-text">
+                <svg><use href="#icon-shouye-zhihui"/></svg>
+                <svg><use href="#icon-xiaoxi-zhihui"/></svg>
+                <svg><use href="#icon-faxian"/></svg>
+                <svg><use href="#icon-wode"/></svg>
+            </div>
+        </div>
+        <div class="xie-card">
+            <h3>技术特点</h3>
+            <p>SVG 图标基于矢量图形，通过 symbol 定义、use 引用实现复用。相比字体图标，SVG 支持多色、渐变等更丰富的视觉效果，且不受字体加载影响。</p>
+        </div>
+        <div class="xie-card">
+            <h3>底部导航说明</h3>
+            <p>底部固定导航使用 flex:1 实现自适应宽度分配，导航项包含数字徽章（消息）和右上角红点（发现）两种状态标记。</p>
+        </div>
+    </div>
+
+    <nav class="xie-bottom-nav">
+        <a class="xie-nav-item xie-active" href="javascript:void(0)">
+            <svg><use href="#icon-shouye-zhihui"/></svg>
+            <span class="xie-nav-label">首页</span>
+        </a>
+        <a class="xie-nav-item" href="javascript:void(0)">
+            <svg><use href="#icon-xiaoxi-zhihui"/></svg>
+            <span class="xie-nav-label">消息</span>
+            <span class="xie-badge">8</span>
+        </a>
+        <a class="xie-nav-item" href="javascript:void(0)">
+            <svg><use href="#icon-faxian"/></svg>
+            <span class="xie-nav-label">发现</span>
+            <span class="xie-dot"></span>
+        </a>
+        <a class="xie-nav-item" href="javascript:void(0)">
+            <svg><use href="#icon-wode"/></svg>
+            <span class="xie-nav-label">我的</span>
+        </a>
+    </nav>
+</body>
+</html>
