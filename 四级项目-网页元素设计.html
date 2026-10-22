@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<!-- 姓名：解浩帅，日期：2026-10-22，功能名称：四级项目-网页元素设计（导航、左图右文、上图下文） -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>四级项目 · 网页元素设计 — 解浩帅</title>
+    <link rel="stylesheet" href="./font/font_5244829_352pklrzxi1/iconfont.css">
+    <style>
+        /* ===== 全局公共CSS ===== */
+        :root {
+            --primary: #1e6fd9;
+            --primary-dark: #144f9e;
+            --accent: #f5a623;
+            --dark: #12283f;
+            --light: #f4f7fb;
+            --ink: #2b2b2b;
+            --muted: #5a6b7c;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        ul { list-style: none; }
+        img { display: block; }
+        a { text-decoration: none; color: inherit; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+            background: var(--light);
+            color: var(--ink);
+            line-height: 1.7;
+        }
+
+        /* ===== 页头 ===== */
+        .xhs-header {
+            background: linear-gradient(135deg, #0b1f3a 0%, #123a6b 55%, var(--primary) 100%);
+            color: #fff;
+            text-align: center;
+            padding: 48px 20px 40px;
+        }
+        .xhs-header h1 { font-size: 32px; letter-spacing: 2px; }
+        .xhs-header h1 span { color: var(--accent); }
+        .xhs-header p { margin-top: 8px; font-size: 14px; color: rgba(255, 255, 255, .8); letter-spacing: 1px; }
+
+        /* ===== 元素一：导航 ===== */
+        .xhs-nav {
+            background: #fff;
+            box-shadow: 0 2px 12px rgba(18, 40, 63, .08);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .xhs-nav-list {
+            max-width: 1080px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+        }
+        .xhs-nav-list a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 14px 34px;
+            font-size: 14px;
+            color: var(--muted);
+            border-bottom: 3px solid transparent;
+        }
+        .xhs-nav-list a .iconfont { font-size: 22px; }
+        .xhs-nav-list a:hover, .xhs-nav-list a.xhs-active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* ===== 区块通用 ===== */
+        .xhs-section {
+            max-width: 1080px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+        .xhs-section-title {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+        .xhs-section-title h2 { font-size: 24px; color: var(--dark); white-space: nowrap; }
+        .xhs-section-title h2 em { font-style: normal; color: var(--primary); }
+        .xhs-section-title .xhs-line { flex: 1; height: 2px; background: linear-gradient(90deg, var(--primary), transparent); }
+
+        /* ===== 元素二：左图右文 ===== */
+        .xhs-media {
+            display: flex;
+            gap: 20px;
+            background: #fff;
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 18px;
+            box-shadow: 0 4px 16px rgba(18, 40, 63, .06);
+        }
+        .xhs-media img {
+            width: 240px;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+        .xhs-media-body { flex: 1; display: flex; flex-direction: column; }
+        .xhs-media-body h3 { font-size: 19px; color: var(--dark); margin-bottom: 6px; }
+        .xhs-media-body p { font-size: 14px; color: var(--muted); flex: 1; }
+        .xhs-media-meta {
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--primary-dark);
+            display: flex;
+            gap: 18px;
+        }
+        .xhs-media-meta .iconfont { margin-right: 4px; }
+
+        /* ===== 元素三：上图下文 ===== */
+        .xhs-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+        }
+        .xhs-card {
+            background: #fff;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(18, 40, 63, .06);
+        }
+        .xhs-card img { width: 100%; height: 180px; object-fit: cover; }
+        .xhs-card-body { padding: 16px 18px 20px; }
+        .xhs-card-body h3 { font-size: 17px; color: var(--dark); margin-bottom: 6px; }
+        .xhs-card-body p { font-size: 13px; color: var(--muted); }
+        .xhs-card-tag {
+            display: inline-block;
+            margin-top: 12px;
+            font-size: 12px;
+            color: var(--primary-dark);
+            background: rgba(30, 111, 217, .1);
+            padding: 3px 12px;
+            border-radius: 999px;
+        }
+
+        /* ===== 页脚 ===== */
+        .xhs-footer {
+            background: var(--dark);
+            color: rgba(255, 255, 255, .7);
+            text-align: center;
+            padding: 24px 16px;
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 768px) {
+            .xhs-cards { grid-template-columns: 1fr; }
+            .xhs-media { flex-direction: column; }
+            .xhs-media img { width: 100%; height: 180px; }
+            .xhs-nav-list a { padding: 12px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========== 页头 ========== -->
+    <header class="xhs-header">
+        <h1>校园资讯<span>门户</span></h1>
+        <p>四级项目 · 网页元素设计 —— 导航 / 左图右文 / 上图下文</p>
+    </header>
+
+    <!-- ========== 元素一：导航 ========== -->
+    <nav class="xhs-nav">
+        <ul class="xhs-nav-list">
+            <li><a href="#" class="xhs-active"><i class="iconfont icon-shouye-zhihui"></i>首页</a></li>
+            <li><a href="#"><i class="iconfont icon-faxian"></i>发现</a></li>
+            <li><a href="#"><i class="iconfont icon-shoucang"></i>收藏</a></li>
+            <li><a href="#"><i class="iconfont icon-xiaoxi-zhihui"></i>消息</a></li>
+            <li><a href="#"><i class="iconfont icon-wode"></i>我的</a></li>
+        </ul>
+    </nav>
+
+    <!-- ========== 元素二：左图右文 ========== -->
+    <section class="xhs-section">
+        <div class="xhs-section-title">
+            <h2>左图右文 · <em>校园新闻</em></h2>
+            <div class="xhs-line"></div>
+        </div>
+
+        <article class="xhs-media">
+            <img src="./img/1.jpg" alt="校园新闻图片1">
+            <div class="xhs-media-body">
+                <h3>我校举办高级网页设计课程作品展</h3>
+                <p>本次展览集中展示了同学们在网页元素设计、布局排版与视觉表现方面的学习成果，涵盖导航、图文排版等多种典型网页元素。</p>
+                <div class="xhs-media-meta">
+                    <span><i class="iconfont icon-bianji"></i>解浩帅</span>
+                    <span><i class="iconfont icon-good"></i>128</span>
+                    <span><i class="iconfont icon-a-fenxiang2"></i>分享</span>
+                </div>
+            </div>
+        </article>
+
+        <article class="xhs-media">
+            <img src="./img/2.jpg" alt="校园新闻图片2">
+            <div class="xhs-media-body">
+                <h3>计算机24001班开展前端技术交流活动</h3>
+                <p>活动围绕 Flex 与 Grid 布局展开讨论，同学们结合实际案例分享了网页元素复用、CSS 选择器规范等企业开发中的常见实践。</p>
+                <div class="xhs-media-meta">
+                    <span><i class="iconfont icon-bianji"></i>解浩帅</span>
+                    <span><i class="iconfont icon-good"></i>96</span>
+                    <span><i class="iconfont icon-a-fenxiang2"></i>分享</span>
+                </div>
+            </div>
+        </article>
+
+        <article class="xhs-media">
+            <img src="./img/3.jpg" alt="校园新闻图片3">
+            <div class="xhs-media-body">
+                <h3>网页元素设计四级项目顺利完成</h3>
+                <p>项目选取导航、左图右文、上图下文三个典型网页元素，全程使用原生 HTML 与 CSS 实现，布局采用 Flex 与 Grid，代码符合企业开发规范。</p>
+                <div class="xhs-media-meta">
+                    <span><i class="iconfont icon-bianji"></i>解浩帅</span>
+                    <span><i class="iconfont icon-good"></i>76</span>
+                    <span><i class="iconfont icon-a-fenxiang2"></i>分享</span>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <!-- ========== 元素三：上图下文 ========== -->
+    <section class="xhs-section">
+        <div class="xhs-section-title">
+            <h2>上图下文 · <em>精彩推荐</em></h2>
+            <div class="xhs-line"></div>
+        </div>
+
+        <div class="xhs-cards">
+            <article class="xhs-card">
+                <img src="./img/a1.png" alt="推荐图片1">
+                <div class="xhs-card-body">
+                    <h3>网页元素设计要点</h3>
+                    <p>语义化 HTML 搭配复用性强的 class 选择器，是编写规范网页元素代码的基础。</p>
+                    <span class="xhs-card-tag">设计规范</span>
+                </div>
+            </article>
+
+            <article class="xhs-card">
+                <img src="./img/a2.jpg" alt="推荐图片2">
+                <div class="xhs-card-body">
+                    <h3>Flex 布局实战</h3>
+                    <p>弹性布局可以轻松实现导航排列、图文并排等常见结构，替代传统的 float 方案。</p>
+                    <span class="xhs-card-tag">布局技术</span>
+                </div>
+            </article>
+
+            <article class="xhs-card">
+                <img src="./img/a3.jpg" alt="推荐图片3">
+                <div class="xhs-card-body">
+                    <h3>Grid 网格排版</h3>
+                    <p>网格布局适合上图下文式卡片列表，一行代码即可完成等宽多列与响应式适配。</p>
+                    <span class="xhs-card-tag">布局技术</span>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- ========== 页脚 ========== -->
+    <footer class="xhs-footer">
+        解浩帅 · 高级网页设计I 四级项目 —— 原生 HTML / CSS 实现，图标来自本地 iconfont
+    </footer>
+
+</body>
+</html>
