@@ -36,3 +36,13 @@
 - model: Kimi-K3
 - prompt: 提交项目
 
+
+## 2026-10-22-16-26
+- model: Kimi-K3
+- prompt: 设置项目规则，所有变量名称、css类、id名称都以xhs_开始，所有html页面中都包括下列注释，注释内容：姓名：解浩帅，日期：功能名称。项目使用原生的html、css和javascript实现，图标使用font目录下的iconfont图标，不使用第三方库和cdn，使用fetch获取服务器端数据 `d:\高级网页设计/AGENTS.md`
+
+
+## 2026-10-22-16-34
+- model: Kimi-K3
+- prompt: 新建14-2.html文件，定义Javascript的六种基础数据类型并演示，然后提交项目。
+

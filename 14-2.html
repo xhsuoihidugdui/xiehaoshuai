@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<!-- 姓名：解浩帅，日期：2026-10-22，功能名称：JavaScript六种基础数据类型演示 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>14-2 JavaScript六种基础数据类型</title>
+    <style>
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .xhs-type-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 10px 0;
+        }
+        .xhs-type-name {
+            font-weight: bold;
+            color: #2c6fbb;
+        }
+        .xhs-type-result {
+            color: #666;
+            font-family: Consolas, monospace;
+        }
+    </style>
+</head>
+<body>
+    <h2>解浩帅：JavaScript六种基础数据类型</h2>
+    <div id="xhs-output"></div>
+
+    <script>
+        // 1. Number 数字类型
+        let xhsNumber = 42;
+        // 2. String 字符串类型
+        let xhsString = "解浩帅，你好";
+        // 3. Boolean 布尔类型
+        let xhsBoolean = true;
+        // 4. Undefined 未定义类型
+        let xhsUndefined;
+        // 5. Null 空类型
+        let xhsNull = null;
+        // 6. Symbol 符号类型（ES6新增，表示唯一值）
+        let xhsSymbol = Symbol("xhs");
+
+        const xhsTypes = [
+            { xhsName: "Number", xhsValue: xhsNumber },
+            { xhsName: "String", xhsValue: xhsString },
+            { xhsName: "Boolean", xhsValue: xhsBoolean },
+            { xhsName: "Undefined", xhsValue: xhsUndefined },
+            { xhsName: "Null", xhsValue: xhsNull },
+            { xhsName: "Symbol", xhsValue: xhsSymbol }
+        ];
+
+        const xhsOutput = document.getElementById("xhs-output");
+
+        xhsTypes.forEach(function (xhsItem) {
+            const xhsTypeofResult = typeof xhsItem.xhsValue;
+            // 页面展示
+            const xhsCard = document.createElement("div");
+            xhsCard.className = "xhs-type-card";
+            xhsCard.innerHTML =
+                '<span class="xhs-type-name">' + xhsItem.xhsName + "</span>" +
+                ' — <span class="xhs-type-result">值: ' + String(xhsItem.xhsValue) +
+                "，typeof 结果: " + xhsTypeofResult + "</span>";
+            xhsOutput.appendChild(xhsCard);
+            // 控制台输出
+            console.log(xhsItem.xhsName, xhsItem.xhsValue, "typeof:", xhsTypeofResult);
+        });
+    </script>
+</body>
+</html>

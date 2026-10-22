@@ -19,7 +19,17 @@ Static HTML/CSS course exercises for "高级网页设计" (Advanced Web Design).
 
 ## Naming rules
 
-- All CSS class names, id names, and JS variables must start with `xie_` (e.g., `.xie-card`, `#xie-grid`, `let xieCount`).
+- All CSS class names, id names, and JS variables must start with `xhs_` (e.g., `.xhs-card`, `#xhs-grid`, `let xhsCount`).
+
+## Page header comment
+
+- Every HTML page must include a comment near the top with: 姓名：解浩帅，日期，功能名称. Format: `<!-- 姓名：解浩帅，日期：yyyy-mm-dd，功能名称：页面功能描述 -->`.
+
+## Tech constraints
+
+- Use native HTML, CSS, and JavaScript only — no third-party libraries or frameworks.
+- Icons must use the iconfont assets under the `font/` directory; no CDN resources.
+- Use `fetch` to retrieve server-side data.
 
 ## Prompt logging
 
