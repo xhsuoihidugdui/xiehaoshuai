@@ -42,11 +42,26 @@ git pull --rebase origin master
 git push origin master
 ```
 
+### 本机网络访问 GitHub 受限（常见于校园/企业网）
+
+现象：`ssh: connect to host github.com port 22: Connection refused` 或 HTTPS 报 SSL certificate problem。
+
+可用 SSH over 443 备用端口：
+```bash
+git -c core.sshCommand="ssh -p 443 -o StrictHostKeyChecking=accept-new" push github master
+```
+如果仍不通，切到 HTTPS + Personal Access Token：
+```bash
+git remote set-url github https://github.com/xhsuoihidugdui/xiehaoshuai.git
+git push github master   # 按提示用 GitHub 用户名 + PAT（Settings → Developer settings → Personal access tokens → Generate new token）
+```
+或在能访问 GitHub 的网络环境（手机热点）下执行 push。
+
 ### Host key verification failed
 
 首次连接：
 ```bash
-git -c core.sshCommand="ssh -o StrictHostKeyChecking=no" push origin master
+git -c core.sshCommand="ssh -o StrictHostKeyChecking=no" push github master
 ```
 
 ## 注意事项

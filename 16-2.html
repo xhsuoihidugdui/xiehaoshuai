@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<!-- 姓名：解浩帅，日期：2026-10-29，功能名称：JavaScript对象与字符串可视化展示 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16-2 JavaScript 对象 &amp; 字符串 — 解浩帅</title>
+    <style>
+        :root {
+            --primary: #1e6fd9;
+            --dark: #12283f;
+            --ink: #2b2b2b;
+            --muted: #5a6b7c;
+            --light: #f4f7fb;
+            --accent: #f5a623;
+            --green: #27ae60;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+            background: var(--light);
+            color: var(--ink);
+            line-height: 1.7;
+            padding: 30px 20px 50px;
+        }
+        .xhs-wrap { max-width: 1080px; margin: 0 auto; }
+        h1 { text-align: center; color: var(--dark); font-size: 30px; margin-bottom: 6px; }
+        .xhs-sub { text-align: center; color: var(--muted); margin-bottom: 28px; font-size: 14px; }
+
+        .xhs-group {
+            margin-bottom: 28px;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(18, 40, 63, .06);
+            overflow: hidden;
+        }
+        .xhs-group-title {
+            background: linear-gradient(90deg, var(--primary), #2f8bf0);
+            color: #fff;
+            padding: 12px 22px;
+            font-size: 17px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .xhs-group-title span { font-weight: normal; opacity: .85; font-size: 13px; margin-left: 10px; }
+        .xhs-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 16px;
+            padding: 20px;
+        }
+
+        .xhs-method {
+            border: 1px solid #e4eaf1;
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+        .xhs-method h3 {
+            color: var(--primary);
+            font-size: 16px;
+            font-family: Consolas, monospace;
+            margin-bottom: 4px;
+        }
+        .xhs-method .xhs-desc { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+        .xhs-method pre {
+            background: #f6f9fd;
+            border-left: 3px solid var(--primary);
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-family: Consolas, monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            line-height: 1.55;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .xhs-result {
+            background: #fffdf2;
+            border: 1px dashed var(--accent);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            max-height: 140px;
+            overflow-y: auto;
+        }
+        .xhs-result b { color: var(--green); }
+        .xhs-tag {
+            display: inline-block;
+            font-size: 11px;
+            padding: 1px 7px;
+            border-radius: 4px;
+            margin-left: 6px;
+            vertical-align: middle;
+            background: #eef3fa;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+<div class="xhs-wrap">
+
+    <h1>解浩帅 · JavaScript 对象 &amp; 字符串</h1>
+    <p class="xhs-sub">对象操作 + 字符串常用方法 — 每个示例实时运行并展示输出</p>
+
+    <!-- ===== 对象 ===== -->
+    <section class="xhs-group">
+        <div class="xhs-group-title">① 对象 Object<span>字面量 / 增删改查 / 解构 / 内置 API</span></div>
+        <div class="xhs-cards" id="xhsGroupObj"></div>
+    </section>
+
+    <!-- ===== 字符串 ===== -->
+    <section class="xhs-group">
+        <div class="xhs-group-title">② 字符串 String<span>查找 / 截取 / 大小写 / 替换 / 拆分 / 模板</span></div>
+        <div class="xhs-cards" id="xhsGroupStr"></div>
+    </section>
+
+</div>
+
+<script>
+    function xhsCard(xhsName, xhsDesc, xhsCode, xhsResultHtml, xhsTag) {
+        const xhsDiv = document.createElement("div");
+        xhsDiv.className = "xhs-method";
+        const xhsTagHtml = xhsTag ? '<span class="xhs-tag">' + xhsTag + "</span>" : "";
+        xhsDiv.innerHTML =
+            "<h3>" + xhsName + xhsTagHtml + "</h3>" +
+            '<div class="xhs-desc">' + xhsDesc + "</div>" +
+            "<pre>" + xhsCode + "</pre>" +
+            '<div class="xhs-result">运行输出:<br>' + xhsResultHtml + "</div>";
+        return xhsDiv;
+    }
+    function xhsOut(xhsArr) {
+        return xhsArr.map(function (s) { return "<b>" + s + "</b>"; }).join("<br>");
+    }
+
+    // ======================= ① 对象 =======================
+    (function () {
+        const g = document.getElementById("xhsGroupObj");
+
+        // 创建 + 增删改查
+        (function () {
+            const out = [];
+            let xhsStudent = { name: "解浩帅", age: 20, grade: "B" };
+            out.push("创建: " + JSON.stringify(xhsStudent));
+            xhsStudent.age = 21;                   // 改
+            xhsStudent.gender = "男";               // 增
+            delete xhsStudent.grade;                // 删
+            out.push("增删改后: " + JSON.stringify(xhsStudent));
+            out.push("读取 name: " + xhsStudent.name + "，xhsStudent['age']: " + xhsStudent["age"]);
+            g.appendChild(xhsCard(
+                "字面量创建 + 增删改查",
+                "对象字面量 {key: val}；读取用 . 或 []；赋值即增/改；delete 删除属性",
+                'let student = { name:"解浩帅", age:20, grade:"B" };\nstudent.age = 21;        // 改\nstudent.gender = "男";   // 增\ndelete student.grade;    // 删',
+                xhsOut(out),
+                "基础"
+            ));
+        })();
+
+        // 解构赋值
+        (function () {
+            const out = [];
+            let xhsUser = { name: "解浩帅", age: 20, city: "大连" };
+            let { name: xhsUname, age: xhsUage } = xhsUser;
+            out.push("解构: " + xhsUname + " / " + xhsUage);
+            // 带默认值
+            let { city: xhsCity2 = "北京", hobby: xhsHobby = "编程" } = xhsUser;
+            out.push("默认值: city=" + xhsCity2 + ", hobby=" + xhsHobby);
+            g.appendChild(xhsCard(
+                "解构赋值 + 默认值",
+                "把对象属性一次性拆到变量，重命名用 : ，缺失补值用 =",
+                'let { name, age } = user;\nlet { city="北京", hobby="编程" } = user;',
+                xhsOut(out),
+                "ES6"
+            ));
+        })();
+
+        // Object.keys / values / entries
+        (function () {
+            const out = [];
+            let xhsBook = { title: "网页设计", price: 59.9, pages: 240 };
+            out.push("keys:   " + JSON.stringify(Object.keys(xhsBook)));
+            out.push("values: " + JSON.stringify(Object.values(xhsBook)));
+            let xhsTotal = 0;
+            for (let [k, v] of Object.entries(xhsBook)) {
+                out.push("entry: " + k + " → " + v);
+            }
+            g.appendChild(xhsCard(
+                "Object.keys / values / entries",
+                "批量取出属性名、值或 [key, val] 对，entries 配合 for...of 遍历最顺手",
+                'Object.keys(obj)    // ["title","price","pages"]\nObject.values(obj)  // ["网页设计",59.9,240]\nfor (let [k,v] of Object.entries(obj)) ...',
+                xhsOut(out),
+                "静态方法"
+            ));
+        })();
+
+        // 方法简写 + this
+        (function () {
+            const out = [];
+            let xhsDog = {
+                name: "旺财",
+                age: 3,
+                bark() { return this.name + " 在叫！"; },
+                info() { return this.name + "，" + this.age + "岁"; }
+            };
+            out.push(xhsDog.bark());
+            out.push(xhsDog.info());
+            out.push("注意：箭头函数没有自己的 this，不能当对象方法用（会指向外层）");
+            g.appendChild(xhsCard(
+                "方法简写 + this",
+                "对象内方法可省掉 function 关键字写成 bark(){}；this 指向调用该方法的对象本身",
+                'let dog = {\n  name: "旺财",\n  bark() { return this.name + " 在叫！"; }\n};',
+                xhsOut(out),
+                "对象方法"
+            ));
+        })();
+
+        // 浅拷贝 vs 深拷贝
+        (function () {
+            const out = [];
+            let xhsSrc = { a: 1, b: { c: 2 } };
+            let xhsShallow = Object.assign({}, xhsSrc);
+            xhsShallow.a = 10;  xhsShallow.b.c = 20;
+            out.push("原对象 a: " + xhsSrc.a + "（浅拷贝改 a 不影响）");
+            out.push("原对象 b.c: " + xhsSrc.b.c + "（但改嵌套 b.c 会一起变！）");
+            let xhsDeep = JSON.parse(JSON.stringify({ a: 1, b: { c: 2 } }));
+            xhsDeep.b.c = 999;
+            out.push("JSON 深拷贝后原对象不受影响：c 仍为 2");
+            g.appendChild(xhsCard(
+                "浅拷贝 vs 深拷贝",
+                "Object.assign / {...obj} 是浅拷贝，嵌套对象仍共享引用；JSON 序列化+反序列化是最快的深拷贝方案（但无法处理函数、undefined、循环引用）",
+                'let shallow = Object.assign({}, src);\nlet deep = JSON.parse(JSON.stringify(src));',
+                xhsOut(out),
+                "重要！"
+            ));
+        })();
+    })();
+
+    // ======================= ② 字符串 =======================
+    (function () {
+        const g = document.getElementById("xhsGroupStr");
+        const xhsBase = "Hello, 解浩帅!";
+
+        // indexOf / lastIndexOf / includes
+        (function () {
+            const out = [];
+            let s = xhsBase;
+            out.push('"' + s + '".indexOf("解") → ' + s.indexOf("解"));
+            out.push('"ll".indexOf("l") → ' + "Hello".indexOf("l") + '（从左找）');
+            out.push('"ll".lastIndexOf("l") → ' + "Hello".lastIndexOf("l") + '（从右找）');
+            out.push('s.includes("帅") → ' + s.includes("帅"));
+            g.appendChild(xhsCard(
+                "indexOf / lastIndexOf / includes",
+                "返回索引或 -1；includes 只关心在不在，返回布尔值",
+                's.indexOf("解")\ns.lastIndexOf("l")\ns.includes("帅")',
+                xhsOut(out),
+                "查找"
+            ));
+        })();
+
+        // slice / substring / substr
+        (function () {
+            const out = [];
+            let s = xhsBase;
+            out.push('slice(7, 11) → "' + s.slice(7, 11) + '"');
+            out.push('substring(7, 11) → "' + s.substring(7, 11) + '"');
+            out.push('slice(-1) → "' + s.slice(-1) + '"（末尾取）');
+            out.push('slice(7) → "' + s.slice(7) + '"（到末尾）');
+            g.appendChild(xhsCard(
+                "slice(start, end) — 最推荐",
+                "支持负索引（-1 表示倒数第一），不支持负索引的是 substring；substr(start, length) 已废弃",
+                's.slice(7, 11)  // 解浩帅\ns.slice(-1)     // 取最后一个字符',
+                xhsOut(out),
+                "截取"
+            ));
+        })();
+
+        // toUpperCase / toLowerCase / trim
+        (function () {
+            const out = [];
+            let s = "  Hello World  ";
+            out.push('"  Hello World  ".trim() → "' + s.trim() + '"');
+            out.push('.toUpperCase() → "' + s.trim().toUpperCase() + '"');
+            out.push('.toLowerCase() → "' + s.trim().toLowerCase() + '"');
+            out.push('startsWith("H") → ' + s.trim().startsWith("H") + "   endsWith(\"!\") → " + xhsBase.endsWith("!"));
+            g.appendChild(xhsCard(
+                "trim / toUpperCase / toLowerCase / startsWith / endsWith",
+                "trim 去首尾空白；大小写转换；startsWith / endsWith 判断开头结尾",
+                '"  Hello  ".trim().toUpperCase()',
+                xhsOut(out),
+                "大小写"
+            ));
+        })();
+
+        // replace
+        (function () {
+            const out = [];
+            let s = "解浩帅 学习 JavaScript，JavaScript 很有趣！";
+            out.push('只替换第一次: "' + s.replace("JavaScript", "JS") + '"');
+            out.push('正则 /g 全替换: "' + s.replace(/JavaScript/g, "JS") + '"');
+            g.appendChild(xhsCard(
+                "replace(search, repl)",
+                "普通字符串只替换 **第一次**；想全部替换要用带 g 标志的正则 /xxx/g",
+                's.replace("JavaScript", "JS")          // 只替换第一个\ns.replace(/JavaScript/g, "JS")         // 全部替换',
+                xhsOut(out),
+                "替换"
+            ));
+        })();
+
+        // split / join / repeat
+        (function () {
+            const out = [];
+            let s = "苹果,香蕉,橘子,葡萄";
+            let arr = s.split(",");
+            out.push('split(",") → ' + JSON.stringify(arr));
+            out.push('join(" · ") → "' + arr.join(" · ") + '"');
+            out.push('"哈".repeat(3) → "' + "哈".repeat(3) + '"');
+            g.appendChild(xhsCard(
+                "split / join / repeat",
+                "split 把串按分隔符拆成数组；join 反过来把数组拼回字符串；repeat 把字符串复制 n 遍",
+                '"a,b,c".split(",")       // ["a","b","c"]\n["a","b"].join(" · ")  // "a · b"\n"哈".repeat(3)          // "哈哈哈"',
+                xhsOut(out),
+                "拆分拼接"
+            ));
+        })();
+
+        // 模板字符串
+        (function () {
+            const out = [];
+            let xhsName = "解浩帅";
+            let xhsAge = 20;
+            let xhsLine = `姓名：${xhsName}，年龄：${xhsAge}，明年 ${xhsAge + 1} 岁`;
+            out.push("单行: " + xhsLine);
+            let xhsMulti = `\n  您好 ${xhsName}！\n  欢迎学习 JavaScript\n`;
+            out.push("多行模板字符串天然支持换行和 ${表达式}");
+            g.appendChild(xhsCard(
+                "模板字符串 `...`",
+                "反引号包裹；${表达式} 可嵌变量甚至函数调用；天然支持多行",
+                'let name = "解浩帅", age = 20;\nlet line = `姓名：${name}，明年 ${age+1} 岁`;\nlet multi = `\n  多行内容\n  直接写换行\n`;',
+                xhsOut([xhsLine, xhsMulti.replace(/\n/g, "↵")]),
+                "ES6"
+            ));
+        })();
+    })();
+
+    console.log("解浩帅 · 16-2 对象与字符串演示完毕");
+</script>
+</body>
+</html>

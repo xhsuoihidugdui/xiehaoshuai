@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<!-- 姓名：解浩帅，日期：2026-10-29，功能名称：JavaScript主要数组方法可视化展示 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16-1 JavaScript 数组方法可视化 — 解浩帅</title>
+    <style>
+        :root {
+            --primary: #1e6fd9;
+            --dark: #12283f;
+            --ink: #2b2b2b;
+            --muted: #5a6b7c;
+            --light: #f4f7fb;
+            --accent: #f5a623;
+            --red: #e74c3c;
+            --green: #27ae60;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+            background: var(--light);
+            color: var(--ink);
+            line-height: 1.65;
+            padding: 30px 20px 50px;
+        }
+        .xhs-wrap { max-width: 1080px; margin: 0 auto; }
+        h1 {
+            text-align: center;
+            color: var(--dark);
+            font-size: 30px;
+            margin-bottom: 6px;
+        }
+        .xhs-sub {
+            text-align: center;
+            color: var(--muted);
+            margin-bottom: 28px;
+            font-size: 14px;
+        }
+
+        /* 分组 */
+        .xhs-group {
+            margin-bottom: 32px;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(18, 40, 63, .06);
+            overflow: hidden;
+        }
+        .xhs-group-title {
+            background: linear-gradient(90deg, var(--primary), #2f8bf0);
+            color: #fff;
+            padding: 12px 22px;
+            font-size: 17px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .xhs-group-title span { font-weight: normal; opacity: .85; font-size: 13px; margin-left: 10px; }
+        .xhs-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+            gap: 16px;
+            padding: 20px;
+        }
+
+        /* 方法卡片 */
+        .xhs-method {
+            border: 1px solid #e4eaf1;
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+        .xhs-method h3 {
+            color: var(--primary);
+            font-size: 16px;
+            font-family: Consolas, monospace;
+            margin-bottom: 4px;
+        }
+        .xhs-method .xhs-desc {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+        .xhs-method pre {
+            background: #f6f9fd;
+            border-left: 3px solid var(--primary);
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-family: Consolas, monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            line-height: 1.5;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .xhs-result {
+            background: #fffdf2;
+            border: 1px dashed var(--accent);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        .xhs-result b { color: var(--green); }
+        .xhs-result .xhs-orig {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+        .xhs-mutable-tag {
+            display: inline-block;
+            font-size: 11px;
+            padding: 1px 7px;
+            border-radius: 4px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        .xhs-tag-yes { background: #fdecea; color: var(--red); }
+        .xhs-tag-no { background: #eafaf1; color: var(--green); }
+
+        /* 基准数组展示 */
+        .xhs-base {
+            text-align: center;
+            background: #fff;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 22px;
+            box-shadow: 0 2px 10px rgba(18, 40, 63, .05);
+        }
+        .xhs-base code {
+            background: #f6f9fd;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-family: Consolas, monospace;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+<div class="xhs-wrap">
+
+    <h1>解浩帅 · JavaScript 数组方法可视化</h1>
+    <p class="xhs-sub">基于基准数组 <code id="xhsBaseRef"></code>，演示常用数组方法的输入与输出</p>
+
+    <div class="xhs-base">
+        <strong>基准数组：</strong> <code id="xhsBaseDisplay"></code>
+        <span style="color:var(--muted);font-size:12px;margin-left:8px">（演示后会被重置，确保每组方法独立运行）</span>
+    </div>
+
+    <!-- ===== 分组 1：增删改 ===== -->
+    <section class="xhs-group">
+        <div class="xhs-group-title">① 增删改（改变原数组）<span>push / pop / unshift / shift / splice / reverse / sort / fill</span></div>
+        <div class="xhs-cards" id="xhsGroup1"></div>
+    </section>
+
+    <!-- ===== 分组 2：遍历 ===== -->
+    <section class="xhs-group">
+        <div class="xhs-group-title">② 遍历与变换（不改变原数组）<span>forEach / map / filter / reduce / concat / slice / join</span></div>
+        <div class="xhs-cards" id="xhsGroup2"></div>
+    </section>
+
+    <!-- ===== 分组 3：查找 ===== -->
+    <section class="xhs-group">
+        <div class="xhs-group-title">③ 查找与判断<span>indexOf / includes / find / findIndex / every / some</span></div>
+        <div class="xhs-cards" id="xhsGroup3"></div>
+    </section>
+
+</div>
+
+<script>
+    // 基准数组（演示前重置）
+    function xhsResetBase() {
+        return ["苹果", "香蕉", "橘子", "葡萄", "西瓜"];
+    }
+    const xhsBase = xhsResetBase();
+    document.getElementById("xhsBaseRef").textContent = JSON.stringify(xhsBase);
+    document.getElementById("xhsBaseDisplay").textContent = JSON.stringify(xhsBase);
+
+    // 卡片生成器
+    function xhsCard(xhsName, xhsDesc, xhsCode, xhsMutable, xhsResult, xhsOrigAfter) {
+        const xhsDiv = document.createElement("div");
+        xhsDiv.className = "xhs-method";
+        const xhsTag = xhsMutable
+            ? '<span class="xhs-mutable-tag xhs-tag-yes">改变原数组</span>'
+            : '<span class="xhs-mutable-tag xhs-tag-no">不改变原数组</span>';
+        const xhsOrigHtml = xhsOrigAfter !== undefined
+            ? '<div class="xhs-orig">原数组（执行后）: <code>' + JSON.stringify(xhsOrigAfter) + '</code></div>'
+            : "";
+        xhsDiv.innerHTML =
+            "<h3>" + xhsName + xhsTag + "</h3>" +
+            '<div class="xhs-desc">' + xhsDesc + "</div>" +
+            "<pre>" + xhsCode + "</pre>" +
+            '<div class="xhs-result">返回值: <b>' + xhsResult + "</b>" + xhsOrigHtml + "</div>";
+        return xhsDiv;
+    }
+
+    // ======================= 分组 1：增删改 =======================
+    (function () {
+        let arr;
+        const g1 = document.getElementById("xhsGroup1");
+
+        arr = xhsResetBase();
+        let r1 = arr.push("芒果");
+        g1.appendChild(xhsCard(
+            "push()",
+            "尾部追加元素，返回新数组长度",
+            'arr.push("芒果")',
+            true, r1, arr
+        ));
+
+        arr = xhsResetBase();
+        let r2 = arr.pop();
+        g1.appendChild(xhsCard(
+            "pop()",
+            "删除尾部元素，返回被删除的元素",
+            "arr.pop()",
+            true, JSON.stringify(r2), arr
+        ));
+
+        arr = xhsResetBase();
+        let r3 = arr.unshift("草莓", "樱桃");
+        g1.appendChild(xhsCard(
+            "unshift()",
+            "头部插入元素，返回新数组长度",
+            'arr.unshift("草莓", "樱桃")',
+            true, r3, arr
+        ));
+
+        arr = xhsResetBase();
+        let r4 = arr.shift();
+        g1.appendChild(xhsCard(
+            "shift()",
+            "删除头部元素，返回被删除的元素",
+            "arr.shift()",
+            true, JSON.stringify(r4), arr
+        ));
+
+        arr = xhsResetBase();
+        let r5 = arr.splice(2, 1, "柚子", "榴莲");
+        g1.appendChild(xhsCard(
+            "splice(start, count, ...items)",
+            "从 index=2 开始删除 1 个元素，再插入 2 个新元素",
+            'arr.splice(2, 1, "柚子", "榴莲")',
+            true, JSON.stringify(r5) + "（被删除项）", arr
+        ));
+
+        arr = xhsResetBase();
+        let r6 = arr.reverse();
+        g1.appendChild(xhsCard(
+            "reverse()",
+            "反转数组顺序",
+            "arr.reverse()",
+            true, JSON.stringify(r6), arr
+        ));
+
+        arr = [3, 1, 4, 1, 5, 9, 2, 6];
+        let r7 = arr.sort(function (a, b) { return a - b; });
+        g1.appendChild(xhsCard(
+            "sort(fn)",
+            "按比较函数排序。数字排序需写 (a,b)=>a-b，否则按字符串字典序",
+            "arr.sort((a,b)=>a-b)",
+            true, JSON.stringify(r7), arr
+        ));
+
+        arr = [0, 1, 2, 3, 4];
+        let r8 = arr.fill("✦", 1, 4);
+        g1.appendChild(xhsCard(
+            "fill(value, start, end)",
+            "用同一值填充 [start, end)",
+            'arr.fill("✦", 1, 4)',
+            true, JSON.stringify(r8), arr
+        ));
+    })();
+
+    // ======================= 分组 2：遍历与变换 =======================
+    (function () {
+        const base2 = xhsResetBase();
+        const g2 = document.getElementById("xhsGroup2");
+
+        const arr = xhsResetBase();
+        let log = [];
+        arr.forEach(function (item, i) { log.push(i + ":" + item); });
+        g2.appendChild(xhsCard(
+            "forEach(fn)",
+            "遍历每个元素执行回调，无返回值",
+            "arr.forEach((item,i)=>console.log(i,item))",
+            false, "undefined（副作用见原数组不变）", arr
+        ));
+
+        let r2b = base2.map(function (item) { return item.length; });
+        g2.appendChild(xhsCard(
+            "map(fn)",
+            "对每个元素映射后返回新数组（同长度）",
+            'arr.map(item => item.length)',
+            false, JSON.stringify(r2b), base2
+        ));
+
+        let r2c = base2.filter(function (item) { return item.length > 2; });
+        g2.appendChild(xhsCard(
+            "filter(fn)",
+            "筛选出条件为真的元素，返回新数组",
+            'arr.filter(item => item.length > 2)',
+            false, JSON.stringify(r2c), base2
+        ));
+
+        let r2d = base2.reduce(function (acc, item) { return acc + item.length; }, 0);
+        g2.appendChild(xhsCard(
+            "reduce(fn, init)",
+            "累加器从 init 出发遍历全部元素，得到单一值",
+            'arr.reduce((acc,item)=>acc+item.length, 0)',
+            false, r2d, base2
+        ));
+
+        let r2e = base2.concat(["哈密瓜", "菠萝"]);
+        g2.appendChild(xhsCard(
+            "concat(...arrs)",
+            "拼接多个数组，返回新数组",
+            'arr.concat(["哈密瓜","菠萝"])',
+            false, JSON.stringify(r2e), base2
+        ));
+
+        let r2f = base2.slice(1, 4);
+        g2.appendChild(xhsCard(
+            "slice(start, end)",
+            "截取 [start, end) 片段，负值表示从末尾数",
+            "arr.slice(1, 4)",
+            false, JSON.stringify(r2f), base2
+        ));
+
+        let r2g = base2.join(" · ");
+        g2.appendChild(xhsCard(
+            "join(sep)",
+            "用分隔符把所有元素拼成字符串",
+            'arr.join(" · ")',
+            false, '"' + r2g + '"', base2
+        ));
+    })();
+
+    // ======================= 分组 3：查找与判断 =======================
+    (function () {
+        const base3 = xhsResetBase();
+        const g3 = document.getElementById("xhsGroup3");
+
+        let r3a = base3.indexOf("橘子");
+        g3.appendChild(xhsCard(
+            "indexOf(val)",
+            "查找元素首次出现的索引，未找到返回 -1",
+            'arr.indexOf("橘子")',
+            false, r3a, base3
+        ));
+
+        let r3b = base3.includes("芒果");
+        g3.appendChild(xhsCard(
+            "includes(val)",
+            "判断数组是否包含某元素，返回布尔值",
+            'arr.includes("芒果")',
+            false, r3b, base3
+        ));
+
+        let r3c = base3.find(function (item) { return item.length === 2; });
+        g3.appendChild(xhsCard(
+            "find(fn)",
+            "返回第一个满足条件的元素，未找到返回 undefined",
+            'arr.find(item => item.length === 2)',
+            false, JSON.stringify(r3c), base3
+        ));
+
+        let r3d = base3.findIndex(function (item) { return item.length > 2; });
+        g3.appendChild(xhsCard(
+            "findIndex(fn)",
+            "返回第一个满足条件的元素索引，未找到返回 -1",
+            'arr.findIndex(item => item.length > 2)',
+            false, r3d, base3
+        ));
+
+        let nums = [2, 4, 6, 8];
+        let r3e = nums.every(function (n) { return n % 2 === 0; });
+        g3.appendChild(xhsCard(
+            "every(fn)",
+            "是否每个元素都满足条件（全真才 true）",
+            "nums.every(n => n%2===0)",
+            false, r3e, nums
+        ));
+
+        let r3f = nums.some(function (n) { return n > 7; });
+        g3.appendChild(xhsCard(
+            "some(fn)",
+            "是否存在元素满足条件（一真即 true）",
+            "nums.some(n => n > 7)",
+            false, r3f, nums
+        ));
+    })();
+
+    // 控制台提示
+    console.log("解浩帅 · 16-1 数组方法演示完毕，基准数组：", xhsBase);
+</script>
+</body>
+</html>

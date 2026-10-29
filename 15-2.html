@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<!-- 姓名：解浩帅，日期：2026-10-29，功能名称：JavaScript程序结构-条件与循环可视化 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>15-2 JavaScript 程序结构 — 解浩帅</title>
+    <style>
+        :root {
+            --primary: #1e6fd9;
+            --dark: #12283f;
+            --ink: #2b2b2b;
+            --muted: #5a6b7c;
+            --light: #f4f7fb;
+            --accent: #f5a623;
+            --green: #27ae60;
+            --red: #e74c3c;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+            background: var(--light);
+            color: var(--ink);
+            line-height: 1.7;
+            padding: 30px 20px 50px;
+        }
+        .xhs-wrap { max-width: 1080px; margin: 0 auto; }
+        h1 { text-align: center; color: var(--dark); font-size: 30px; margin-bottom: 6px; }
+        .xhs-sub { text-align: center; color: var(--muted); margin-bottom: 28px; font-size: 14px; }
+
+        .xhs-group {
+            margin-bottom: 28px;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(18, 40, 63, .06);
+            overflow: hidden;
+        }
+        .xhs-group-title {
+            background: linear-gradient(90deg, var(--primary), #2f8bf0);
+            color: #fff;
+            padding: 12px 22px;
+            font-size: 17px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .xhs-group-title span { font-weight: normal; opacity: .85; font-size: 13px; margin-left: 10px; }
+        .xhs-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 16px;
+            padding: 20px;
+        }
+
+        .xhs-method {
+            border: 1px solid #e4eaf1;
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+        .xhs-method h3 {
+            color: var(--primary);
+            font-size: 16px;
+            font-family: Consolas, monospace;
+            margin-bottom: 4px;
+        }
+        .xhs-method .xhs-desc { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+        .xhs-method pre {
+            background: #f6f9fd;
+            border-left: 3px solid var(--primary);
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-family: Consolas, monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            line-height: 1.55;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .xhs-result {
+            background: #fffdf2;
+            border: 1px dashed var(--accent);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            max-height: 140px;
+            overflow-y: auto;
+        }
+        .xhs-result b { color: var(--green); }
+        .xhs-tag {
+            display: inline-block;
+            font-size: 11px;
+            padding: 1px 7px;
+            border-radius: 4px;
+            margin-left: 6px;
+            vertical-align: middle;
+            background: #eef3fa;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+<div class="xhs-wrap">
+
+    <h1>解浩帅 · JavaScript 程序结构</h1>
+    <p class="xhs-sub">条件判断 + 循环结构 — 每个示例都实时运行并展示输出</p>
+
+    <!-- ===== 条件判断 ===== -->
+    <section class="xhs-group">
+        <div class="xhs-group-title">① 条件判断<span>if / else if / else / 三元 / switch</span></div>
+        <div class="xhs-cards" id="xhsGroupIf"></div>
+    </section>
+
+    <!-- ===== 循环结构 ===== -->
+    <section class="xhs-group">
+        <div class="xhs-group-title">② 循环结构<span>for / while / do...while / for...in / for...of</span></div>
+        <div class="xhs-cards" id="xhsGroupLoop"></div>
+    </section>
+
+    <!-- ===== break & continue ===== -->
+    <section class="xhs-group">
+        <div class="xhs-group-title">③ 循环控制<span>break 跳出循环 / continue 跳过本次</span></div>
+        <div class="xhs-cards" id="xhsGroupCtrl"></div>
+    </section>
+
+</div>
+
+<script>
+    // 卡片生成器
+    function xhsCard(xhsName, xhsDesc, xhsCode, xhsResultHtml, xhsTag) {
+        const xhsDiv = document.createElement("div");
+        xhsDiv.className = "xhs-method";
+        const xhsTagHtml = xhsTag ? '<span class="xhs-tag">' + xhsTag + "</span>" : "";
+        xhsDiv.innerHTML =
+            "<h3>" + xhsName + xhsTagHtml + "</h3>" +
+            '<div class="xhs-desc">' + xhsDesc + "</div>" +
+            "<pre>" + xhsCode + "</pre>" +
+            '<div class="xhs-result">运行输出:<br>' + xhsResultHtml + "</div>";
+        return xhsDiv;
+    }
+
+    // 把多次输出用 <br> 拼成可读内容，并给值着色
+    function xhsOut(xhsArr) {
+        return xhsArr.map(function (s) { return "<b>" + s + "</b>"; }).join("<br>");
+    }
+
+    // ======================= ① 条件判断 =======================
+    (function () {
+        const g = document.getElementById("xhsGroupIf");
+
+        // if / else if / else
+        (function () {
+            const out = [];
+            let xhsScore = 85;
+            let xhsGrade;
+            if (xhsScore >= 90)      { xhsGrade = "A"; }
+            else if (xhsScore >= 80) { xhsGrade = "B"; }
+            else if (xhsScore >= 60) { xhsGrade = "C"; }
+            else                     { xhsGrade = "不及格"; }
+            out.push("分数 " + xhsScore + " → 等级 " + xhsGrade);
+            g.appendChild(xhsCard(
+                "if / else if / else",
+                "多分支条件判断",
+                'let score = 85;\nlet grade;\nif (score >= 90)      grade = "A";\nelse if (score >= 80) grade = "B";\nelse if (score >= 60) grade = "C";\nelse                  grade = "不及格";',
+                xhsOut(out),
+                "多分支"
+            ));
+        })();
+
+        // 三元运算符
+        (function () {
+            const out = [];
+            let xhsAge = 20;
+            let xhsType = xhsAge >= 18 ? "成年" : "未成年";
+            out.push("年龄 " + xhsAge + " → " + xhsType);
+            g.appendChild(xhsCard(
+                "三元运算符 ? :",
+                "条件 ? 真值 : 假值 — 相当于一行 if/else",
+                'let age = 20;\nlet type = age >= 18 ? "成年" : "未成年";',
+                xhsOut(out),
+                "简写"
+            ));
+        })();
+
+        // switch
+        (function () {
+            const out = [];
+            let xhsDay = 3;
+            let xhsName;
+            switch (xhsDay) {
+                case 1: xhsName = "一"; break;
+                case 2: xhsName = "二"; break;
+                case 3: xhsName = "三"; break;
+                case 4: xhsName = "四"; break;
+                case 5: xhsName = "五"; break;
+                default: xhsName = "周末";
+            }
+            out.push("day=" + xhsDay + " → 星期" + xhsName);
+            g.appendChild(xhsCard(
+                "switch / case",
+                "多对一匹配，每个 case 末尾要 break，否则会继续向下穿透",
+                'let day = 3;\nlet name;\nswitch (day) {\n  case 1: name = "一"; break;\n  case 2: name = "二"; break;\n  case 3: name = "三"; break;\n  default: name = "周末";\n}',
+                xhsOut(out),
+                "多值匹配"
+            ));
+        })();
+
+        // switch 穿透（fall-through）
+        (function () {
+            const out = [];
+            let xhsMonth = 2;
+            let xhsDays;
+            switch (xhsMonth) {
+                case 1: case 3: case 5: case 7: case 8: case 10: case 12: xhsDays = 31; break;
+                case 4: case 6: case 9: case 11:                          xhsDays = 30; break;
+                case 2:                                                   xhsDays = 28; break;
+                default:                                                  xhsDays = "?";
+            }
+            out.push(xhsMonth + "月有 " + xhsDays + " 天");
+            g.appendChild(xhsCard(
+                "switch 穿透（fall-through）",
+                "无 break 的 case 会继续执行下一个 case，可用于多 case 共享同一逻辑",
+                'switch (month) {\n  case 1: case 3: case 5:\n  case 7: case 8: case 10: case 12:\n    days = 31; break;\n  case 4: case 6: case 9: case 11:\n    days = 30; break;\n  case 2: days = 28; break;\n}',
+                xhsOut(out),
+                "高级用法"
+            ));
+        })();
+
+        // 短路逻辑 && / ||
+        (function () {
+            const out = [];
+            let xhsUser = null;
+            out.push("user?.name → " + (xhsUser && xhsUser.name));
+            let xhsStr = "";
+            out.push('"" || "默认值" → ' + (xhsStr || "默认值"));
+            g.appendChild(xhsCard(
+                "短路逻辑 && / ||",
+                "&& 全真才真，遇到假即停；|| 一真即真，遇到真即停",
+                'let user = null;\nuser && user.name  // 短路：直接返回 null\nlet str = "";\nstr || "默认值"    // 空串为假，返回"默认值"',
+                xhsOut(out),
+                "逻辑运算符"
+            ));
+        })();
+    })();
+
+    // ======================= ② 循环结构 =======================
+    (function () {
+        const g = document.getElementById("xhsGroupLoop");
+
+        // for (C 风格)
+        (function () {
+            const out = [];
+            for (let i = 1; i <= 5; i++) { out.push(i); }
+            g.appendChild(xhsCard(
+                "for (初始化; 条件; 更新)",
+                "最常用的经典循环：起始、终止、步长三合一",
+                'for (let i = 1; i <= 5; i++) {\n  // 循环体\n}',
+                xhsOut(["输出 1 到 5"]),
+                "经典循环"
+            ));
+        })();
+
+        // while
+        (function () {
+            const out = [];
+            let xhsN = 1;
+            while (xhsN < 100) { xhsN *= 2; }
+            out.push("最后 n = " + xhsN);
+            g.appendChild(xhsCard(
+                "while (条件)",
+                "先判断条件，为真才进入循环体",
+                'let n = 1;\nwhile (n < 100) { n *= 2; }',
+                xhsOut(out),
+                "先判断后执行"
+            ));
+        })();
+
+        // do...while
+        (function () {
+            const out = [];
+            let xhsI = 10;
+            do { out.push(xhsI); xhsI++; } while (xhsI < 5);
+            out.push("（即使条件为假，循环体也至少执行 1 次）");
+            g.appendChild(xhsCard(
+                "do { } while (条件)",
+                "先执行循环体，再判断条件 — 至少跑一次",
+                'let i = 10;\ndo { i++; } while (i < 5);\n// i=10 依然会先执行一次',
+                xhsOut(out),
+                "先执行后判断"
+            ));
+        })();
+
+        // for...of
+        (function () {
+            const out = [];
+            let xhsArr = ["苹果", "香蕉", "橘子"];
+            for (let item of xhsArr) { out.push(item); }
+            g.appendChild(xhsCard(
+                "for...of (可迭代对象)",
+                "遍历数组、字符串、Map 等可迭代对象的 **值**",
+                'let arr = ["苹果","香蕉","橘子"];\nfor (let item of arr) { ... }',
+                xhsOut(out),
+                "遍历值"
+            ));
+        })();
+
+        // for...in
+        (function () {
+            const out = [];
+            let xhsObj = { name: "解浩帅", age: 20, grade: "B" };
+            for (let key in xhsObj) {
+                if (Object.prototype.hasOwnProperty.call(xhsObj, key)) {
+                    out.push(key + " → " + xhsObj[key]);
+                }
+            }
+            g.appendChild(xhsCard(
+                "for...in (对象)",
+                "遍历对象的 **可枚举属性名（键）**，也会遍历原型链，建议配合 hasOwnProperty",
+                'let obj = { name:"解浩帅", age:20, grade:"B" };\nfor (let key in obj) {\n  if (obj.hasOwnProperty(key)) ...\n}',
+                xhsOut(out),
+                "遍历键"
+            ));
+        })();
+
+        // forEach（数组方法）
+        (function () {
+            const out = [];
+            let xhsNums = [10, 20, 30];
+            xhsNums.forEach(function (v, i) { out.push("[" + i + "] = " + v); });
+            g.appendChild(xhsCard(
+                "arr.forEach(fn(v, i, arr))",
+                "数组专用遍历方法，回调拿到 值、索引、数组本身",
+                '[10,20,30].forEach((v,i) => {\n  console.log(i, v);\n});',
+                xhsOut(out),
+                "数组方法"
+            ));
+        })();
+    })();
+
+    // ======================= ③ break & continue =======================
+    (function () {
+        const g = document.getElementById("xhsGroupCtrl");
+
+        // break
+        (function () {
+            const out = [];
+            for (let i = 1; i <= 10; i++) {
+                if (i === 6) { out.push("遇到 6 → break 跳出"); break; }
+                out.push(i);
+            }
+            g.appendChild(xhsCard(
+                "break — 跳出整个循环",
+                "立刻终止当前循环，跳到循环外继续执行",
+                'for (let i=1; i<=10; i++) {\n  if (i === 6) break;\n  ...\n}',
+                xhsOut(out),
+                "终止循环"
+            ));
+        })();
+
+        // continue
+        (function () {
+            const out = [];
+            for (let i = 1; i <= 8; i++) {
+                if (i % 2 === 0) { out.push(i + " → 偶数跳过（continue）"); continue; }
+                out.push(i + " → 奇数保留");
+            }
+            g.appendChild(xhsCard(
+                "continue — 跳过本次迭代",
+                "不终止循环，只是跳过当前这一次，继续下一轮",
+                'for (let i=1; i<=8; i++) {\n  if (i%2===0) continue;\n  ...\n}',
+                xhsOut(out),
+                "跳过本次"
+            ));
+        })();
+
+        // 素数查找（综合）
+        (function () {
+            const out = ["找出 1~20 中的素数："];
+            for (let n = 2; n <= 20; n++) {
+                let xhsIsPrime = true;
+                for (let j = 2; j * j <= n; j++) {
+                    if (n % j === 0) { xhsIsPrime = false; break; }
+                }
+                if (xhsIsPrime) out.push(n + " ");
+            }
+            g.appendChild(xhsCard(
+                "综合示例：找素数",
+                "双重 for + break：内层一旦发现能整除，立刻标记非素数并跳出内层",
+                'for (let n=2; n<=20; n++) {\n  let isPrime = true;\n  for (let j=2; j*j<=n; j++)\n    if (n%j===0){ isPrime=false; break; }\n  if (isPrime) console.log(n);\n}',
+                xhsOut([out.join("")]),
+                "嵌套循环"
+            ));
+        })();
+    })();
+
+    console.log("解浩帅 · 15-2 程序结构演示完毕");
+</script>
+</body>
+</html>

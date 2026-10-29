@@ -51,3 +51,18 @@
 - model: Kimi-K3
 - prompt: 根据指导书内容完成四级项目（参考文件：d:\1\高级网页设计I 实验指导书 网页元素设计.docx）
 
+
+## 2026-10-29-15-40
+- model: Kimi-K3
+- prompt: 编写16-1.html，形象的展示javascript主要的数组方法。
+
+
+## 2026-10-29-15-42
+- model: Kimi-K3
+- prompt: 完成15-2.html,展示javascript程序结构：条件，循环。
+
+
+## 2026-10-29-15-48
+- model: Kimi-K3
+- prompt: 生成16-2.html,形象展示javascript对象和字符串。
+
