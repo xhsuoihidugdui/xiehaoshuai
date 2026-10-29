@@ -1,67 +1,120 @@
 <!DOCTYPE html>
-<html lang="en">
+<!-- 姓名：解浩帅，日期：2026-10-29，功能名称：6-2 一左一右标题栏（标题+更多链接） -->
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>一左一右</title>
+    <title>6-2 一左一右标题栏 — 解浩帅</title>
+    <link rel="stylesheet" href="./font/font_5244829_352pklrzxi1/iconfont.css">
     <style>
-        *{
-            margin: 0;
-            padding: 0;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+            background: #f0f2f5;
+            padding: 30px 20px;
         }
-        .title{
-            width: 500px;
-            height: 33px;
-            line-height:33px;
-            padding-left: 10px;
+
+        /* ===== 容器 ===== */
+        .xhs-wrap {
+            max-width: 540px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
-        .title h2{
-            font-size: 14px;
-            color:#039;
+
+        /* ===== 一左一右 · 标题栏 ===== */
+        /* Flex space-between 让左右分离，border 完成视觉边框 */
+        .xhs-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 18px;
         }
-        .title a{
+
+        /* 样式一：带外边框 */
+        .xhs-bar-1 {
+            border: 1px solid #e6e6e6;
+        }
+
+        /* 样式二：顶部粗蓝线 + 背景 */
+        .xhs-bar-2 {
+            border-top: 3px solid #1e6fd9;
+            background: #f8faff;
+        }
+
+        /* 样式三：底部蓝色下划线（常见"更多"栏） */
+        .xhs-bar-3 {
+            border-bottom: 2px solid #1e6fd9;
+        }
+
+        /* 左：标题 */
+        .xhs-bar-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #039;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .xhs-bar-2 .xhs-bar-title { color: #0b1f3a; }
+        .xhs-bar-3 .xhs-bar-title { color: #1e6fd9; }
+
+        .xhs-bar-title .iconfont { font-size: 16px; }
+
+        /* 右：更多链接 */
+        .xhs-bar-more {
             font-size: 12px;
             color: #999;
             text-decoration: none;
-        }
-        .title:first-child{
-            border:1px solid #ccc;
             display: flex;
-            justify-content:space-between;
+            align-items: center;
+            gap: 2px;
         }
-        .title:nth-child(2){
-            display: flex;
-            border-top:2px solid #ccc;
+        .xhs-bar-more:hover { color: #1e6fd9; }
+        .xhs-bar-more .iconfont { font-size: 14px; }
+
+        /* ===== 三条栏之间的间距 ===== */
+        .xhs-wrap .xhs-bar + .xhs-bar {
+            border-top: 1px dashed #eee;
         }
-        .title:nth-child(2) h2{
-            flex-grow: 1;
-            /*占剩余所有空间*/
-        }
-        .title:nth-child(3){
-            position:relative;
-            border-bottom: 2px solid #039;
-        }
-        .title:nth-child(3) a{
-            position: absolute;
-            right: 16px;
-            top: 0;
-            
+        /* 用 margin 替代（更灵活） */
+        .xhs-bar + .xhs-bar { margin-top: 16px; border-top: none; }
+
+        /* ===== 页脚 ===== */
+        .xhs-foot {
+            text-align: center;
+            font-size: 12px;
+            color: #bbb;
+            padding: 20px;
+            letter-spacing: 1px;
         }
     </style>
 </head>
 <body>
-    <div class="title">
-        <h2>解浩帅的标题</h2>
-        <a href="#">更多</a>
-    </div>
-    <div class="title">
-        <h2>解浩帅的标题</h2>
-        <a href="#">更多</a>
-    </div>
-    <div class="title">
-        <h2>解浩帅的标题</h2>
-        <a href="#">更多</a>
+<div class="xhs-wrap">
+
+    <!-- 样式一：外边框 + 居中控件 -->
+    <div class="xhs-bar xhs-bar-1">
+        <div class="xhs-bar-title"><i class="iconfont icon-shouye-zhihui"></i>解浩帅的标题栏</div>
+        <a href="#" class="xhs-bar-more">更多<i class="iconfont icon-bianji"></i></a>
     </div>
 
+    <!-- 样式二：顶部粗蓝线 + 浅蓝背景 -->
+    <div class="xhs-bar xhs-bar-2">
+        <div class="xhs-bar-title"><i class="iconfont icon-shangcheng"></i>解浩帅的标题栏</div>
+        <a href="#" class="xhs-bar-more">更多<i class="iconfont icon-a-fenxiang2"></i></a>
+    </div>
+
+    <!-- 样式三：底部蓝色下划线（新闻列表最常见的"更多"样式） -->
+    <div class="xhs-bar xhs-bar-3">
+        <div class="xhs-bar-title"><i class="iconfont icon-faxian"></i>解浩帅的标题栏</div>
+        <a href="#" class="xhs-bar-more">更多<i class="iconfont icon-shanchu"></i></a>
+    </div>
+
+    <div class="xhs-foot">一左一右 · Flex space-between 实现 · 解浩帅</div>
+
+</div>
 </body>
 </html>

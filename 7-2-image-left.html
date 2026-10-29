@@ -1,72 +1,151 @@
 <!DOCTYPE html>
-<html lang="en">
+<!-- 姓名：解浩帅，日期：2026-10-29，功能名称：7-2 左图右文新闻列表（Flex+虚线分隔） -->
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style> 
-        *{margin: 0;padding: 0;}
-        .box{}
-        .zy{
+    <title>7-2 左图右文 — 解浩帅</title>
+    <link rel="stylesheet" href="./font/font_5244829_352pklrzxi1/iconfont.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+            background: #f0f2f5;
+            padding: 30px 20px;
+        }
+
+        /* ===== 容器 ===== */
+        .xhs-wrap {
+            max-width: 640px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 8px;
+            padding: 18px 20px 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        /* ===== 标题栏 ===== */
+        .xhs-title-bar {
             display: flex;
-            padding: 5px 10px;
-            margin-bottom:5px;
-            border-bottom: 1px dashed #ccc;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #1e6fd9;
         }
-        .zy img{
+        .xhs-title-bar h2 {
+            font-size: 16px;
+            color: #039;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .xhs-title-bar a {
+            font-size: 12px;
+            color: #999;
+            text-decoration: none;
+        }
+        .xhs-title-bar a:hover { color: #1e6fd9; }
+
+        /* ===== 核心：左图右文 Flex 行 ===== */
+        .xhs-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px dashed #e0e0e0;
+        }
+        .xhs-item:last-child { border-bottom: none; }
+
+        /* 左：固定宽度小图 */
+        .xhs-item img {
             width: 100px;
+            height: 75px;
+            object-fit: cover;
+            border-radius: 3px;
+            flex-shrink: 0;
         }
-        .text{
-            margin-left:10px;
+
+        /* 右：文字区 Flex-wrap */
+        .xhs-text {
+            flex: 1;
+            min-width: 0;          /* 防止标题撑破 */
             display: flex;
             flex-wrap: wrap;
+            align-content: flex-start;
+            gap: 6px 0;
             font-size: 12px;
-            color:#999;
-            flex-grow:1;
+            color: #999;
         }
-        .text h3{
-            width:100%;
+
+        /* 标题占一整行 */
+        .xhs-text h3 {
+            width: 100%;
             font-size: 16px;
-            color:#333;
-            height: 36PX;
+            font-weight: bold;
+            color: #333;
+            line-height: 1.4;
+            height: 36px;           /* 固定两行高度 */
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
         }
-        .author{
-            flex-grow:1;
-        }
-        .time{
-            margin-right: 5px;
+        .xhs-text h3:hover { color: #c00; }
+
+        /* 作者占剩余空间，时间靠右 */
+        .xhs-text .xhs-author { flex-grow: 1; }
+        .xhs-text .xhs-time { margin-right: 4px; }
+
+        /* ===== 页脚 ===== */
+        .xhs-foot {
+            text-align: center;
+            font-size: 12px;
+            color: #bbb;
+            padding: 16px;
+            letter-spacing: 1px;
         }
     </style>
 </head>
 <body>
-    <div class="box">
-        <div class="zy">
-            <img src="./img/a1.png">
-            <div class="text">
-                <h3>标题</h3>
-                <span class="author">解浩帅</span>
-                <span class="time">2020-10-10</span>
-            </div>
-        </div>
+<div class="xhs-wrap">
 
-        <div class="zy">
-            <img src="./img/a1.png">
-            <div class="text">
-                <h3>标题</h3>
-                <span class="author">解浩帅</span>
-                <span class="time">2020-10-10</span>
-            </div>
-        </div>
-
-        <div class="zy">
-            <img src="./img/a1.png">
-            <div class="text">
-                <h3>标题</h3>
-                <span class="author">解浩帅</span>
-                <span class="time">2020-10-10</span>
-            </div>
-        </div>
-
+    <!-- 标题栏 -->
+    <div class="xhs-title-bar">
+        <h2><i class="iconfont icon-faxian"></i>左图右文 · 新闻列表</h2>
+        <a href="#">更多 <i class="iconfont icon-bianji"></i></a>
     </div>
+
+    <!-- 新闻列表：每行 Flex 左图右文 + 虚线分隔 -->
+    <div class="xhs-item">
+        <img src="./img/a1.png" alt="封面">
+        <div class="xhs-text">
+            <h3>解浩帅 · 前端开发技术分享：Flex 与 Grid 布局实战对比</h3>
+            <span class="xhs-author">解浩帅</span>
+            <span class="xhs-time">2026-10-29</span>
+        </div>
+    </div>
+
+    <div class="xhs-item">
+        <img src="./img/a2.jpg" alt="封面">
+        <div class="xhs-text">
+            <h3>解浩帅 · 网页元素设计四级项目完成总结：语义化 HTML + 规范 CSS</h3>
+            <span class="xhs-author">解浩帅</span>
+            <span class="xhs-time">2026-10-28</span>
+        </div>
+    </div>
+
+    <div class="xhs-item">
+        <img src="./img/a3.jpg" alt="封面">
+        <div class="xhs-text">
+            <h3>解浩帅 · CSS iconfont 图标库使用教程：从下载到项目接入完整流程</h3>
+            <span class="xhs-author">解浩帅</span>
+            <span class="xhs-time">2026-10-27</span>
+        </div>
+    </div>
+
+    <div class="xhs-foot">Flex 左图右文 · 虚线分隔 · 解浩帅</div>
+
+</div>
 </body>
 </html>

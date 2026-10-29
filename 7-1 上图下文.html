@@ -1,60 +1,133 @@
 <!DOCTYPE html>
-<html lang="en">
+<!-- 姓名：解浩帅，日期：2026-10-29，功能名称：7-1 上图下文卡片列表（Grid三列） -->
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>7-1 上图下文 — 解浩帅</title>
+    <link rel="stylesheet" href="./font/font_5244829_352pklrzxi1/iconfont.css">
     <style>
-        /*全局CSS*/
-        *{margin: 0;padding: 0;}
-        ul{list-style: none;}
-        img{
-            display: block;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        ul { list-style: none; }
+        img { display: block; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+            background: #f0f2f5;
+            padding: 30px 20px;
         }
-        .slist{
+
+        /* ===== 容器 ===== */
+        .xhs-wrap {
+            max-width: 760px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 8px;
+            padding: 24px 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        /* ===== 标题栏 ===== */
+        .xhs-title-bar {
             display: flex;
-            margin: 8px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #1e6fd9;
         }
-        .slist li{
-            width:30%;
-            margin-right: 3px;
-            flex-grow:1;
-            /*相对*/
+        .xhs-title-bar h2 {
+            font-size: 16px;
+            color: #039;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .xhs-title-bar a {
+            font-size: 12px;
+            color: #999;
+            text-decoration: none;
+        }
+        .xhs-title-bar a:hover { color: #1e6fd9; }
+
+        /* ===== 核心：Grid 三列卡片 ===== */
+        .xhs-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        /* 上图下文：外层 li 相对定位，p 绝对定位叠在图片底部 */
+        .xhs-cards li {
             position: relative;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            border-radius: 4px;
         }
-        .slist img{
+        .xhs-cards li img {
             width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .25s;
         }
-        .slist p{
-            font-size: 14px;
-            text-align: center;
-            line-height: 24px;
-            /*绝对定位*/
+        .xhs-cards li:hover img { transform: scale(1.05); }
+
+        /* 文字叠在图片底部（半透明黑底白字） */
+        .xhs-cards li p {
             position: absolute;
-            bottom: 0;
             left: 0;
-            width:100%;
-            background: rgba(0,0,0,0.5);
+            bottom: 0;
+            width: 100%;
+            padding: 8px 10px;
+            font-size: 13px;
+            line-height: 1.6;
+            text-align: center;
             color: #fff;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(2px);
+        }
+
+        /* ===== 页脚 ===== */
+        .xhs-foot {
+            text-align: center;
+            font-size: 12px;
+            color: #bbb;
+            padding: 18px;
+            letter-spacing: 1px;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 600px) {
+            .xhs-cards { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
 <body>
-    <ul class="slist">
+<div class="xhs-wrap">
+
+    <!-- 标题栏 -->
+    <div class="xhs-title-bar">
+        <h2><i class="iconfont icon-shouye-zhihui"></i>上图下文 · 推荐图集</h2>
+        <a href="#">更多 <i class="iconfont icon-bianji"></i></a>
+    </div>
+
+    <!-- Grid 三列，每格都是"上图下文" -->
+    <ul class="xhs-cards">
         <li>
-            <img src="./img/4.jpg"">
+            <img src="./img/1.jpg" alt="解浩帅的标题1">
             <p>解浩帅的标题1</p>
         </li>
-
-         <li>
-            <img src="./img/5.jpg">
+        <li>
+            <img src="./img/2.jpg" alt="解浩帅的标题2">
             <p>解浩帅的标题2</p>
         </li>
-
-         <li>
-            <img src="./img/6.jpg">
+        <li>
+            <img src="./img/3.jpg" alt="解浩帅的标题3">
             <p>解浩帅的标题3</p>
         </li>
     </ul>
+
+    <div class="xhs-foot">Grid 三列 · 上图下文 · 解浩帅</div>
+
+</div>
 </body>
 </html>
