@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<!-- 姓名：解浩帅，日期：2026-10-29，功能名称：电商分类导航 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16-3 电商分类导航 — 解浩帅</title>
+    <link rel="stylesheet" href="./font/font_5244829_352pklrzxi1/iconfont.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+            background: #fff;
+            padding: 20px;
+        }
+        .xhs-wrap {
+            max-width: 500px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        }
+        .xhs-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .xhs-category-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            border-bottom: 1px solid #f5f5f5;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .xhs-category-item:hover { background: #f9f9f9; }
+        .xhs-category-item:last-child { border-bottom: none; }
+        .xhs-icon {
+            font-family: "iconfont" !important;
+            font-size: 22px;
+            color: #4a4a4a;
+            margin-right: 12px;
+            width: 28px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .xhs-category-text {
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+            line-height: 1.8;
+        }
+        .xhs-category-text a {
+            color: #333;
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+        .xhs-category-text a:hover { color: #1e6fd9; }
+        .xhs-sep {
+            color: #c0c0c0;
+            margin: 0 6px;
+        }
+    </style>
+</head>
+<body>
+<div class="xhs-wrap">
+    <div class="xhs-title">分类</div>
+
+    <div class="xhs-category-item">
+        <span class="iconfont icon-shangcheng xhs-icon"></span>
+        <div class="xhs-category-text">
+            <a href="#">冰洗</a><span class="xhs-sep">/</span>
+            <a href="#">空调</a><span class="xhs-sep">/</span>
+            <a href="#">电视</a><span class="xhs-sep">/</span>
+            <a href="#">厨卫大电</a>
+        </div>
+    </div>
+
+    <div class="xhs-category-item">
+        <span class="iconfont icon-zhongxinshengcheng xhs-icon"></span>
+        <div class="xhs-category-text">
+            <a href="#">电脑</a><span class="xhs-sep">/</span>
+            <a href="#">办公</a><span class="xhs-sep">/</span>
+            <a href="#">文具用品</a>
+        </div>
+    </div>
+
+    <div class="xhs-category-item">
+        <span class="iconfont icon-denglu xhs-icon"></span>
+        <div class="xhs-category-text">
+            <a href="#">手机</a><span class="xhs-sep">/</span>
+            <a href="#">运营商</a><span class="xhs-sep">/</span>
+            <a href="#">数码</a>
+        </div>
+    </div>
+
+    <div class="xhs-category-item">
+        <span class="iconfont icon-anquanbaozhang xhs-icon"></span>
+        <div class="xhs-category-text">
+            <a href="#">生活电器</a><span class="xhs-sep">/</span>
+            <a href="#">厨房小电</a><span class="xhs-sep">/</span>
+            <a href="#">个护健康</a>
+        </div>
+    </div>
+
+    <div class="xhs-category-item">
+        <span class="iconfont icon-pingguo xhs-icon"></span>
+        <div class="xhs-category-text">
+            <a href="#">食品</a><span class="xhs-sep">/</span>
+            <a href="#">酒类</a><span class="xhs-sep">/</span>
+            <a href="#">生鲜</a><span class="xhs-sep">/</span>
+            <a href="#">特产</a>
+        </div>
+    </div>
+
+    <div class="xhs-category-item">
+        <span class="iconfont icon-shoucang xhs-icon"></span>
+        <div class="xhs-category-text">
+            <a href="#">美妆</a><span class="xhs-sep">/</span>
+            <a href="#">个护清洁</a><span class="xhs-sep">/</span>
+            <a href="#">宠物</a>
+        </div>
+    </div>
+
+    <div class="xhs-category-item">
+        <span class="iconfont icon-kuaijiezhifu xhs-icon"></span>
+        <div class="xhs-category-text">
+            <a href="#">元器件</a><span class="xhs-sep">/</span>
+            <a href="#">劳保物资</a><span class="xhs-sep">/</span>
+            <a href="#">五金机电</a>
+        </div>
+    </div>
+
+    <div class="xhs-category-item">
+        <span class="iconfont icon-shouye-zhihui xhs-icon"></span>
+        <div class="xhs-category-text">
+            <a href="#">家装</a><span class="xhs-sep">/</span>
+            <a href="#">建材</a><span class="xhs-sep">/</span>
+            <a href="#">家具</a>
+        </div>
+    </div>
+
+    <div class="xhs-category-item">
+        <span class="iconfont icon-xiaoxi-zhihui xhs-icon"></span>
+        <div class="xhs-category-text">
+            <a href="#">家居日用</a><span class="xhs-sep">/</span>
+            <a href="#">厨具</a>
+        </div>
+    </div>
+
+    <div class="xhs-category-item">
+        <span class="iconfont icon-bianji xhs-icon"></span>
+        <div class="xhs-category-text">
+            <a href="#">男鞋</a><span class="xhs-sep">/</span>
+            <a href="#">运动</a><span class="xhs-sep">/</span>
+            <a href="#">户外</a>
+        </div>
+    </div>
+
+    <div class="xhs-category-item">
+        <span class="iconfont icon-wode xhs-icon"></span>
+        <div class="xhs-category-text">
+            <a href="#">男装</a><span class="xhs-sep">/</span>
+            <a href="#">女装</a><span class="xhs-sep">/</span>
+            <a href="#">童装</a><span class="xhs-sep">/</span>
+            <a href="#">内衣</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 点击分类项的交互提示
+    document.querySelectorAll(".xhs-category-item a").forEach(function (xhsLink) {
+        xhsLink.addEventListener("click", function (e) {
+            e.preventDefault();
+            console.log("解浩帅 · 点击分类：" + xhsLink.textContent);
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<!-- 姓名：解浩帅，日期：2026-10-29，功能名称：新浪财经排行榜tab选项卡 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16-4 新浪财经排行榜 — 解浩帅</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .xhs-wrap {
+            max-width: 520px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        /* ===== Tab 栏 ===== */
+        .xhs-tabs {
+            display: flex;
+            border-bottom: 2px solid #eee;
+        }
+        .xhs-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 15px;
+            font-weight: bold;
+            color: #666;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.2s;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+        .xhs-tab:hover { color: #1e6fd9; }
+        .xhs-tab.xhs-active {
+            color: #c00;
+            border-bottom-color: #c00;
+        }
+
+        /* ===== 列表 ===== */
+        .xhs-rank-list {
+            display: none;
+            padding: 8px 0;
+        }
+        .xhs-rank-list.xhs-active { display: block; }
+
+        .xhs-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 12px 18px;
+            border-bottom: 1px solid #f5f5f5;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .xhs-item:hover { background: #fafafa; }
+        .xhs-item:last-child { border-bottom: none; }
+
+        .xhs-num {
+            width: 22px;
+            height: 22px;
+            line-height: 22px;
+            text-align: center;
+            border-radius: 3px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #fff;
+            background: #c00;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .xhs-num.xhs-num-1 { background: #c00; }
+        .xhs-num.xhs-num-2 { background: #e63946; }
+        .xhs-num.xhs-num-3 { background: #f4a261; }
+        .xhs-num.xhs-num-hi { background: #e63946; }
+        .xhs-num.xhs-num-lo { background: #bbb; }
+
+        .xhs-title {
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+            line-height: 1.55;
+        }
+        .xhs-title:hover { color: #c00; }
+    </style>
+</head>
+<body>
+<div class="xhs-wrap">
+
+    <!-- ===== Tab 栏 ===== -->
+    <div class="xhs-tabs">
+        <div class="xhs-tab xhs-active" data-tab="rank">排行榜</div>
+        <div class="xhs-tab" data-tab="news">新闻</div>
+        <div class="xhs-tab" data-tab="stock">证券</div>
+        <div class="xhs-tab" data-tab="finance">理财</div>
+        <div class="xhs-tab" data-tab="blog">博客</div>
+    </div>
+
+    <!-- ===== 排行榜 ===== -->
+    <ul class="xhs-rank-list xhs-active" id="rank">
+        <li class="xhs-item"><span class="xhs-num xhs-num-1">1</span><span class="xhs-title">构建"股市+债市"稳市机制！央行新工具来了</span></li>
+        <li class="xhs-item"><span class="xhs-num xhs-num-2">2</span><span class="xhs-title">美媒：美军已准备好再打击伊朗 特朗普或中期选举后</span></li>
+        <li class="xhs-item"><span class="xhs-num xhs-num-3">3</span><span class="xhs-title">姆巴佩发表涉中国不当言论，多家品牌终止合作，媒</span></li>
+        <li class="xhs-item"><span class="xhs-num xhs-num-hi">4</span><span class="xhs-title">东鹏饮料集团：零容忍伤害民族感情行为，终止与姆</span></li>
+        <li class="xhs-item"><span class="xhs-num xhs-num-hi">5</span><span class="xhs-title">300672，业绩暴增超5600%！10股业绩大增（附股）</span></li>
+        <li class="xhs-item"><span class="xhs-num xhs-num-lo">6</span><span class="xhs-title">史上最大IPO要来了！7位创始人身家均超130亿美元</span></li>
+        <li class="xhs-item"><span class="xhs-num xhs-num-lo">7</span><span class="xhs-title">外交部：对英国警方任意、过度执法行为表示强烈不</span></li>
+        <li class="xhs-item"><span class="xhs-num xhs-num-lo">8</span><span class="xhs-title">1000000美元！特朗普重金悬赏</span></li>
+        <li class="xhs-item"><span class="xhs-num xhs-num-lo">9</span><span class="xhs-title">张一鸣以6700亿元刷新中国首富财富纪录！《2026胡</span></li>
+        <li class="xhs-item"><span class="xhs-num xhs-num-lo">10</span><span class="xhs-title">Gucci卖不动了 开云今年将关掉至少125家门店</span></li>
+    </ul>
+
+    <!-- ===== 新闻 ===== -->
+    <ul class="xhs-rank-list" id="news">
+        <li class="xhs-item"><span class="xhs-num xhs-num-1">1</span><span class="xhs-title">央行宣布降准0.5个百分点 释放长期资金约1.2万亿元</span></li>
+        <li class="xhs-item"><span class="xhs-num xhs-num-2">2</span><span class="xhs-title">国务院印发《关于推动高质量发展的若干意见》</span></li>
+        <li class="xhs-item"><span class="xhs-num xhs-num-3">3</span><span class="xhs-title">全国两会将于3月4日、5日召开</span></li>
+        <li class="xhs-item"><span class="xhs-num xhs-num-hi">4</span><span class="xhs-title">新能源汽车2月销量同比增长45%</span></li>
+        <li class="xhs-item"><span class="xhs-num xhs-num-hi">5</span><span class="xhs-title">多地发布楼市新政 首套房贷利率可低至3.5%</span></li>
+    </ul>
+
+    <!-- ===== 证券 ===== -->
+    <ul class="xhs-rank-list" id="stock">
+        <li class="xhs-item"><span class="xhs-num xhs-num-1">1</span><span class="xhs-title">沪指重返3300点 两市成交额突破2万亿</span></li>
+        <li class="xhs-item"><span class="xhs-num xhs-num-2">2</span><span class="xhs-title">AI概念股持续走强 多只个股涨停</span></li>
+        <li class="xhs-item"><span class="xhs-num xhs-num-3">3</span><span class="xhs-title">北向资金单日净买入超150亿元</span></li>
+        <li class="xhs-item"><span class="xhs-num xhs-num-lo">4</span><span class="xhs-title">创业板指放量上涨3.2% 科技股全线飘红</span></li>
+    </ul>
+
+    <!-- ===== 理财 ===== -->
+    <ul class="xhs-rank-list" id="finance">
+        <li class="xhs-item"><span class="xhs-num xhs-num-1">1</span><span class="xhs-title">银行理财收益率持续下行 3年期定存成香饽饽</span></li>
+        <li class="xhs-item"><span class="xhs-num xhs-num-2">2</span><span class="xhs-title">国债发行火爆 开售即售罄</span></li>
+        <li class="xhs-item"><span class="xhs-num xhs-num-hi">3</span><span class="xhs-title">黄金价格突破2100美元 创历史新高</span></li>
+        <li class="xhs-item"><span class="xhs-num xhs-num-lo">4</span><span class="xhs-title">余额宝收益率跌破1.5% 居民储蓄搬家</span></li>
+    </ul>
+
+    <!-- ===== 博客 ===== -->
+    <ul class="xhs-rank-list" id="blog">
+        <li class="xhs-item"><span class="xhs-num xhs-num-1">1</span><span class="xhs-title">【解浩帅】JavaScript数组方法全解析：从push到reduce的最佳实践</span></li>
+        <li class="xhs-item"><span class="xhs-num xhs-num-2">2</span><span class="xhs-title">前端开发必看：Flex与Grid布局实战对比</span></li>
+        <li class="xhs-item"><span class="xhs-num xhs-num-3">3</span><span class="xhs-title">CSS变量（自定义属性）从入门到精通</span></li>
+        <li class="xhs-item"><span class="xhs-num xhs-num-lo">4</span><span class="xhs-title">从零搭建一个完整的HTML+CSS网页元素设计项目</span></li>
+    </ul>
+
+</div>
+
+<script>
+    // Tab 切换
+    const xhsTabs = document.querySelectorAll(".xhs-tab");
+    const xhsLists = document.querySelectorAll(".xhs-rank-list");
+
+    xhsTabs.forEach(function (xhsTab) {
+        xhsTab.addEventListener("click", function () {
+            // 清除所有 active
+            xhsTabs.forEach(function (t) { t.classList.remove("xhs-active"); });
+            xhsLists.forEach(function (l) { l.classList.remove("xhs-active"); });
+
+            // 激活当前
+            xhsTab.classList.add("xhs-active");
+            const xhsTarget = document.getElementById(xhsTab.getAttribute("data-tab"));
+            if (xhsTarget) { xhsTarget.classList.add("xhs-active"); }
+
+            console.log("解浩帅 · 切换到 tab：" + xhsTab.textContent.trim());
+        });
+    });
+
+    // 点击列表项
+    document.querySelectorAll(".xhs-item").forEach(function (xhsItem) {
+        xhsItem.addEventListener("click", function () {
+            const xhsNum = xhsItem.querySelector(".xhs-num").textContent;
+            const xhsTitle = xhsItem.querySelector(".xhs-title").textContent;
+            console.log("解浩帅 · 点击：第" + xhsNum + "条 — " + xhsTitle);
+        });
+    });
+</script>
+</body>
+</html>
