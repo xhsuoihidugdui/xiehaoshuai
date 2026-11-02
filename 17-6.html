@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<!-- 姓名：解浩帅，日期：2026-11-02，功能名称：17-6 Promise 与 async/await 异步流程演示（包饺子） -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17-6 异步流程 · 包饺子 — 解浩帅</title>
+    <link rel="stylesheet" href="./font/font_5244829_352pklrzxi1/iconfont.css">
+    <style>
+        :root {
+            --xhs-main: #1e6fd9;
+            --xhs-dark: #0b1f3a;
+            --xhs-text: #2c3646;
+            --xhs-sub: #7a8797;
+            --xhs-line: #e6eaf0;
+            --xhs-bg: #f0f2f5;
+            --xhs-ok: #1e8449;
+            --xhs-warn: #b26a00;
+            --xhs-err: #c0392b;
+            --xhs-gold: #e08a00;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+            background: var(--xhs-bg);
+            color: var(--xhs-text);
+            padding: 24px 16px 36px;
+        }
+
+        .xhs-wrap {
+            max-width: 1120px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(18, 40, 63, .08);
+        }
+
+        /* ===== 头部 ===== */
+        .xhs-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 15px 22px;
+            background: linear-gradient(135deg, var(--xhs-dark), var(--xhs-main));
+            color: #fff;
+        }
+        .xhs-head h1 { font-size: 17px; display: flex; align-items: center; gap: 8px; }
+        .xhs-head h1 .iconfont { font-size: 20px; }
+        .xhs-head em { font-style: normal; color: #ffc46b; }
+
+        /* ===== 控制区 ===== */
+        .xhs-controls {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 13px 22px;
+            background: #fafbfc;
+            border-bottom: 1px solid var(--xhs-line);
+        }
+        .xhs-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 18px;
+            border: none;
+            border-radius: 5px;
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all .16s;
+        }
+        .xhs-btn-main { background: var(--xhs-main); color: #fff; }
+        .xhs-btn-main:hover { background: #14509f; }
+        .xhs-btn-main:disabled { background: #a8c1de; cursor: not-allowed; }
+        .xhs-btn-ghost { background: #fff; color: var(--xhs-sub); border: 1px solid var(--xhs-line); }
+        .xhs-btn-ghost:hover { color: var(--xhs-main); border-color: var(--xhs-main); }
+
+        .xhs-speed {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--xhs-sub);
+        }
+        .xhs-speed select {
+            padding: 6px 8px;
+            border: 1px solid var(--xhs-line);
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: inherit;
+            color: var(--xhs-text);
+            background: #fff;
+            cursor: pointer;
+        }
+
+        .xhs-total {
+            margin-left: auto;
+            font-size: 12px;
+            color: var(--xhs-sub);
+            font-family: Consolas, Monaco, monospace;
+        }
+        .xhs-total b { color: var(--xhs-dark); font-size: 14px; }
+
+        /* ===== 进度条 ===== */
+        .xhs-progress-wrap {
+            padding: 0 22px 14px;
+            background: #fafbfc;
+            border-bottom: 1px solid var(--xhs-line);
+        }
+        .xhs-progress {
+            height: 6px;
+            background: #e9edf2;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .xhs-progress i {
+            display: block;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, #1e6fd9, #4a9af5);
+            transition: width .25s ease;
+        }
+
+        /* ===== 主体两栏 ===== */
+        .xhs-body {
+            display: grid;
+            grid-template-columns: 1.05fr .95fr;
+            gap: 0;
+        }
+        .xhs-pane { padding: 16px 22px 20px; }
+        .xhs-pane + .xhs-pane { border-left: 1px solid var(--xhs-line); }
+        .xhs-pane h2 {
+            font-size: 13px;
+            color: var(--xhs-dark);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .xhs-pane h2 .iconfont { color: var(--xhs-main); }
+
+        /* ===== 流程步骤 ===== */
+        .xhs-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 12px;
+            border: 1px solid var(--xhs-line);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background: #fff;
+            transition: all .2s;
+        }
+        .xhs-step .xhs-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ccd4de;
+            margin-top: 5px;
+            flex-shrink: 0;
+        }
+        .xhs-step .xhs-main-col { flex: 1; min-width: 0; }
+        .xhs-step .xhs-name {
+            font-size: 13.5px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .xhs-step .xhs-name small {
+            font-weight: 400;
+            font-size: 11px;
+            color: var(--xhs-sub);
+            background: #f4f7fb;
+            padding: 1px 7px;
+            border-radius: 10px;
+        }
+        .xhs-step .xhs-note {
+            font-size: 11.5px;
+            color: var(--xhs-sub);
+            margin-top: 3px;
+            line-height: 1.6;
+        }
+        .xhs-step .xhs-state {
+            font-size: 11px;
+            color: var(--xhs-sub);
+            white-space: nowrap;
+            padding-top: 3px;
+        }
+
+        /* 状态样式 */
+        .xhs-step.xhs-running {
+            border-color: #a9c7f0;
+            background: #f4f9ff;
+            box-shadow: 0 0 0 3px rgba(30, 111, 217, .07);
+        }
+        .xhs-step.xhs-running .xhs-dot {
+            background: var(--xhs-main);
+            animation: xhsPulse 1.1s infinite;
+        }
+        .xhs-step.xhs-running .xhs-state { color: var(--xhs-main); font-weight: 600; }
+
+        .xhs-step.xhs-done {
+            border-color: #b7e2c8;
+            background: #f6fdf9;
+        }
+        .xhs-step.xhs-done .xhs-dot { background: var(--xhs-ok); }
+        .xhs-step.xhs-done .xhs-state { color: var(--xhs-ok); font-weight: 600; }
+
+        @keyframes xhsPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(30, 111, 217, .5); }
+            50% { box-shadow: 0 0 0 5px rgba(30, 111, 217, 0); }
+        }
+
+        /* 并行子任务 */
+        .xhs-lanes { margin-top: 7px; display: flex; flex-direction: column; gap: 5px; }
+        .xhs-lane {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 11.5px;
+            color: var(--xhs-sub);
+            background: #fafbfc;
+            border: 1px dashed var(--xhs-line);
+            border-radius: 5px;
+            padding: 5px 9px;
+        }
+        .xhs-lane .xhs-lane-icon {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #ccd4de;
+            flex-shrink: 0;
+        }
+        .xhs-lane .xhs-lane-txt { flex: 1; }
+        .xhs-lane .xhs-lane-state { font-family: Consolas, Monaco, monospace; }
+        .xhs-lane.xhs-lane-running { border-color: #a9c7f0; background: #f4f9ff; }
+        .xhs-lane.xhs-lane-running .xhs-lane-icon {
+            background: var(--xhs-main);
+            animation: xhsPulse 1.1s infinite;
+        }
+        .xhs-lane.xhs-lane-running .xhs-lane-state { color: var(--xhs-main); }
+        .xhs-lane.xhs-lane-done { border-color: #b7e2c8; background: #f6fdf9; }
+        .xhs-lane.xhs-lane-done .xhs-lane-icon { background: var(--xhs-ok); }
+        .xhs-lane.xhs-lane-done .xhs-lane-state { color: var(--xhs-ok); }
+        .xhs-lane.xhs-lane-lose { opacity: .62; }
+        .xhs-lane.xhs-lane-lose .xhs-lane-state { color: var(--xhs-warn); }
+
+        /* ===== 日志 ===== */
+        .xhs-log {
+            background: #0f1c2e;
+            border-radius: 8px;
+            padding: 10px 12px;
+            height: 468px;
+            overflow: auto;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 12px;
+            line-height: 1.8;
+            color: #b9c8da;
+        }
+        .xhs-log div { white-space: pre-wrap; word-break: break-all; }
+        .xhs-log .xhs-l-time { color: #62748a; }
+        .xhs-log .xhs-l-ok { color: #9ae6a3; }
+        .xhs-log .xhs-l-warn { color: #ffc46b; }
+        .xhs-log .xhs-l-sys { color: #7fd1ff; }
+        .xhs-log .xhs-l-title { color: #fff; font-weight: 700; }
+        .xhs-log.xhs-empty::before {
+            content: "等待开始……点左上角「开始包饺子」，观察 Promise.race / Promise.all 如何编排流程";
+            color: #5b6b7d;
+        }
+
+        /* ===== 代码对照 ===== */
+        .xhs-code-section {
+            padding: 0 22px 20px;
+        }
+        .xhs-code-section h2 {
+            font-size: 13px;
+            color: var(--xhs-dark);
+            padding: 14px 0 10px;
+            border-top: 1px solid var(--xhs-line);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .xhs-code-section h2 .iconfont { color: var(--xhs-main); }
+        .xhs-code-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .xhs-code-block {
+            background: #fbfcfd;
+            border: 1px solid var(--xhs-line);
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 12px;
+            line-height: 1.75;
+            color: #2b2b2b;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .xhs-code-block .xhs-kw { color: #8e44ad; }
+        .xhs-code-block .xhs-str { color: #1e8449; }
+        .xhs-code-block .xhs-fn { color: #1e6fd9; }
+        .xhs-code-block .xhs-cmt { color: #8a97a6; }
+
+        /* ===== 页脚 ===== */
+        .xhs-foot {
+            padding: 14px 22px;
+            text-align: center;
+            font-size: 12px;
+            color: #b6bfca;
+            border-top: 1px solid var(--xhs-line);
+            letter-spacing: .5px;
+        }
+
+        @media (max-width: 860px) {
+            .xhs-body { grid-template-columns: 1fr; }
+            .xhs-pane + .xhs-pane { border-left: none; border-top: 1px solid var(--xhs-line); }
+            .xhs-code-grid { grid-template-columns: 1fr; }
+            .xhs-log { height: 320px; }
+        }
+    </style>
+</head>
+<body>
+<div class="xhs-wrap">
+
+    <header class="xhs-head">
+        <h1><i class="iconfont icon-xiaoxi-zhihui"></i>Promise &amp; async / await · <em>包饺子</em></h1>
+        <span class="xhs-tip" style="font-size:11px;color:rgba(255,255,255,.72);">Promise.race 抢先完成 · Promise.all 全部完成</span>
+    </header>
+
+    <div class="xhs-controls">
+        <button class="xhs-btn xhs-btn-main" id="xhsBtnStart">
+            <i class="iconfont icon-kaitongfuwu"></i>开始包饺子
+        </button>
+        <button class="xhs-btn xhs-btn-ghost" id="xhsBtnReset">
+            <i class="iconfont icon-zhongxinshengcheng"></i>重置
+        </button>
+        <div class="xhs-speed">
+            演示速度：
+            <select id="xhsSpeed">
+                <option value="1">×1（真实时长）</option>
+                <option value="2" selected>×2（推荐）</option>
+                <option value="5">×5（快速）</option>
+            </select>
+        </div>
+        <div class="xhs-total">已用时 <b id="xhsElapsed">0.0s</b> / 基准 23s</div>
+    </div>
+
+    <div class="xhs-progress-wrap">
+        <div class="xhs-progress"><i id="xhsBar"></i></div>
+    </div>
+
+    <div class="xhs-body">
+        <!-- 左：流程 -->
+        <section class="xhs-pane">
+            <h2><i class="iconfont icon-shouye-zhihui"></i>包饺子流程</h2>
+
+            <div class="xhs-step" id="xhsStepBuy">
+                <span class="xhs-dot"></span>
+                <div class="xhs-main-col">
+                    <div class="xhs-name">① 买原料 <small>Promise.race · 任一完成即可</small></div>
+                    <div class="xhs-note">线上、线下同时下单，谁先完成就用谁的原料。</div>
+                    <div class="xhs-lanes">
+                        <div class="xhs-lane" id="xhsLaneOnline">
+                            <span class="xhs-lane-icon"></span>
+                            <span class="xhs-lane-txt">线上购买（生鲜配送）· 6s</span>
+                            <span class="xhs-lane-state">等待</span>
+                        </div>
+                        <div class="xhs-lane" id="xhsLaneOffline">
+                            <span class="xhs-lane-icon"></span>
+                            <span class="xhs-lane-txt">线下购买（超市采购）· 8s</span>
+                            <span class="xhs-lane-state">等待</span>
+                        </div>
+                    </div>
+                </div>
+                <span class="xhs-state">待开始</span>
+            </div>
+
+            <div class="xhs-step" id="xhsStepPickup">
+                <span class="xhs-dot"></span>
+                <div class="xhs-main-col">
+                    <div class="xhs-name">② 取原料 <small>await</small></div>
+                    <div class="xhs-note">拿到先完成的原料，才能进入下一步。</div>
+                </div>
+                <span class="xhs-state">待开始</span>
+            </div>
+
+            <div class="xhs-step" id="xhsStepPrep">
+                <span class="xhs-dot"></span>
+                <div class="xhs-main-col">
+                    <div class="xhs-name">③ 和面 + 和馅 <small>Promise.all · 全部完成</small></div>
+                    <div class="xhs-note">两件事同时做，但必须两件都完成才能包。</div>
+                    <div class="xhs-lanes">
+                        <div class="xhs-lane" id="xhsLaneDough">
+                            <span class="xhs-lane-icon"></span>
+                            <span class="xhs-lane-txt">和面 · 4s</span>
+                            <span class="xhs-lane-state">等待</span>
+                        </div>
+                        <div class="xhs-lane" id="xhsLaneFilling">
+                            <span class="xhs-lane-icon"></span>
+                            <span class="xhs-lane-txt">和馅 · 3.5s</span>
+                            <span class="xhs-lane-state">等待</span>
+                        </div>
+                    </div>
+                </div>
+                <span class="xhs-state">待开始</span>
+            </div>
+
+            <div class="xhs-step" id="xhsStepWrap">
+                <span class="xhs-dot"></span>
+                <div class="xhs-main-col">
+                    <div class="xhs-name">④ 包饺子 <small>await</small></div>
+                    <div class="xhs-note">面和馅都准备好了，开始包饺子 · 5s</div>
+                </div>
+                <span class="xhs-state">待开始</span>
+            </div>
+
+            <div class="xhs-step" id="xhsStepBoil">
+                <span class="xhs-dot"></span>
+                <div class="xhs-main-col">
+                    <div class="xhs-name">⑤ 煮饺子 <small>await</small></div>
+                    <div class="xhs-note">水开下锅，煮到浮起 · 4s</div>
+                </div>
+                <span class="xhs-state">待开始</span>
+            </div>
+
+            <div class="xhs-step" id="xhsStepEat">
+                <span class="xhs-dot"></span>
+                <div class="xhs-main-col">
+                    <div class="xhs-name">⑥ 吃饺子 <small>await</small></div>
+                    <div class="xhs-note">流程结束，开吃！· 2s</div>
+                </div>
+                <span class="xhs-state">待开始</span>
+            </div>
+        </section>
+
+        <!-- 右：日志 -->
+        <section class="xhs-pane">
+            <h2><i class="iconfont icon-bianji"></i>执行日志（时间轴）</h2>
+            <div class="xhs-log xhs-empty" id="xhsLog"></div>
+        </section>
+    </div>
+
+    <!-- 两种写法对照 -->
+    <section class="xhs-code-section">
+        <h2><i class="iconfont icon-faxian"></i>本页核心代码：async / await 与 Promise 链两种写法</h2>
+        <div class="xhs-code-grid">
+            <div class="xhs-code-block"><span class="xhs-cmt">// 写法一：async / await（本页采用）</span>
+<span class="xhs-kw">async function</span> <span class="xhs-fn">xhsCook</span>() {
+  <span class="xhs-cmt">// 谁先完成用谁（线上 6s / 线下 8s）</span>
+  <span class="xhs-kw">const</span> xhsMat = <span class="xhs-kw">await</span> Promise.<span class="xhs-fn">race</span>([
+    <span class="xhs-fn">xhsBuyOnline</span>(), <span class="xhs-fn">xhsBuyOffline</span>()
+  ]);
+
+  <span class="xhs-kw">await</span> <span class="xhs-fn">xhsPickUp</span>(xhsMat);          <span class="xhs-cmt">// 取原料 2s</span>
+
+  <span class="xhs-cmt">// 和面、和馅同时做，两个都完成</span>
+  <span class="xhs-kw">await</span> Promise.<span class="xhs-fn">all</span>([
+    <span class="xhs-fn">xhsKneadDough</span>(), <span class="xhs-fn">xhsMixFilling</span>()
+  ]);
+
+  <span class="xhs-kw">await</span> <span class="xhs-fn">xhsWrap</span>();   <span class="xhs-cmt">// 包饺子 5s</span>
+  <span class="xhs-kw">await</span> <span class="xhs-fn">xhsBoil</span>();   <span class="xhs-cmt">// 煮饺子 4s</span>
+  <span class="xhs-kw">await</span> <span class="xhs-fn">xhsEat</span>();    <span class="xhs-cmt">// 吃饺子 2s</span>
+}</div>
+            <div class="xhs-code-block"><span class="xhs-cmt">// 写法二：Promise 链（等价写法）</span>
+<span class="xhs-fn">xhsBuyOnlineOrOffline</span>() {
+  <span class="xhs-kw">return</span> Promise.<span class="xhs-fn">race</span>([
+    <span class="xhs-fn">xhsBuyOnline</span>(), <span class="xhs-fn">xhsBuyOffline</span>()
+  ]);
+}
+
+<span class="xhs-fn">xhsBuyOnlineOrOffline</span>()
+  .<span class="xhs-fn">then</span>(xhsMat =&gt; <span class="xhs-fn">xhsPickUp</span>(xhsMat))
+  .<span class="xhs-fn">then</span>(() =&gt; Promise.<span class="xhs-fn">all</span>([
+    <span class="xhs-fn">xhsKneadDough</span>(), <span class="xhs-fn">xhsMixFilling</span>()
+  ]))
+  .<span class="xhs-fn">then</span>(() =&gt; <span class="xhs-fn">xhsWrap</span>())
+  .<span class="xhs-fn">then</span>(() =&gt; <span class="xhs-fn">xhsBoil</span>())
+  .<span class="xhs-fn">then</span>(() =&gt; <span class="xhs-fn">xhsEat</span>())
+  .<span class="xhs-fn">catch</span>(xhsErr =&gt; console.<span class="xhs-fn">error</span>(xhsErr));</div>
+        </div>
+    </section>
+
+    <div class="xhs-foot">Promise.race / Promise.all / async / await · 每个步骤用 setTimeout 模拟 · 解浩帅</div>
+</div>
+
+<script>
+    /* ===== 常量与状态 ===== */
+    var XHS_BASE_TOTAL = 23;          /* 6 + 2 + 4 + 5 + 4 + 2 = 23s（和馅 3.5s 被和面 4s 覆盖） */
+    var xhsSpeed = 2;
+    var xhsRunId = 0;                 /* 每次运行 +1，用于废弃旧回调 */
+    var xhsTickId = null;
+    var xhsStartTime = 0;
+    var xhsDoneSteps = 0;
+
+    var xhsLogBox = document.getElementById("xhsLog");
+    var xhsBar = document.getElementById("xhsBar");
+    var xhsElapsed = document.getElementById("xhsElapsed");
+    var xhsBtnStart = document.getElementById("xhsBtnStart");
+
+    /* ===== 工具：把基准毫秒换算成当前演示速度 ===== */
+    function xhsMs(xhsBase) {
+        return Math.round(xhsBase / xhsSpeed);
+    }
+
+    /* ===== 工具：setTimeout 的 Promise 封装 ===== */
+    function xhsWait(xhsBase) {
+        return new Promise(function (resolve) {
+            setTimeout(resolve, xhsMs(xhsBase));
+        });
+    }
+
+    /* ===== 日志 ===== */
+    function xhsNow() {
+        var xhsD = new Date();
+        return String(xhsD.getHours()).padStart(2, "0") + ":"
+            + String(xhsD.getMinutes()).padStart(2, "0") + ":"
+            + String(xhsD.getSeconds()).padStart(2, "0") + "."
+            + String(xhsD.getMilliseconds()).padStart(3, "0");
+    }
+    function xhsLog(xhsMsg, xhsType) {
+        xhsLogBox.classList.remove("xhs-empty");
+        var xhsCls = "";
+        if (xhsType === "ok") xhsCls = "xhs-l-ok";
+        else if (xhsType === "warn") xhsCls = "xhs-l-warn";
+        else if (xhsType === "sys") xhsCls = "xhs-l-sys";
+        else if (xhsType === "title") xhsCls = "xhs-l-title";
+
+        var xhsLine = document.createElement("div");
+        xhsLine.innerHTML = '<span class="xhs-l-time">[' + xhsNow() + ']</span> '
+            + '<span class="' + xhsCls + '">' + xhsMsg + '</span>';
+        xhsLogBox.appendChild(xhsLine);
+        xhsLogBox.scrollTop = xhsLogBox.scrollHeight;
+    }
+
+    /* ===== 状态设置 ===== */
+    function xhsSetStep(xhsId, xhsState, xhsText) {
+        var xhsEl = document.getElementById(xhsId);
+        xhsEl.classList.remove("xhs-running", "xhs-done");
+        if (xhsState) xhsEl.classList.add("xhs-" + xhsState);
+        var xhsStateEl = xhsEl.querySelector(".xhs-state");
+        if (xhsText !== undefined) xhsStateEl.textContent = xhsText;
+        else if (xhsState === "running") xhsStateEl.textContent = "进行中…";
+        else if (xhsState === "done") xhsStateEl.textContent = "已完成";
+        else xhsStateEl.textContent = "待开始";
+    }
+    function xhsSetLane(xhsId, xhsState, xhsText) {
+        var xhsEl = document.getElementById(xhsId);
+        xhsEl.classList.remove("xhs-lane-running", "xhs-lane-done", "xhs-lane-lose");
+        if (xhsState && xhsState !== "pending") xhsEl.classList.add("xhs-lane-" + xhsState);
+        xhsEl.querySelector(".xhs-lane-state").textContent = xhsText !== undefined
+            ? xhsText
+            : (xhsState === "running" ? "进行中…" : (xhsState === "done" ? "完成" : "等待"));
+    }
+
+    /* ===== 进度 / 计时 ===== */
+    function xhsUpdateProgress() {
+        var xhsPct = Math.round(xhsDoneSteps / 6 * 100);
+        xhsBar.style.width = xhsPct + "%";
+    }
+    function xhsStartTick() {
+        xhsStartTime = performance.now();
+        xhsTickId = setInterval(function () {
+            xhsElapsed.textContent = ((performance.now() - xhsStartTime) / 1000).toFixed(1) + "s";
+        }, 100);
+    }
+    function xhsStopTick() {
+        if (xhsTickId !== null) { clearInterval(xhsTickId); xhsTickId = null; }
+    }
+
+    /* ===== 单个步骤完成 ===== */
+    function xhsStepDone(xhsId) {
+        xhsSetStep(xhsId, "done");
+        xhsDoneSteps++;
+        xhsUpdateProgress();
+    }
+
+    /* ===== 主流程：async / await ===== */
+    async function xhsCook() {
+        var xhsRun = ++xhsRunId;
+        xhsDoneSteps = 0;
+        xhsUpdateProgress();
+        xhsBtnStart.disabled = true;
+        xhsStartTick();
+
+        xhsLog("========== 开始包饺子（演示速度 ×" + xhsSpeed + "）==========", "title");
+
+        try {
+            /* ---------- ① 买原料：Promise.race ---------- */
+            xhsSetStep("xhsStepBuy", "running");
+            xhsSetLane("xhsLaneOnline", "running");
+            xhsSetLane("xhsLaneOffline", "running");
+            xhsLog("① 线上购买（6s）与线下购买（8s）同时开始 → 用 Promise.race 取最先完成的", "sys");
+
+            var xhsOnlineP = xhsWait(6000).then(function () {
+                if (xhsRun !== xhsRunId) return "xhs_stale";
+                xhsSetLane("xhsLaneOnline", "done", "完成 6.0s");
+                xhsLog("　线上购买完成（6.0s）", "ok");
+                return "线上";
+            });
+            var xhsOfflineP = xhsWait(8000).then(function () {
+                if (xhsRun !== xhsRunId) return "xhs_stale";
+                /* 如果线下后完成，标记为未采用；此前已被 race 采用则保持 done */
+                var xhsLaneEl = document.getElementById("xhsLaneOffline");
+                if (!xhsLaneEl.classList.contains("xhs-lane-done")) {
+                    xhsSetLane("xhsLaneOffline", "lose", "完成 8.0s · 未采用");
+                    xhsLog("　线下购买也完成了（8.0s），但 Promise.race 只采用第一个结果，本次忽略", "warn");
+                }
+                return "线下";
+            });
+
+            var xhsSource = await Promise.race([xhsOnlineP, xhsOfflineP]);
+            if (xhsRun !== xhsRunId) return "xhs_stale";
+
+            if (xhsSource === "线上") {
+                xhsLog("① Promise.race 结果：线上原料到手（线下仍会在后台跑完，不影响流程）", "ok");
+            } else {
+                xhsSetLane("xhsLaneOnline", "lose", "完成 6.0s · 未采用");
+                xhsLog("① Promise.race 结果：线下原料先到", "ok");
+            }
+            xhsStepDone("xhsStepBuy");
+
+            /* ---------- ② 取原料 ---------- */
+            xhsSetStep("xhsStepPickup", "running");
+            xhsLog("② 取原料（2s）……", "sys");
+            await xhsWait(2000);
+            if (xhsRun !== xhsRunId) return "xhs_stale";
+            xhsLog("② 原料已到手（来源：" + xhsSource + "）", "ok");
+            xhsStepDone("xhsStepPickup");
+
+            /* ---------- ③ 和面 + 和馅：Promise.all ---------- */
+            xhsSetStep("xhsStepPrep", "running");
+            xhsSetLane("xhsLaneDough", "running");
+            xhsSetLane("xhsLaneFilling", "running");
+            xhsLog("③ 和面（4s）与和馅（3.5s）同时开始 → 用 Promise.all 等两个都完成", "sys");
+
+            var xhsDoughP = xhsWait(4000).then(function () {
+                if (xhsRun !== xhsRunId) return;
+                xhsSetLane("xhsLaneDough", "done", "完成 4.0s");
+                xhsLog("　和面完成（4.0s）", "ok");
+            });
+            var xhsFillingP = xhsWait(3500).then(function () {
+                if (xhsRun !== xhsRunId) return;
+                xhsSetLane("xhsLaneFilling", "done", "完成 3.5s");
+                xhsLog("　和馅完成（3.5s），但还要等和面", "ok");
+            });
+
+            await Promise.all([xhsDoughP, xhsFillingP]);
+            if (xhsRun !== xhsRunId) return "xhs_stale";
+            xhsLog("③ Promise.all 两个任务都完成，可以开始包了（总等待 4.0s，而不是 7.5s）", "ok");
+            xhsStepDone("xhsStepPrep");
+
+            /* ---------- ④ 包饺子 ---------- */
+            xhsSetStep("xhsStepWrap", "running");
+            xhsLog("④ 包饺子（5s）……", "sys");
+            await xhsWait(5000);
+            if (xhsRun !== xhsRunId) return "xhs_stale";
+            xhsLog("④ 饺子包好了，一共 60 个", "ok");
+            xhsStepDone("xhsStepWrap");
+
+            /* ---------- ⑤ 煮饺子 ---------- */
+            xhsSetStep("xhsStepBoil", "running");
+            xhsLog("⑤ 煮饺子（4s）……", "sys");
+            await xhsWait(4000);
+            if (xhsRun !== xhsRunId) return "xhs_stale";
+            xhsLog("⑤ 饺子浮起来了，出锅！", "ok");
+            xhsStepDone("xhsStepBoil");
+
+            /* ---------- ⑥ 吃饺子 ---------- */
+            xhsSetStep("xhsStepEat", "running");
+            xhsLog("⑥ 吃饺子（2s）……", "sys");
+            await xhsWait(2000);
+            if (xhsRun !== xhsRunId) return "xhs_stale";
+            xhsLog("⑥ 吃饱了，流程结束！", "ok");
+            xhsStepDone("xhsStepEat");
+
+            /* ---------- 总结 ---------- */
+            xhsStopTick();
+            var xhsReal = ((performance.now() - xhsStartTime) / 1000).toFixed(1);
+            xhsElapsed.textContent = xhsReal + "s";
+            xhsLog("========== 全部完成：真实耗时 " + xhsReal + "s ==========", "title");
+            xhsLog("要点：race 用「最快的」，all 用「最慢的」，await 保证顺序执行", "sys");
+        } catch (xhsErr) {
+            xhsLog("流程出错：" + xhsErr.message, "warn");
+        } finally {
+            xhsBtnStart.disabled = false;
+        }
+    }
+
+    /* ===== 重置 ===== */
+    function xhsReset(xhsSilent) {
+        xhsRunId++;
+        xhsStopTick();
+        xhsDoneSteps = 0;
+        xhsUpdateProgress();
+        xhsElapsed.textContent = "0.0s";
+        xhsBtnStart.disabled = false;
+
+        ["xhsStepBuy", "xhsStepPickup", "xhsStepPrep", "xhsStepWrap", "xhsStepBoil", "xhsStepEat"]
+            .forEach(function (xhsId) {
+                var xhsEl = document.getElementById(xhsId);
+                xhsEl.classList.remove("xhs-running", "xhs-done");
+                xhsEl.querySelector(".xhs-state").textContent = "待开始";
+            });
+
+        ["xhsLaneOnline", "xhsLaneOffline", "xhsLaneDough", "xhsLaneFilling"]
+            .forEach(function (xhsId) {
+                var xhsEl = document.getElementById(xhsId);
+                xhsEl.classList.remove("xhs-lane-running", "xhs-lane-done", "xhs-lane-lose");
+                xhsEl.querySelector(".xhs-lane-state").textContent = "等待";
+            });
+
+        xhsLogBox.innerHTML = "";
+        xhsLogBox.classList.add("xhs-empty");
+        if (!xhsSilent) xhsLog("已重置，点击「开始包饺子」重新演示", "sys");
+    }
+
+    /* ===== 事件绑定 ===== */
+    xhsBtnStart.addEventListener("click", function () {
+        xhsReset(true);
+        xhsCook();
+    });
+    document.getElementById("xhsBtnReset").addEventListener("click", function () {
+        xhsReset(false);
+    });
+    document.getElementById("xhsSpeed").addEventListener("change", function () {
+        xhsSpeed = parseInt(this.value, 10);
+        if (xhsBtnStart.disabled) xhsLog("演示速度已切换为 ×" + xhsSpeed + "（对已排定的步骤不生效，建议重置后重跑）", "warn");
+    });
+
+    /* 初始状态 */
+    xhsReset(true);
+</script>
+</body>
+</html>

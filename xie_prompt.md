@@ -76,3 +76,33 @@
 - model: Kimi-K3
 - prompt: 原图从网站里找，我选三个部分，7-1，7-2，6-2，你围绕这个三个，给我完成项目
 
+
+## 2026-11-02-10-20
+- model: Kimi-K3
+- prompt: 完成17-1.html，展示JSON。
+
+
+## 2026-11-02-10-40
+- model: DeepSeek-V4.1-Flash
+- prompt: 完成17-2.html 获取`https://dog.ceo/api/breed/hound/images/random/3`的数据并展示。接口可以跨域访问。使用fetch和原生代码实现。
+
+
+## 2026-11-02-11-05
+- model: Kimi-K3
+- prompt: 3、完成17-3.html 和17-3-detail.html,显示列表和列表详情，数据来源于接口，使用fetch 列表：`https://dummyjson.com/products?limit=8`，默认商品列表。详情：`https://dummyjson.com/products/1`，根据ID获取单个商品。
+
+
+## 2026-11-02-11-30
+- model: Kimi-K3
+- prompt: 完成17-4.html，对远程数据接口进行测试，支持get、post等，显示返回的数据和错误提示信息，示例post接口：`https://jsonplaceholder.typicode.com/posts`
+
+
+## 2026-11-02-16-35
+- model: Kimi-K3
+- prompt: 完成17-5.html，展示javascript的两种定时器。
+
+
+## 2026-11-02-17-20
+- model: Kimi-K3
+- prompt: 完成17-6.html，使用promise和async完成异步操作的演示包饺子的流程。先买原料（线上线下同时购买，完成任何一个即可进行下一步），取原料，买完原料之后同时和面、和馅，两个活动都完成之后包饺子，包完饺子煮饺子，然后吃饺子。使用setTimeout模拟每一个流程，如买原料6s。在页面上显示流程。
+

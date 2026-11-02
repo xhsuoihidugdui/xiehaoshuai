@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<!-- 姓名：解浩帅，日期：2026-11-02，功能名称：17-3-detail 商品详情页（根据 URL 中的 id 使用 fetch 获取单个商品） -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17-3 商品详情 — 解浩帅</title>
+    <link rel="stylesheet" href="./font/font_5244829_352pklrzxi1/iconfont.css">
+    <style>
+        :root {
+            --xhs-main: #1e6fd9;
+            --xhs-dark: #0b1f3a;
+            --xhs-text: #2c3646;
+            --xhs-sub: #7a8797;
+            --xhs-line: #e6eaf0;
+            --xhs-price: #e4393c;
+            --xhs-bg: #f0f2f5;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+            background: var(--xhs-bg);
+            color: var(--xhs-text);
+            padding: 26px 18px 40px;
+        }
+
+        .xhs-wrap {
+            max-width: 1020px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(18, 40, 63, .08);
+        }
+
+        /* ===== 头部 ===== */
+        .xhs-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, var(--xhs-dark), var(--xhs-main));
+            color: #fff;
+        }
+        .xhs-head h1 {
+            font-size: 17px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .xhs-head h1 .iconfont { font-size: 20px; }
+        .xhs-head em { font-style: normal; color: #ffc46b; }
+        .xhs-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 13px;
+            background: rgba(255, 255, 255, .14);
+            padding: 6px 14px;
+            border-radius: 4px;
+            transition: background .18s;
+        }
+        .xhs-back:hover { background: rgba(255, 255, 255, .28); }
+
+        /* ===== 状态条 ===== */
+        .xhs-status {
+            padding: 9px 24px;
+            font-size: 12px;
+            border-bottom: 1px solid var(--xhs-line);
+            line-height: 1.6;
+        }
+        .xhs-status.xhs-loading { background: #fffbe6; color: #b7791f; }
+        .xhs-status.xhs-ok { background: #eafaf1; color: #1e8449; }
+        .xhs-status.xhs-warn { background: #fff4e5; color: #b26a00; }
+        .xhs-status.xhs-err { background: #fdedec; color: #c0392b; }
+
+        /* ===== 主体两栏 ===== */
+        .xhs-main-area {
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 28px;
+            padding: 24px;
+        }
+
+        /* 左：图片画廊 */
+        .xhs-gallery { display: flex; flex-direction: column; gap: 12px; }
+        .xhs-main-img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background: #f7f9fb;
+            border: 1px solid var(--xhs-line);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .xhs-main-img img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            padding: 12px;
+        }
+        .xhs-thumbs { display: flex; gap: 10px; }
+        .xhs-thumb-item {
+            width: 76px;
+            height: 76px;
+            border: 2px solid transparent;
+            border-radius: 6px;
+            background: #f7f9fb;
+            cursor: pointer;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color .18s;
+        }
+        .xhs-thumb-item.xhs-active { border-color: var(--xhs-main); }
+        .xhs-thumb-item img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+        /* 右：信息 */
+        .xhs-info { display: flex; flex-direction: column; gap: 12px; }
+        .xhs-cate {
+            font-size: 12px;
+            color: var(--xhs-sub);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .xhs-title { font-size: 24px; line-height: 1.4; font-weight: 700; }
+        .xhs-brand { font-size: 13px; color: var(--xhs-sub); }
+        .xhs-brand b { color: var(--xhs-text); font-weight: 600; }
+
+        .xhs-rate {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--xhs-sub);
+        }
+        .xhs-rate .xhs-stars { color: #f5a623; font-size: 15px; letter-spacing: 2px; }
+        .xhs-rate b { color: var(--xhs-text); font-size: 15px; }
+
+        .xhs-price-box {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            background: #fff5f5;
+            border-radius: 8px;
+            padding: 12px 16px;
+        }
+        .xhs-price { font-size: 28px; font-weight: 700; color: var(--xhs-price); }
+        .xhs-price-old { font-size: 13px; color: #aab4c0; text-decoration: line-through; }
+        .xhs-off {
+            font-size: 12px;
+            background: var(--xhs-price);
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 3px;
+        }
+
+        .xhs-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+        .xhs-tag {
+            font-size: 12px;
+            color: var(--xhs-main);
+            background: #eef4fd;
+            border-radius: 20px;
+            padding: 3px 12px;
+        }
+
+        .xhs-desc {
+            font-size: 14px;
+            line-height: 1.85;
+            color: #4a5563;
+        }
+
+        .xhs-rows {
+            display: flex;
+            flex-direction: column;
+            border-top: 1px dashed var(--xhs-line);
+        }
+        .xhs-row {
+            display: flex;
+            gap: 10px;
+            padding: 9px 0;
+            font-size: 13px;
+            border-bottom: 1px dashed var(--xhs-line);
+        }
+        .xhs-row span:first-child {
+            width: 90px;
+            color: var(--xhs-sub);
+            flex-shrink: 0;
+        }
+        .xhs-row .iconfont { color: var(--xhs-main); margin-right: 4px; }
+
+        .xhs-actions { display: flex; gap: 12px; margin-top: 4px; }
+        .xhs-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 11px 26px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: inherit;
+            cursor: pointer;
+            text-decoration: none;
+            border: none;
+            transition: all .18s;
+        }
+        .xhs-btn-buy { background: var(--xhs-price); color: #fff; }
+        .xhs-btn-buy:hover { background: #c9302c; }
+        .xhs-btn-cart { background: #fff; color: var(--xhs-main); border: 1px solid var(--xhs-main); }
+        .xhs-btn-cart:hover { background: var(--xhs-main); color: #fff; }
+
+        /* ===== 评价 ===== */
+        .xhs-reviews {
+            padding: 0 24px 24px;
+        }
+        .xhs-reviews h2 {
+            font-size: 15px;
+            padding: 14px 0 12px;
+            border-top: 1px solid var(--xhs-line);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .xhs-reviews h2 .iconfont { color: var(--xhs-main); }
+        .xhs-review {
+            background: #fafbfc;
+            border-left: 3px solid var(--xhs-main);
+            border-radius: 4px;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+        }
+        .xhs-review-head {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+        .xhs-review-head b { color: var(--xhs-text); }
+        .xhs-review-head span { color: var(--xhs-sub); font-size: 12px; }
+        .xhs-review p { font-size: 13px; color: #5b6774; line-height: 1.7; }
+
+        /* ===== 代码说明 ===== */
+        .xhs-code-box {
+            padding: 0 24px 24px;
+        }
+        .xhs-code-box h2 {
+            font-size: 15px;
+            padding: 14px 0 10px;
+            border-top: 1px solid var(--xhs-line);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .xhs-code-box h2 .iconfont { color: var(--xhs-main); }
+        .xhs-code {
+            background: #f8f9fb;
+            border: 1px solid var(--xhs-line);
+            border-radius: 6px;
+            padding: 12px 14px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 12.5px;
+            line-height: 1.8;
+            color: #2b2b2b;
+            overflow-x: auto;
+        }
+        .xhs-code .xhs-kw { color: #8e44ad; }
+        .xhs-code .xhs-str { color: #27ae60; }
+
+        /* ===== 页脚 ===== */
+        .xhs-foot {
+            padding: 16px 24px;
+            text-align: center;
+            font-size: 12px;
+            color: #b6bfca;
+            border-top: 1px solid var(--xhs-line);
+            letter-spacing: .5px;
+        }
+
+        @media (max-width: 860px) {
+            .xhs-main-area { grid-template-columns: 1fr; }
+            .xhs-title { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="xhs-wrap">
+
+    <header class="xhs-head">
+        <h1><i class="iconfont icon-xinzeng"></i>商品<em>详情</em></h1>
+        <a class="xhs-back" href="./17-3.html"><i class="iconfont icon-shouye-zhihui"></i>返回列表</a>
+    </header>
+
+    <div class="xhs-status xhs-loading" id="xhsStatus">
+        正在读取地址栏中的 id 参数，并请求 https://dummyjson.com/products/…
+    </div>
+
+    <main class="xhs-main-area" id="xhsMain">
+        <!-- 左：图片画廊 -->
+        <section class="xhs-gallery">
+            <div class="xhs-main-img">
+                <img id="xhsMainImg" alt="商品主图" src="./img/a1.png">
+            </div>
+            <div class="xhs-thumbs" id="xhsThumbs"></div>
+        </section>
+
+        <!-- 右：商品信息 -->
+        <section class="xhs-info">
+            <span class="xhs-cate" id="xhsCate">category</span>
+            <h1 class="xhs-title" id="xhsTitle">商品标题</h1>
+            <div class="xhs-brand">品牌：<b id="xhsBrand">—</b></div>
+
+            <div class="xhs-rate">
+                <span class="xhs-stars" id="xhsStars">★★★★★</span>
+                <b id="xhsScore">0.00</b>
+                <span id="xhsReviewCount">0 条评价</span>
+            </div>
+
+            <div class="xhs-price-box">
+                <span class="xhs-price" id="xhsPrice">$0.00</span>
+                <span class="xhs-price-old" id="xhsPriceOld">$0.00</span>
+                <span class="xhs-off" id="xhsOff">-0%</span>
+            </div>
+
+            <div class="xhs-tags" id="xhsTags"></div>
+
+            <p class="xhs-desc" id="xhsDesc">商品描述加载中…</p>
+
+            <div class="xhs-rows">
+                <div class="xhs-row"><span>库存状态</span><span id="xhsStock">—</span></div>
+                <div class="xhs-row"><span>质保信息</span><span id="xhsWarranty">—</span></div>
+                <div class="xhs-row"><span>配送信息</span><span id="xhsShipping">—</span></div>
+                <div class="xhs-row"><span>退换政策</span><span id="xhsReturn">—</span></div>
+                <div class="xhs-row"><span>最小起订</span><span id="xhsMinOrder">—</span></div>
+            </div>
+
+            <div class="xhs-actions">
+                <a class="xhs-btn xhs-btn-buy" href="./17-3.html"><i class="iconfont icon-kuaijiezhifu"></i>立即购买</a>
+                <a class="xhs-btn xhs-btn-cart" href="./17-3.html"><i class="iconfont icon-shoucang"></i>加入收藏</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- 评价 -->
+    <section class="xhs-reviews">
+        <h2><i class="iconfont icon-xiaoxi-zhihui"></i>用户评价</h2>
+        <div id="xhsReviews"></div>
+    </section>
+
+    <!-- 接口说明 -->
+    <section class="xhs-code-box">
+        <h2><i class="iconfont icon-bianji"></i>本页数据来源（fetch 单品接口）</h2>
+        <pre class="xhs-code"><span class="xhs-kw">const</span> xhsId = <span class="xhs-kw">new</span> URLSearchParams(location.search).get(<span class="xhs-str">"id"</span>) || <span class="xhs-str">"1"</span>;
+<span class="xhs-kw">const</span> xhsUrl = <span class="xhs-str">"https://dummyjson.com/products/"</span> + xhsId;
+
+fetch(xhsUrl)
+  .then(res =&gt; res.json())
+  .then(data =&gt; xhsRenderDetail(data))
+  .catch(err =&gt; xhsFallback(err));</pre>
+    </section>
+
+    <div class="xhs-foot">17-3-detail · fetch 单品详情 · 解浩帅</div>
+</div>
+
+<script>
+    /* ===== 本地演示数据（与列表页保持一致，接口不可达时兜底） ===== */
+    var xhsMockDetail = {
+        1: {
+            id: 1, title: "Essence Mascara Lash Princess", category: "beauty", brand: "Essence",
+            price: 9.99, discountPercentage: 10.48, rating: 4.94, stock: 5,
+            availabilityStatus: "Low Stock", minimumOrderQuantity: 48,
+            warrantyInformation: "1 month warranty", shippingInformation: "Ships in 1 month",
+            returnPolicy: "30 days return policy",
+            description: "这款睫毛膏带来极致纤长卷翘效果，质地顺滑、速干不易晕染，独特刷头能均匀包裹每根睫毛，日常通勤与浓妆场景都适用。",
+            tags: ["beauty", "mascara", "cosmetics"],
+            images: ["./img/a1.png", "./img/a2.jpg", "./img/a3.jpg", "./img/1.jpg"],
+            reviews: [
+                { rating: 5, reviewerName: "解浩帅", date: "2026-10-20", comment: "刷头很好用，涂两层就很浓密，也不怎么结块。" },
+                { rating: 4, reviewerName: "王小明", date: "2026-10-18", comment: "价格便宜，持久度一般，工作需要补一次妆。" }
+            ]
+        },
+        2: {
+            id: 2, title: "Eyeshadow Palette with Mirror", category: "beauty", brand: "Glamour Beauty",
+            price: 19.99, discountPercentage: 18.19, rating: 3.28, stock: 44,
+            availabilityStatus: "In Stock", minimumOrderQuantity: 3,
+            warrantyInformation: "1 month warranty", shippingInformation: "Ships in 2 weeks",
+            returnPolicy: "No return policy",
+            description: "12 色大地色系眼影盘，自带镜面，哑光与珠光搭配，粉质细腻好上色，适合日常通勤与派对妆容。",
+            tags: ["beauty", "eyeshadow", "palette"],
+            images: ["./img/a2.jpg", "./img/a3.jpg", "./img/a1.png", "./img/2.jpg"],
+            reviews: [
+                { rating: 3, reviewerName: "李小红", date: "2026-10-17", comment: "颜色好看，但有的珠光有点飞粉。" }
+            ]
+        },
+        3: {
+            id: 3, title: "Powder Canister", category: "beauty", brand: "Velvet Touch",
+            price: 14.99, discountPercentage: 9.84, rating: 3.82, stock: 59,
+            availabilityStatus: "In Stock", minimumOrderQuantity: 3,
+            warrantyInformation: "1 month warranty", shippingInformation: "Ships overnight",
+            returnPolicy: "30 days return policy",
+            description: "控油定妆蜜粉罐，粉质轻盈透气，能有效减少面部油光，长时间保持清爽哑光妆效。",
+            tags: ["beauty", "powder", "loose powder"],
+            images: ["./img/a3.jpg", "./img/1.jpg", "./img/a1.png", "./img/3.jpg"],
+            reviews: [
+                { rating: 4, reviewerName: "张伟", date: "2026-10-16", comment: "夏天用很合适，控油效果不错。" }
+            ]
+        },
+        4: {
+            id: 4, title: "Red Lipstick", category: "beauty", brand: "Chic Cosmetics",
+            price: 12.99, discountPercentage: 12.99, rating: 2.51, stock: 68,
+            availabilityStatus: "In Stock", minimumOrderQuantity: 1,
+            warrantyInformation: "1 month warranty", shippingInformation: "Ships in 1 month",
+            returnPolicy: "30 days return policy",
+            description: "经典正红色口红，滋润不拔干，显色度高，一抹上色，适合职场与重要场合。",
+            tags: ["beauty", "lipstick", "makeup"],
+            images: ["./img/1.jpg", "./img/2.jpg", "./img/3.jpg", "./img/a1.png"],
+            reviews: [
+                { rating: 2, reviewerName: "赵敏", date: "2026-10-15", comment: "颜色偏亮，我肤色偏黄，涂着有点突兀。" }
+            ]
+        },
+        5: {
+            id: 5, title: "Red Nail Polish", category: "beauty", brand: "Nail Couture",
+            price: 8.99, discountPercentage: 11.44, rating: 3.91, stock: 71,
+            availabilityStatus: "In Stock", minimumOrderQuantity: 1,
+            warrantyInformation: "1 month warranty", shippingInformation: "Ships in 2 weeks",
+            returnPolicy: "30 days return policy",
+            description: "正红色指甲油，快干型配方，涂布均匀、色泽饱和，一般保持一周以上不脱落。",
+            tags: ["beauty", "nail polish", "nail care"],
+            images: ["./img/2.jpg", "./img/3.jpg", "./img/a2.jpg", "./img/1.jpg"],
+            reviews: [
+                { rating: 4, reviewerName: "孙悦", date: "2026-10-14", comment: "颜色很正，刷子好涂，就是味道稍大。" }
+            ]
+        },
+        6: {
+            id: 6, title: "Calvin Klein CK One", category: "fragrances", brand: "Calvin Klein",
+            price: 49.99, discountPercentage: 5.88, rating: 4.35, stock: 29,
+            availabilityStatus: "In Stock", minimumOrderQuantity: 1,
+            warrantyInformation: "No warranty", shippingInformation: "Ships in 3 weeks",
+            returnPolicy: "No return policy",
+            description: "经典中性香水，柑橘与绿茶香调清爽干净，适合日常通勤，男女皆可使用。",
+            tags: ["fragrances", "perfume", "unisex"],
+            images: ["./img/3.jpg", "./img/a1.png", "./img/a2.jpg", "./img/a3.jpg"],
+            reviews: [
+                { rating: 5, reviewerName: "周一鸣", date: "2026-10-19", comment: "很清爽的柑橘调，四季都能用。" }
+            ]
+        },
+        7: {
+            id: 7, title: "Chanel Coco Noir Eau De Parfum", category: "fragrances", brand: "Chanel",
+            price: 129.99, discountPercentage: 17.06, rating: 4.26, stock: 23,
+            availabilityStatus: "In Stock", minimumOrderQuantity: 1,
+            warrantyInformation: "No warranty", shippingInformation: "Ships in 3 weeks",
+            returnPolicy: "No return policy",
+            description: "可可小姐黑色浓香水，木质与琥珀基调沉稳优雅，留香持久，适合晚间与正式场合。",
+            tags: ["fragrances", "perfume", "luxury"],
+            images: ["./img/a1.png", "./img/a3.jpg", "./img/1.jpg", "./img/2.jpg"],
+            reviews: [
+                { rating: 4, reviewerName: "陈静", date: "2026-10-13", comment: "香味很高级，留香到第二天早上还有。" }
+            ]
+        },
+        8: {
+            id: 8, title: "Dior J'adore Eau de Parfume", category: "fragrances", brand: "Dior",
+            price: 89.99, discountPercentage: 15.58, rating: 4.64, stock: 98,
+            availabilityStatus: "In Stock", minimumOrderQuantity: 1,
+            warrantyInformation: "No warranty", shippingInformation: "Ships in 2 weeks",
+            returnPolicy: "No return policy",
+            description: "真我香水，花香调明亮柔和，依兰与茉莉交织，尾调温暖，适合优雅女性日常使用。",
+            tags: ["fragrances", "perfume", "floral"],
+            images: ["./img/a2.jpg", "./img/1.jpg", "./img/2.jpg", "./img/a3.jpg"],
+            reviews: [
+                { rating: 5, reviewerName: "林小雨", date: "2026-10-12", comment: "花香很舒服，不会太甜腻，送人很体面。" }
+            ]
+        }
+    };
+
+    var xhsStatus = document.getElementById("xhsStatus");
+    var xhsId = new URLSearchParams(location.search).get("id") || "1";
+    var xhsUrl = "https://dummyjson.com/products/" + xhsId;
+
+    /* ===== 星级 ===== */
+    function xhsBuildStars(xhsScore) {
+        var xhsFull = Math.round(xhsScore), xhsOut = "";
+        for (var i = 1; i <= 5; i++) xhsOut += (i <= xhsFull ? "★" : "☆");
+        return xhsOut;
+    }
+
+    /* ===== 渲染详情 ===== */
+    function xhsRenderDetail(xhsP) {
+        document.getElementById("xhsCate").textContent = xhsP.category;
+        document.getElementById("xhsTitle").textContent = xhsP.title;
+        document.getElementById("xhsBrand").textContent = xhsP.brand || "—";
+        document.getElementById("xhsStars").textContent = xhsBuildStars(xhsP.rating);
+        document.getElementById("xhsScore").textContent = xhsP.rating.toFixed(2);
+
+        var xhsReviews = xhsP.reviews || [];
+        document.getElementById("xhsReviewCount").textContent = xhsReviews.length + " 条评价";
+
+        document.getElementById("xhsPrice").textContent = "$" + xhsP.price.toFixed(2);
+        document.getElementById("xhsPriceOld").textContent =
+            "$" + (xhsP.price / (1 - xhsP.discountPercentage / 100)).toFixed(2);
+        document.getElementById("xhsOff").textContent = "-" + Math.round(xhsP.discountPercentage) + "%";
+
+        document.getElementById("xhsStock").textContent =
+            (xhsP.availabilityStatus || "In Stock") + "（剩余 " + xhsP.stock + " 件）";
+        document.getElementById("xhsWarranty").textContent = xhsP.warrantyInformation || "—";
+        document.getElementById("xhsShipping").textContent = xhsP.shippingInformation || "—";
+        document.getElementById("xhsReturn").textContent = xhsP.returnPolicy || "—";
+        document.getElementById("xhsMinOrder").textContent =
+            (xhsP.minimumOrderQuantity || 1) + " 件";
+
+        document.getElementById("xhsDesc").textContent = xhsP.description;
+
+        var xhsTagHtml = "";
+        (xhsP.tags || []).forEach(function (xhsT) {
+            xhsTagHtml += '<span class="xhs-tag">' + xhsT + '</span>';
+        });
+        document.getElementById("xhsTags").innerHTML = xhsTagHtml;
+
+        /* 画廊：images 与 thumbnail 合并去重，至少保证 1 张 */
+        var xhsImgs = [];
+        (xhsP.images || []).forEach(function (xhsSrc) {
+            if (xhsSrc && xhsImgs.indexOf(xhsSrc) === -1) xhsImgs.push(xhsSrc);
+        });
+        if (xhsP.thumbnail && xhsImgs.indexOf(xhsP.thumbnail) === -1) xhsImgs.push(xhsP.thumbnail);
+        if (!xhsImgs.length) xhsImgs.push("./img/a1.png");
+
+        var xhsMainImg = document.getElementById("xhsMainImg");
+        xhsMainImg.dataset.xhsFixed = "";
+        xhsMainImg.onerror = function () {
+            if (xhsMainImg.dataset.xhsFixed) return;
+            xhsMainImg.dataset.xhsFixed = "1";
+            xhsMainImg.src = "./img/a1.png";
+        };
+        xhsMainImg.src = xhsImgs[0];
+
+        var xhsThumbs = document.getElementById("xhsThumbs");
+        xhsThumbs.innerHTML = "";
+        xhsImgs.forEach(function (xhsSrc, xhsIdx) {
+            var xhsDiv = document.createElement("div");
+            xhsDiv.className = "xhs-thumb-item" + (xhsIdx === 0 ? " xhs-active" : "");
+            var xhsImg = document.createElement("img");
+            xhsImg.src = xhsSrc;
+            xhsImg.alt = "图 " + (xhsIdx + 1);
+            xhsImg.onerror = function () { xhsImg.src = "./img/a1.png"; };
+            xhsDiv.appendChild(xhsImg);
+            xhsDiv.addEventListener("click", function () {
+                xhsMainImg.src = xhsSrc;
+                var xhsAll = xhsThumbs.querySelectorAll(".xhs-thumb-item");
+                for (var i = 0; i < xhsAll.length; i++) xhsAll[i].classList.remove("xhs-active");
+                xhsDiv.classList.add("xhs-active");
+            });
+            xhsThumbs.appendChild(xhsDiv);
+        });
+
+        /* 评价列表 */
+        var xhsReviewHtml = "";
+        if (!xhsReviews.length) {
+            xhsReviewHtml = '<div class="xhs-review"><p>暂无评价。</p></div>';
+        }
+        xhsReviews.forEach(function (xhsR) {
+            xhsReviewHtml += '<div class="xhs-review">'
+                + '<div class="xhs-review-head">'
+                + '<b>' + xhsR.reviewerName + ' · ' + xhsBuildStars(xhsR.rating) + '</b>'
+                + '<span>' + (xhsR.date || "").slice(0, 10) + '</span>'
+                + '</div>'
+                + '<p>' + xhsR.comment + '</p>'
+                + '</div>';
+        });
+        document.getElementById("xhsReviews").innerHTML = xhsReviewHtml;
+    }
+
+    /* ===== 真实接口：fetch 单个商品，8 秒超时 ===== */
+    function xhsLoadDetail() {
+        xhsStatus.className = "xhs-status xhs-loading";
+        xhsStatus.textContent = "⏳ 正在 fetch " + xhsUrl + " （id = " + xhsId + "）...";
+
+        var xhsCtrl = new AbortController();
+        var xhsTimer = setTimeout(function () { xhsCtrl.abort(); }, 8000);
+        var xhsStart = performance.now();
+
+        fetch(xhsUrl, { signal: xhsCtrl.signal })
+            .then(function (xhsRes) {
+                clearTimeout(xhsTimer);
+                if (!xhsRes.ok) throw new Error("HTTP " + xhsRes.status);
+                return xhsRes.json();
+            })
+            .then(function (xhsData) {
+                xhsRenderDetail(xhsData);
+                xhsStatus.className = "xhs-status xhs-ok";
+                xhsStatus.textContent = "✔ 接口请求成功：GET " + xhsUrl
+                    + "（耗时 " + Math.round(performance.now() - xhsStart) + "ms）";
+            })
+            .catch(function (xhsErr) {
+                clearTimeout(xhsTimer);
+                var xhsMsg = xhsErr.name === "AbortError" ? "请求超时 8 秒" : xhsErr.message;
+                var xhsMock = xhsMockDetail[xhsId];
+                if (!xhsMock) {
+                    xhsStatus.className = "xhs-status xhs-err";
+                    xhsStatus.textContent = "✗ 接口不可达（" + xhsMsg + "），且本地演示数据中没有 id = " + xhsId + " 的商品";
+                    return;
+                }
+                xhsRenderDetail(xhsMock);
+                xhsStatus.className = "xhs-status xhs-warn";
+                xhsStatus.textContent = "⚠ 接口不可达（" + xhsMsg
+                    + "），已自动使用本地演示数据（id = " + xhsId + "）";
+            });
+    }
+
+    xhsLoadDetail();
+</script>
+</body>
+</html>

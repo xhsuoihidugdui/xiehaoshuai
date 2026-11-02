@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<!-- 姓名：解浩帅，日期：2026-11-02，功能名称：17-4 远程接口测试工具（fetch 支持 GET/POST/PUT/PATCH/DELETE，展示返回数据与错误信息） -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17-4 接口测试工具 — 解浩帅</title>
+    <link rel="stylesheet" href="./font/font_5244829_352pklrzxi1/iconfont.css">
+    <style>
+        :root {
+            --xhs-main: #1e6fd9;
+            --xhs-dark: #0b1f3a;
+            --xhs-text: #2c3646;
+            --xhs-sub: #7a8797;
+            --xhs-line: #e6eaf0;
+            --xhs-bg: #f0f2f5;
+            --xhs-ok: #1e8449;
+            --xhs-warn: #b26a00;
+            --xhs-err: #c0392b;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+            background: var(--xhs-bg);
+            color: var(--xhs-text);
+            padding: 24px 16px 36px;
+        }
+
+        .xhs-wrap {
+            max-width: 1180px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(18, 40, 63, .08);
+        }
+
+        /* ===== 头部 ===== */
+        .xhs-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 15px 22px;
+            background: linear-gradient(135deg, var(--xhs-dark), var(--xhs-main));
+            color: #fff;
+        }
+        .xhs-head h1 {
+            font-size: 17px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .xhs-head h1 .iconfont { font-size: 20px; }
+        .xhs-head em { font-style: normal; color: #ffc46b; }
+        .xhs-head .xhs-tip {
+            font-size: 11px;
+            color: rgba(255, 255, 255, .72);
+        }
+
+        /* ===== 示例快捷按钮 ===== */
+        .xhs-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 12px 22px;
+            background: #fafbfc;
+            border-bottom: 1px solid var(--xhs-line);
+        }
+        .xhs-chip {
+            font-size: 12px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--xhs-line);
+            background: #fff;
+            color: var(--xhs-sub);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all .16s;
+        }
+        .xhs-chip:hover { color: var(--xhs-main); border-color: var(--xhs-main); }
+        .xhs-chip b { font-weight: 700; margin-right: 4px; }
+        .xhs-chip.xhs-get b { color: #1e8449; }
+        .xhs-chip.xhs-post b { color: #b26a00; }
+        .xhs-chip.xhs-put b { color: #1e6fd9; }
+        .xhs-chip.xhs-del b { color: #c0392b; }
+
+        /* ===== 主体两栏 ===== */
+        .xhs-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+        .xhs-pane { padding: 16px 22px 20px; }
+        .xhs-pane + .xhs-pane { border-left: 1px solid var(--xhs-line); }
+
+        .xhs-pane h2 {
+            font-size: 13px;
+            color: var(--xhs-dark);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .xhs-pane h2 .iconfont { color: var(--xhs-main); }
+
+        /* ===== 输入区 ===== */
+        .xhs-url-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .xhs-select {
+            width: 104px;
+            flex-shrink: 0;
+            padding: 9px 8px;
+            border: 1px solid #dcdfe6;
+            border-radius: 5px;
+            font-size: 13px;
+            font-family: inherit;
+            font-weight: 700;
+            color: var(--xhs-text);
+            background: #fff;
+            cursor: pointer;
+        }
+        .xhs-select:focus { outline: none; border-color: var(--xhs-main); }
+        .xhs-input {
+            flex: 1;
+            padding: 9px 12px;
+            border: 1px solid #dcdfe6;
+            border-radius: 5px;
+            font-size: 13px;
+            font-family: Consolas, Monaco, monospace;
+            min-width: 0;
+        }
+        .xhs-input:focus { outline: none; border-color: var(--xhs-main); }
+
+        .xhs-field { margin-bottom: 12px; }
+        .xhs-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--xhs-sub);
+            margin-bottom: 5px;
+        }
+        .xhs-label code {
+            font-family: Consolas, Monaco, monospace;
+            color: #8a97a6;
+        }
+        .xhs-area {
+            width: 100%;
+            border: 1px solid #dcdfe6;
+            border-radius: 5px;
+            padding: 10px 12px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 12.5px;
+            line-height: 1.65;
+            resize: vertical;
+            color: var(--xhs-text);
+            background: #fbfcfd;
+        }
+        .xhs-area:focus { outline: none; border-color: var(--xhs-main); background: #fff; }
+        .xhs-area#xhsHeaders { height: 66px; }
+        .xhs-area#xhsBody { height: 132px; }
+        .xhs-area:disabled { background: #f4f6f8; color: #aab4c0; cursor: not-allowed; }
+
+        .xhs-actions { display: flex; gap: 10px; }
+        .xhs-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all .16s;
+        }
+        .xhs-btn-send { background: var(--xhs-main); color: #fff; flex: 1; }
+        .xhs-btn-send:hover { background: #14509f; }
+        .xhs-btn-send:disabled { background: #a8c1de; cursor: not-allowed; }
+        .xhs-btn-clear { background: #fff; color: var(--xhs-sub); border: 1px solid var(--xhs-line); }
+        .xhs-btn-clear:hover { color: var(--xhs-main); border-color: var(--xhs-main); }
+
+        /* ===== 右侧响应 ===== */
+        .xhs-statusbar {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 9px 12px;
+            background: #fafbfc;
+            border: 1px solid var(--xhs-line);
+            border-radius: 6px;
+            font-size: 12px;
+            margin-bottom: 10px;
+            min-height: 38px;
+        }
+        .xhs-code-badge {
+            font-weight: 700;
+            padding: 2px 9px;
+            border-radius: 3px;
+            color: #fff;
+            background: #9aa5b1;
+        }
+        .xhs-code-badge.xhs-2xx { background: var(--xhs-ok); }
+        .xhs-code-badge.xhs-3xx { background: #1e6fd9; }
+        .xhs-code-badge.xhs-4xx { background: var(--xhs-warn); }
+        .xhs-code-badge.xhs-5xx { background: var(--xhs-err); }
+        .xhs-statusbar .xhs-dim { color: var(--xhs-sub); }
+        .xhs-statusbar .xhs-dim b { color: var(--xhs-text); font-weight: 600; }
+
+        .xhs-sub-title {
+            font-size: 12px;
+            color: var(--xhs-sub);
+            margin: 12px 0 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .xhs-sub-title .iconfont { font-size: 13px; }
+        .xhs-sub-title span.xhs-arrow { font-size: 10px; color: #aaa; }
+
+        .xhs-headers {
+            background: #fbfcfd;
+            border: 1px solid var(--xhs-line);
+            border-radius: 6px;
+            max-height: 132px;
+            overflow: auto;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 12px;
+            padding: 6px 10px;
+        }
+        .xhs-headers div { padding: 2px 0; word-break: break-all; }
+        .xhs-headers b { color: #8a97a6; font-weight: 400; }
+
+        .xhs-resp {
+            min-height: 246px;
+            max-height: 360px;
+            overflow: auto;
+            background: #0f1c2e;
+            border-radius: 6px;
+            padding: 12px 14px;
+        }
+        .xhs-resp pre {
+            font-family: Consolas, Monaco, monospace;
+            font-size: 12.5px;
+            line-height: 1.7;
+            color: #d6e0ec;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .xhs-resp pre.xhs-empty { color: #6b7c90; }
+        /* JSON 高亮 */
+        .xhs-hl-key { color: #7fd1ff; }
+        .xhs-hl-str { color: #9ae6a3; }
+        .xhs-hl-num { color: #ffc46b; }
+        .xhs-hl-bool { color: #c792ea; }
+
+        .xhs-error {
+            display: none;
+            margin-top: 10px;
+            background: #fdedec;
+            border-left: 3px solid var(--xhs-err);
+            border-radius: 4px;
+            padding: 10px 12px;
+            font-size: 12.5px;
+            color: #a93226;
+            line-height: 1.75;
+        }
+        .xhs-error.xhs-show { display: block; }
+        .xhs-error b { display: block; margin-bottom: 3px; }
+
+        /* ===== 请求历史 ===== */
+        .xhs-history {
+            margin-top: 16px;
+            border-top: 1px dashed var(--xhs-line);
+            padding-top: 10px;
+        }
+        .xhs-history h3 {
+            font-size: 12px;
+            color: var(--xhs-sub);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .xhs-history-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            padding: 5px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: Consolas, Monaco, monospace;
+        }
+        .xhs-history-item:hover { background: #f4f7fb; }
+        .xhs-history-item b {
+            font-size: 11px;
+            font-weight: 700;
+            width: 44px;
+            flex-shrink: 0;
+        }
+        .xhs-history-item .xhs-h-url {
+            flex: 1;
+            color: var(--xhs-sub);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .xhs-history-item .xhs-h-code { font-weight: 700; }
+
+        /* ===== 页脚 ===== */
+        .xhs-foot {
+            padding: 14px 22px;
+            text-align: center;
+            font-size: 12px;
+            color: #b6bfca;
+            border-top: 1px solid var(--xhs-line);
+            letter-spacing: .5px;
+        }
+
+        @media (max-width: 900px) {
+            .xhs-body { grid-template-columns: 1fr; }
+            .xhs-pane + .xhs-pane { border-left: none; border-top: 1px solid var(--xhs-line); }
+        }
+    </style>
+</head>
+<body>
+<div class="xhs-wrap">
+
+    <header class="xhs-head">
+        <h1><i class="iconfont icon-faxian"></i>远程接口<em>测试</em>工具</h1>
+        <span class="xhs-tip">fetch · GET / POST / PUT / PATCH / DELETE · 显示响应与错误（若某域名被网络拦截，可用下方 dummyjson 备用示例）</span>
+    </header>
+
+    <!-- 示例快捷入口 -->
+    <div class="xhs-chips" id="xhsChips">
+        <button class="xhs-chip xhs-get" data-xhs-method="GET" data-xhs-url="https://jsonplaceholder.typicode.com/posts?_limit=3">GET 列表（3 条）</button>
+        <button class="xhs-chip xhs-get" data-xhs-method="GET" data-xhs-url="https://jsonplaceholder.typicode.com/posts/1">GET 单条</button>
+        <button class="xhs-chip xhs-post" data-xhs-method="POST" data-xhs-url="https://jsonplaceholder.typicode.com/posts">POST 新建</button>
+        <button class="xhs-chip xhs-put" data-xhs-method="PUT" data-xhs-url="https://jsonplaceholder.typicode.com/posts/1">PUT 更新</button>
+        <button class="xhs-chip xhs-del" data-xhs-method="DELETE" data-xhs-url="https://jsonplaceholder.typicode.com/posts/1">DELETE 删除</button>
+        <button class="xhs-chip" data-xhs-method="GET" data-xhs-url="https://jsonplaceholder.typicode.com/posts/99999">GET 404 错误</button>
+        <button class="xhs-chip" data-xhs-method="GET" data-xhs-url="https://xhs-not-exist-host.example/api">GET 域名错误</button>
+        <button class="xhs-chip xhs-get" data-xhs-method="GET" data-xhs-url="https://dummyjson.com/products/1">GET 备用（dummyjson）</button>
+        <button class="xhs-chip xhs-post" data-xhs-method="POST" data-xhs-url="https://dummyjson.com/products/add">POST 备用（dummyjson）</button>
+    </div>
+
+    <div class="xhs-body">
+        <!-- 左：请求配置 -->
+        <section class="xhs-pane">
+            <h2><i class="iconfont icon-bianji"></i>请求配置</h2>
+
+            <div class="xhs-url-row">
+                <select class="xhs-select" id="xhsMethod">
+                    <option value="GET">GET</option>
+                    <option value="POST" selected>POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="PATCH">PATCH</option>
+                    <option value="DELETE">DELETE</option>
+                </select>
+                <input class="xhs-input" id="xhsUrl" type="text"
+                       value="https://jsonplaceholder.typicode.com/posts"
+                       placeholder="https://example.com/api">
+            </div>
+
+            <div class="xhs-field">
+                <div class="xhs-label">
+                    <span>请求头（JSON 对象）</span>
+                    <code>Headers</code>
+                </div>
+                <textarea class="xhs-area" id="xhsHeaders" spellcheck="false">{"Content-Type": "application/json; charset=UTF-8"}</textarea>
+            </div>
+
+            <div class="xhs-field">
+                <div class="xhs-label">
+                    <span>请求体（JSON 对象）</span>
+                    <code>Body</code>
+                </div>
+                <textarea class="xhs-area" id="xhsBody" spellcheck="false">{
+  "title": "解浩帅的接口测试",
+  "body": "这段数据由 fetch POST 提交到 jsonplaceholder",
+  "userId": 1
+}</textarea>
+            </div>
+
+            <div class="xhs-actions">
+                <button class="xhs-btn xhs-btn-send" id="xhsBtnSend">
+                    <i class="iconfont icon-faxian"></i>发送请求
+                </button>
+                <button class="xhs-btn xhs-btn-clear" id="xhsBtnReset">
+                    <i class="iconfont icon-zhongxinshengcheng"></i>重置
+                </button>
+            </div>
+
+            <div class="xhs-history">
+                <h3><i class="iconfont icon-shouye-zhihui"></i>最近请求（点击可重新填入）</h3>
+                <div id="xhsHistory"><div class="xhs-history-item" style="cursor:default;color:#aab4c0;">暂无请求记录</div></div>
+            </div>
+        </section>
+
+        <!-- 右：响应结果 -->
+        <section class="xhs-pane">
+            <h2><i class="iconfont icon-anquanbaozhang"></i>响应结果</h2>
+
+            <div class="xhs-statusbar" id="xhsStatusbar">
+                <span class="xhs-code-badge" id="xhsCode">—</span>
+                <span class="xhs-dim" id="xhsStatusText">等待发送请求</span>
+                <span class="xhs-dim">耗时 <b id="xhsTime">—</b></span>
+                <span class="xhs-dim">大小 <b id="xhsSize">—</b></span>
+            </div>
+
+            <div class="xhs-sub-title" id="xhsToggleHeaders">
+                <span class="xhs-arrow" id="xhsArrow">▼</span>
+                <i class="iconfont icon-sousuo"></i>响应头（Response Headers）
+            </div>
+            <div class="xhs-headers" id="xhsRespHeaders">
+                <div style="color:#aab4c0;">暂无响应头</div>
+            </div>
+
+            <div class="xhs-sub-title">
+                <i class="iconfont icon-bianji"></i>响应体（Response Body）
+            </div>
+            <div class="xhs-resp">
+                <pre id="xhsRespBody" class="xhs-empty">尚未发送请求，点击左侧「发送请求」开始测试。</pre>
+            </div>
+
+            <div class="xhs-error" id="xhsError"></div>
+        </section>
+    </div>
+
+    <div class="xhs-foot">fetch 接口测试 · 支持 GET / POST / PUT / PATCH / DELETE · 解浩帅</div>
+</div>
+
+<script>
+    var xhsMethodSel = document.getElementById("xhsMethod");
+    var xhsUrlInput = document.getElementById("xhsUrl");
+    var xhsHeadersInput = document.getElementById("xhsHeaders");
+    var xhsBodyInput = document.getElementById("xhsBody");
+    var xhsBtnSend = document.getElementById("xhsBtnSend");
+    var xhsCode = document.getElementById("xhsCode");
+    var xhsStatusText = document.getElementById("xhsStatusText");
+    var xhsTime = document.getElementById("xhsTime");
+    var xhsSize = document.getElementById("xhsSize");
+    var xhsRespBody = document.getElementById("xhsRespBody");
+    var xhsRespHeaders = document.getElementById("xhsRespHeaders");
+    var xhsError = document.getElementById("xhsError");
+    var xhsHistory = document.getElementById("xhsHistory");
+    var xhsHistoryList = [];
+
+    /* ===== 方法变化：GET / DELETE 时禁用请求体 ===== */
+    function xhsSyncBodyState() {
+        var xhsM = xhsMethodSel.value;
+        var xhsNeedBody = xhsM !== "GET" && xhsM !== "DELETE";
+        xhsBodyInput.disabled = !xhsNeedBody;
+        xhsBodyInput.style.opacity = xhsNeedBody ? "1" : ".55";
+    }
+    xhsMethodSel.addEventListener("change", xhsSyncBodyState);
+    xhsSyncBodyState();
+
+    /* ===== 错误提示 ===== */
+    function xhsShowError(xhsTitle, xhsDetail) {
+        xhsError.className = "xhs-error xhs-show";
+        xhsError.innerHTML = "<b>" + xhsTitle + "</b>" + xhsDetail;
+    }
+    function xhsHideError() {
+        xhsError.className = "xhs-error";
+        xhsError.innerHTML = "";
+    }
+
+    /* ===== JSON 高亮 ===== */
+    function xhsHighlight(xhsText) {
+        var xhsEsc = xhsText.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        return xhsEsc
+            .replace(/"([^"]+)":/g, "\"<span class='xhs-hl-key'>$1</span>\":")
+            .replace(/: ("(?:[^"\\]|\\.)*")/g, ": <span class='xhs-hl-str'>$1</span>")
+            .replace(/: (true|false|null)/g, ": <span class='xhs-hl-bool'>$1</span>")
+            .replace(/: (-?\d+(?:\.\d+)?)(?=[,\s\]}])/g, ": <span class='xhs-hl-num'>$1</span>");
+    }
+
+    /* ===== 状态码配色 ===== */
+    function xhsCodeClass(xhsStatus) {
+        if (xhsStatus >= 200 && xhsStatus < 300) return "xhs-2xx";
+        if (xhsStatus >= 300 && xhsStatus < 400) return "xhs-3xx";
+        if (xhsStatus >= 400 && xhsStatus < 500) return "xhs-4xx";
+        if (xhsStatus >= 500) return "xhs-5xx";
+        return "";
+    }
+
+    /* ===== 请求历史 ===== */
+    function xhsAddHistory(xhsM, xhsU, xhsStatus) {
+        xhsHistoryList.unshift({ method: xhsM, url: xhsU, status: xhsStatus });
+        if (xhsHistoryList.length > 6) xhsHistoryList.pop();
+
+        var xhsHtml = "";
+        xhsHistoryList.forEach(function (xhsItem, xhsIdx) {
+            xhsHtml += '<div class="xhs-history-item" data-xhs-idx="' + xhsIdx + '">'
+                + '<b>' + xhsItem.method + '</b>'
+                + '<span class="xhs-h-url">' + xhsItem.url + '</span>'
+                + '<span class="xhs-h-code" style="color:'
+                + (xhsItem.status >= 200 && xhsItem.status < 300 ? "#1e8449" : "#c0392b") + '">'
+                + (xhsItem.status || "ERR") + '</span>'
+                + '</div>';
+        });
+        xhsHistory.innerHTML = xhsHtml;
+
+        var xhsNodes = xhsHistory.querySelectorAll(".xhs-history-item");
+        for (var i = 0; i < xhsNodes.length; i++) {
+            xhsNodes[i].addEventListener("click", function () {
+                var xhsIdx = parseInt(this.getAttribute("data-xhs-idx"), 10);
+                var xhsRec = xhsHistoryList[xhsIdx];
+                xhsMethodSel.value = xhsRec.method;
+                xhsUrlInput.value = xhsRec.url;
+                xhsSyncBodyState();
+            });
+        }
+    }
+
+    /* ===== 发送请求 ===== */
+    async function xhsSend() {
+        xhsHideError();
+        xhsBtnSend.disabled = true;
+
+        var xhsM = xhsMethodSel.value;
+        var xhsU = xhsUrlInput.value.trim();
+
+        /* 1. 校验 URL */
+        if (!xhsU) {
+            xhsShowError("✗ 请求未发送：URL 为空", "请填写完整的接口地址，例如 https://jsonplaceholder.typicode.com/posts");
+            xhsBtnSend.disabled = false;
+            return;
+        }
+        if (!/^https?:\/\//i.test(xhsU)) {
+            xhsShowError("✗ 请求未发送：URL 格式不正确",
+                "地址必须以 http:// 或 https:// 开头，当前填写：「" + xhsU + "」");
+            xhsBtnSend.disabled = false;
+            return;
+        }
+
+        /* 2. 校验请求头 JSON */
+        var xhsHeadersObj = {};
+        var xhsRawHeaders = xhsHeadersInput.value.trim();
+        if (xhsRawHeaders) {
+            try {
+                xhsHeadersObj = JSON.parse(xhsRawHeaders);
+                if (typeof xhsHeadersObj !== "object" || Array.isArray(xhsHeadersObj)) {
+                    throw new Error("请求头必须是 JSON 对象");
+                }
+            } catch (xhsHe) {
+                xhsShowError("✗ 请求未发送：请求头不是合法 JSON", "解析失败：" + xhsHe.message);
+                xhsBtnSend.disabled = false;
+                return;
+            }
+        }
+
+        /* 3. 组装 fetch 参数 */
+        var xhsOptions = { method: xhsM, headers: xhsHeadersObj };
+
+        if (xhsBodyInput.disabled === false) {
+            var xhsRawBody = xhsBodyInput.value.trim();
+            if (xhsRawBody) {
+                try {
+                    JSON.parse(xhsRawBody);
+                } catch (xhsBe) {
+                    xhsShowError("✗ 请求未发送：请求体不是合法 JSON", "解析失败：" + xhsBe.message);
+                    xhsBtnSend.disabled = false;
+                    return;
+                }
+                xhsOptions.body = xhsRawBody;
+            }
+        }
+
+        /* 4. 发请求（10 秒超时） */
+        var xhsCtrl = new AbortController();
+        var xhsTimer = setTimeout(function () { xhsCtrl.abort(); }, 10000);
+        xhsOptions.signal = xhsCtrl.signal;
+        var xhsStart = performance.now();
+
+        xhsCode.textContent = "…";
+        xhsCode.className = "xhs-code-badge";
+        xhsStatusText.textContent = "请求中";
+        xhsTime.textContent = "—";
+        xhsSize.textContent = "—";
+        xhsRespBody.className = "xhs-empty";
+        xhsRespBody.textContent = "请求发送中，等待响应…";
+
+        try {
+            var xhsRes = await fetch(xhsU, xhsOptions);
+            clearTimeout(xhsTimer);
+
+            var xhsRaw = await xhsRes.text();
+            var xhsMs = Math.round(performance.now() - xhsStart);
+
+            /* 状态栏 */
+            xhsCode.textContent = xhsRes.status;
+            xhsCode.className = "xhs-code-badge " + xhsCodeClass(xhsRes.status);
+            xhsStatusText.textContent = xhsRes.statusText || (xhsRes.ok ? "OK" : "请求失败");
+            xhsTime.textContent = xhsMs + " ms";
+            xhsSize.textContent = xhsRaw.length + " B";
+
+            /* 响应头 */
+            var xhsHeadHtml = "";
+            var xhsHeadCount = 0;
+            xhsRes.headers.forEach(function (xhsVal, xhsKey) {
+                xhsHeadCount++;
+                xhsHeadHtml += "<div><b>" + xhsKey + ":</b> " + xhsVal + "</div>";
+            });
+            xhsRespHeaders.innerHTML = xhsHeadCount ? xhsHeadHtml
+                : '<div style="color:#aab4c0;">该响应没有可读的响应头</div>';
+
+            /* 响应体：能当 JSON 就美化 + 高亮，否则原样输出 */
+            xhsRespBody.className = "";
+            if (!xhsRaw) {
+                xhsRespBody.className = "xhs-empty";
+                xhsRespBody.textContent = "（空响应体，例如 DELETE / 204 No Content）";
+            } else {
+                try {
+                    var xhsJson = JSON.parse(xhsRaw);
+                    xhsRespBody.innerHTML = xhsHighlight(JSON.stringify(xhsJson, null, 2));
+                } catch (xhsPe) {
+                    xhsRespBody.textContent = xhsRaw;
+                }
+            }
+
+            /* 4xx / 5xx 给出提示，但响应体照常展示 */
+            if (!xhsRes.ok) {
+                xhsShowError("✗ HTTP " + xhsRes.status + " " + (xhsRes.statusText || ""),
+                    "服务器已返回响应，但状态码表示请求未被正常处理。"
+                    + (xhsRes.status === 404 ? "常见原因：资源不存在（路径或 id 写错）。" : "")
+                    + (xhsRes.status === 401 || xhsRes.status === 403 ? "常见原因：缺少鉴权或权限不足。" : "")
+                    + (xhsRes.status >= 500 ? "常见原因：服务端内部异常，需稍后重试。" : ""));
+            }
+
+            xhsAddHistory(xhsM, xhsU, xhsRes.status);
+        } catch (xhsErr) {
+            clearTimeout(xhsTimer);
+            var xhsMs2 = Math.round(performance.now() - xhsStart);
+
+            xhsCode.textContent = "ERR";
+            xhsCode.className = "xhs-code-badge xhs-5xx";
+            xhsStatusText.textContent = "请求失败";
+            xhsTime.textContent = xhsMs2 + " ms";
+            xhsSize.textContent = "—";
+            xhsRespBody.className = "xhs-empty";
+            xhsRespBody.textContent = "未收到服务器响应。";
+
+            var xhsReason;
+            var xhsHint;
+            if (xhsErr.name === "AbortError") {
+                xhsReason = "请求超时（10 秒）";
+                xhsHint = "接口响应过慢，或目标地址不可达。可换用其它接口或检查网络。";
+            } else if (/Failed to fetch|NetworkError|Load failed/i.test(xhsErr.message)) {
+                xhsReason = "网络请求失败（" + xhsErr.message + "）";
+                xhsHint = "常见原因：① 域名或端口写错；② 目标接口不允许跨域（需服务器返回 CORS 头）；"
+                    + "③ 本机网络/代理拦截了该域名；④ HTTPS 页面请求 HTTP 接口被浏览器拦截。";
+            } else {
+                xhsReason = "请求异常（" + xhsErr.message + "）";
+                xhsHint = "请检查请求方法、请求头与请求体是否符合接口文档要求。";
+            }
+
+            xhsRespHeaders.innerHTML = '<div style="color:#aab4c0;">请求失败，没有响应头</div>';
+            xhsShowError("✗ " + xhsReason, xhsHint);
+            xhsAddHistory(xhsM, xhsU, 0);
+        } finally {
+            xhsBtnSend.disabled = false;
+        }
+    }
+
+    xhsBtnSend.addEventListener("click", xhsSend);
+
+    /* ===== 重置 ===== */
+    document.getElementById("xhsBtnReset").addEventListener("click", function () {
+        xhsMethodSel.value = "POST";
+        xhsUrlInput.value = "https://jsonplaceholder.typicode.com/posts";
+        xhsHeadersInput.value = '{"Content-Type": "application/json; charset=UTF-8"}';
+        xhsBodyInput.value = '{\n  "title": "解浩帅的接口测试",\n  "body": "这段数据由 fetch POST 提交到 jsonplaceholder",\n  "userId": 1\n}';
+        xhsSyncBodyState();
+        xhsHideError();
+        xhsCode.textContent = "—";
+        xhsCode.className = "xhs-code-badge";
+        xhsStatusText.textContent = "等待发送请求";
+        xhsTime.textContent = "—";
+        xhsSize.textContent = "—";
+        xhsRespHeaders.innerHTML = '<div style="color:#aab4c0;">暂无响应头</div>';
+        xhsRespBody.className = "xhs-empty";
+        xhsRespBody.textContent = "尚未发送请求，点击左侧「发送请求」开始测试。";
+    });
+
+    /* ===== 示例快捷按钮 ===== */
+    var xhsChips = document.getElementById("xhsChips").querySelectorAll(".xhs-chip");
+    for (var xhsI = 0; xhsI < xhsChips.length; xhsI++) {
+        xhsChips[xhsI].addEventListener("click", function () {
+            xhsMethodSel.value = this.getAttribute("data-xhs-method");
+            xhsUrlInput.value = this.getAttribute("data-xhs-url");
+            xhsSyncBodyState();
+            xhsHideError();
+        });
+    }
+
+    /* ===== 响应头折叠 ===== */
+    document.getElementById("xhsToggleHeaders").addEventListener("click", function () {
+        var xhsBox = xhsRespHeaders;
+        var xhsArrow = document.getElementById("xhsArrow");
+        var xhsHidden = xhsBox.style.display === "none";
+        xhsBox.style.display = xhsHidden ? "block" : "none";
+        xhsArrow.textContent = xhsHidden ? "▼" : "▶";
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<!-- 姓名：解浩帅，日期：2026-11-02，功能名称：17-1 JSON 可视化展示与解析 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17-1 JSON 可视化 — 解浩帅</title>
+    <link rel="stylesheet" href="./font/font_5244829_352pklrzxi1/iconfont.css">
+    <style>
+        :root {
+            --json-key: #c0392b;
+            --json-str: #27ae60;
+            --json-num: #2980b9;
+            --json-bool: #8e44ad;
+            --json-null: #7f8c8d;
+            --json-bg: #f8f9fb;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", Consolas, monospace;
+            background: #f0f2f5;
+            padding: 24px 20px;
+        }
+
+        .xhs-wrap {
+            max-width: 1080px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 14px rgba(0, 0, 0, 0.06);
+        }
+
+        /* ===== 头部 ===== */
+        .xhs-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #0b1f3a, #1e6fd9);
+            color: #fff;
+        }
+        .xhs-head h1 { font-size: 18px; display: flex; align-items: center; gap: 8px; }
+        .xhs-head h1 .iconfont { font-size: 22px; }
+        .xhs-head em { font-style: normal; color: #f5a623; }
+
+        .xhs-tools { display: flex; gap: 8px; }
+        .xhs-tools button {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            font-family: inherit;
+            display: flex; align-items: center; gap: 4px;
+            transition: background .15s;
+        }
+        .xhs-tools button:hover { background: rgba(255,255,255,0.3); }
+
+        /* ===== 主体两栏 ===== */
+        .xhs-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            border-top: 1px solid #eee;
+        }
+
+        .xhs-pane { padding: 16px 20px; }
+        .xhs-pane + .xhs-pane {
+            border-left: 1px solid #eee;
+        }
+
+        .xhs-pane h2 {
+            font-size: 13px;
+            color: #5a6b7c;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 1px;
+        }
+        .xhs-pane h2 .iconfont { font-size: 15px; }
+
+        /* ===== 左：文本框 ===== */
+        .xhs-input {
+            width: 100%;
+            height: 360px;
+            resize: vertical;
+            border: 1px solid #dcdfe6;
+            border-radius: 6px;
+            padding: 12px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            background: var(--json-bg);
+            color: #2b2b2b;
+        }
+        .xhs-input:focus { outline: none; border-color: #1e6fd9; }
+
+        .xhs-status {
+            margin-top: 8px;
+            font-size: 12px;
+            padding: 6px 10px;
+            border-radius: 4px;
+        }
+        .xhs-status.xhs-ok { background: #eafaf1; color: #1e8449; }
+        .xhs-status.xhs-err { background: #fdedec; color: #c0392b; }
+
+        /* ===== 右：树状视图 ===== */
+        .xhs-tree {
+            height: 360px;
+            overflow: auto;
+            background: var(--json-bg);
+            border: 1px solid #dcdfe6;
+            border-radius: 6px;
+            padding: 12px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        /* JSON 语法高亮 */
+        .xhs-node { padding-left: 0; }
+        .xhs-key { color: var(--json-key); }
+        .xhs-key::after { content: ": "; color: #999; }
+
+        .xhs-val-str { color: var(--json-str); }
+        .xhs-val-str::before, .xhs-val-str::after { content: '"'; color: var(--json-str); }
+
+        .xhs-val-num { color: var(--json-num); }
+        .xhs-val-bool { color: var(--json-bool); font-style: italic; }
+        .xhs-val-null { color: var(--json-null); font-style: italic; }
+
+        .xhs-toggle {
+            display: inline-block;
+            width: 14px;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            color: #aaa;
+            font-weight: bold;
+        }
+        .xhs-toggle:hover { color: #1e6fd9; }
+
+        .xhs-brace { color: #555; font-weight: bold; }
+        .xhs-type-tag {
+            font-size: 10px;
+            color: #aaa;
+            margin-left: 4px;
+            background: #eef0f3;
+            padding: 1px 6px;
+            border-radius: 10px;
+        }
+
+        /* 折叠 */
+        .xhs-collapsed > .xhs-child { display: none; }
+        .xhs-collapsed > .xhs-toggle::before { content: "▶ "; }
+        .xhs-toggle::before { content: "▼ "; }
+
+        /* ===== 方法示范区 ===== */
+        .xhs-demos {
+            padding: 14px 20px 20px;
+            border-top: 1px solid #eee;
+            background: #fafbfc;
+        }
+        .xhs-demos h2 {
+            font-size: 13px;
+            color: #0b1f3a;
+            margin-bottom: 10px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .xhs-demos h2 .iconfont { color: #1e6fd9; }
+
+        .xhs-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .xhs-demo-card {
+            background: #fff;
+            border: 1px solid #e4e8ed;
+            border-radius: 6px;
+            padding: 10px 12px;
+        }
+        .xhs-demo-card h3 {
+            font-size: 13px;
+            color: #039;
+            margin-bottom: 6px;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .xhs-demo-card code {
+            font-family: Consolas, Monaco, monospace;
+            font-size: 12px;
+            color: #2b2b2b;
+            background: #f4f7fb;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        .xhs-demo-card pre {
+            font-family: Consolas, Monaco, monospace;
+            font-size: 12px;
+            color: #2b2b2b;
+            background: #f8f9fb;
+            padding: 6px 8px;
+            border-radius: 3px;
+            margin-top: 4px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 60px;
+            overflow: hidden;
+        }
+
+        /* ===== 页脚 ===== */
+        .xhs-foot {
+            text-align: center;
+            font-size: 12px;
+            color: #bbb;
+            padding: 16px;
+            letter-spacing: 1px;
+            border-top: 1px solid #eee;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 720px) {
+            .xhs-body { grid-template-columns: 1fr; }
+            .xhs-pane + .xhs-pane { border-left: none; border-top: 1px solid #eee; }
+            .xhs-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="xhs-wrap">
+
+    <!-- 头部 -->
+    <header class="xhs-head">
+        <h1><i class="iconfont icon-good"></i>JSON <em>可视化</em> 展示</h1>
+        <div class="xhs-tools">
+            <button id="xhsBtnSample"><i class="iconfont icon-shouye-zhihui"></i>示例</button>
+            <button id="xhsBtnFormat"><i class="iconfont icon-kuaijiezhifu"></i>格式化</button>
+            <button id="xhsBtnMinify"><i class="iconfont icon-shanchu"></i>压缩</button>
+            <button id="xhsBtnParse"><i class="iconfont icon-anquanbaozhang"></i>解析</button>
+        </div>
+    </header>
+
+    <!-- 两栏 -->
+    <section class="xhs-body">
+        <!-- 左：文本 -->
+        <div class="xhs-pane">
+            <h2><i class="iconfont icon-bianji"></i>JSON 源码（可编辑）</h2>
+            <textarea id="xhsInput" class="xhs-input" spellcheck="false">{"姓名":"解浩帅","学号":"24001010110","专业":"计算机科学与技术","兴趣":["前端开发","篮球","音乐"],"年级":2,"是否在校":true,"毕业院校":null,"课程":{"前端":["HTML","CSS","JavaScript"],"后端":["Java","MySQL"]}}</textarea>
+            <div id="xhsStatus" class="xhs-status xhs-ok">✓ 准备就绪</div>
+        </div>
+
+        <!-- 右：树 -->
+        <div class="xhs-pane">
+            <h2><i class="iconfont icon-faxian"></i>可视化树</h2>
+            <div id="xhsTree" class="xhs-tree"></div>
+        </div>
+    </section>
+
+    <!-- 方法示范 -->
+    <section class="xhs-demos">
+        <h2><i class="iconfont icon-shouye-zhihui"></i>JSON 核心方法（实时执行）</h2>
+        <div class="xhs-row">
+            <div class="xhs-demo-card">
+                <h3>① JSON.parse()</h3>
+                <code>把字符串 → 对象</code>
+                <pre id="xhsDemoParse">对象类型: object</pre>
+            </div>
+            <div class="xhs-demo-card">
+                <h3>② JSON.stringify()</h3>
+                <code>把对象 → 字符串</code>
+                <pre id="xhsDemoString">"{"姓名":"解浩帅"...}"</pre>
+            </div>
+            <div class="xhs-demo-card">
+                <h3>③ 美化 stringify(obj, null, 2)</h3>
+                <code>格式化缩进 2 空格</code>
+                <pre id="xhsDemoPretty">格式化输出已填入左栏</pre>
+            </div>
+        </div>
+    </section>
+
+    <div class="xhs-foot">JSON · parse / stringify / 美化 · 解浩帅</div>
+
+</div>
+
+<script>
+    const xhsInput = document.getElementById("xhsInput");
+    const xhsStatus = document.getElementById("xhsStatus");
+    const xhsTree = document.getElementById("xhsTree");
+
+    // ===== 渲染 JSON 树 =====
+    function xhsRenderTree(xhsData, xhsIsRoot) {
+        let xhsHtml = "";
+
+        if (xhsData === null) {
+            xhsHtml = '<span class="xhs-val-null">null</span>';
+        } else if (typeof xhsData === "boolean") {
+            xhsHtml = '<span class="xhs-val-bool">' + xhsData + '</span>';
+        } else if (typeof xhsData === "number") {
+            xhsHtml = '<span class="xhs-val-num">' + xhsData + '</span>';
+        } else if (typeof xhsData === "string") {
+            xhsHtml = '<span class="xhs-val-str">' + xhsData + '</span>';
+        } else if (Array.isArray(xhsData)) {
+            xhsHtml = xhsRenderContainer(xhsData.map(function (v) { return { key: "", value: v }; }), true);
+        } else if (typeof xhsData === "object") {
+            let xhsItems = Object.keys(xhsData).map(function (k) { return { key: k, value: xhsData[k] }; });
+            xhsHtml = xhsRenderContainer(xhsItems, false);
+        }
+
+        if (xhsIsRoot) {
+            xhsHtml = '<div class="xhs-node xhs-collapsed">' + xhsHtml + '</div>';
+        }
+        return xhsHtml;
+    }
+
+    function xhsRenderContainer(xhsItems, xhsIsArray) {
+        const xhsOpen = xhsIsArray ? "[" : "{";
+        const xhsClose = xhsIsArray ? "]" : "}";
+        const xhsCount = xhsItems.length;
+
+        let xhsHtml = "";
+        xhsHtml += '<span class="xhs-toggle"></span>';
+        xhsHtml += '<span class="xhs-brace">' + xhsOpen + '</span>';
+        xhsHtml += '<span class="xhs-type-tag">' + (xhsIsArray ? "Array" : "Object") + ' ' + xhsCount + '</span>';
+        xhsHtml += '<div class="xhs-child" style="padding-left:18px;">';
+
+        xhsItems.forEach(function (xhsItem, xhsIdx) {
+            const xhsIsContainer = xhsItem.value !== null && typeof xhsItem.value === "object";
+            xhsHtml += '<div>';
+            if (!xhsIsArray) {
+                xhsHtml += '<span class="xhs-key">' + xhsItem.key + '</span>';
+            }
+            if (xhsIsContainer) {
+                let xhsSub = xhsRenderTree(xhsItem.value, false);
+                xhsHtml += xhsSub;
+            } else {
+                xhsHtml += xhsRenderTree(xhsItem.value, false);
+            }
+            if (xhsIdx < xhsItems.length - 1) xhsHtml += '<span style="color:#aaa">,</span>';
+            xhsHtml += '</div>';
+        });
+
+        xhsHtml += '</div>';
+        xhsHtml += '<span class="xhs-brace">' + xhsClose + '</span>';
+        return xhsHtml;
+    }
+
+    // ===== 解析并渲染 =====
+    function xhsParse() {
+        try {
+            const xhsObj = JSON.parse(xhsInput.value);
+            xhsStatus.className = "xhs-status xhs-ok";
+            xhsStatus.textContent = "✓ 解析成功：type=" + Object.prototype.toString.call(xhsObj)
+                + "  keys=" + (Array.isArray(xhsObj) ? xhsObj.length : Object.keys(xhsObj).length);
+            xhsTree.innerHTML = xhsRenderTree(xhsObj, true);
+            // 根默认展开
+            xhsTree.querySelector(".xhs-node").classList.remove("xhs-collapsed");
+            // 绑定折叠点击
+            xhsTree.querySelectorAll(".xhs-toggle").forEach(function (xhsT) {
+                xhsT.addEventListener("click", function () {
+                    xhsT.parentElement.classList.toggle("xhs-collapsed");
+                });
+            });
+            // 更新方法示范
+            xhsUpdateDemos(xhsObj);
+        } catch (xhsErr) {
+            xhsStatus.className = "xhs-status xhs-err";
+            xhsStatus.textContent = "✗ 解析失败：" + xhsErr.message;
+        }
+    }
+
+    // ===== 方法示范 =====
+    function xhsUpdateDemos(xhsObj) {
+        document.getElementById("xhsDemoParse").textContent =
+            "JSON.parse(str) → type: " + typeof xhsObj + (Array.isArray(xhsObj) ? " (Array)" : " (Object)");
+        document.getElementById("xhsDemoString").textContent =
+            JSON.stringify(xhsObj).length > 80 ?
+            JSON.stringify(xhsObj).slice(0, 80) + "..." : JSON.stringify(xhsObj);
+        document.getElementById("xhsDemoPretty").textContent =
+            JSON.stringify(xhsObj, null, 2).length > 100 ?
+            JSON.stringify(xhsObj, null, 2).slice(0, 100) + "..." : JSON.stringify(xhsObj, null, 2);
+    }
+
+    // ===== 按钮事件 =====
+    document.getElementById("xhsBtnSample").addEventListener("click", function () {
+        xhsInput.value = '{"姓名":"解浩帅","学号":"24001010110","专业":"计算机科学与技术","兴趣":["前端开发","篮球","音乐"],"年级":2,"是否在校":true,"毕业院校":null,"课程":{"前端":["HTML","CSS","JavaScript"],"后端":["Java","MySQL"]}}';
+        xhsParse();
+    });
+    document.getElementById("xhsBtnFormat").addEventListener("click", function () {
+        try {
+            xhsInput.value = JSON.stringify(JSON.parse(xhsInput.value), null, 2);
+            xhsParse();
+        } catch (e) {
+            xhsStatus.className = "xhs-status xhs-err";
+            xhsStatus.textContent = "✗ 格式化失败：" + e.message;
+        }
+    });
+    document.getElementById("xhsBtnMinify").addEventListener("click", function () {
+        try {
+            xhsInput.value = JSON.stringify(JSON.parse(xhsInput.value));
+            xhsParse();
+        } catch (e) {
+            xhsStatus.className = "xhs-status xhs-err";
+            xhsStatus.textContent = "✗ 压缩失败：" + e.message;
+        }
+    });
+    document.getElementById("xhsBtnParse").addEventListener("click", xhsParse);
+
+    // 文本框输入即实时解析（300ms 防抖）
+    let xhsTimer;
+    xhsInput.addEventListener("input", function () {
+        clearTimeout(xhsTimer);
+        xhsTimer = setTimeout(xhsParse, 300);
+    });
+
+    // 初始渲染
+    xhsParse();
+</script>
+</body>
+</html>

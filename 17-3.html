@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<!-- 姓名：解浩帅，日期：2026-11-02，功能名称：17-3 商品列表页（fetch 请求 dummyjson 接口，含本地演示数据兜底） -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17-3 商品列表 — 解浩帅</title>
+    <link rel="stylesheet" href="./font/font_5244829_352pklrzxi1/iconfont.css">
+    <style>
+        :root {
+            --xhs-main: #1e6fd9;
+            --xhs-dark: #0b1f3a;
+            --xhs-text: #2c3646;
+            --xhs-sub: #7a8797;
+            --xhs-line: #e6eaf0;
+            --xhs-price: #e4393c;
+            --xhs-bg: #f0f2f5;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+            background: var(--xhs-bg);
+            color: var(--xhs-text);
+            padding: 26px 18px 40px;
+        }
+
+        .xhs-wrap {
+            max-width: 1080px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(18, 40, 63, .08);
+        }
+
+        /* ===== 头部 ===== */
+        .xhs-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, var(--xhs-dark), var(--xhs-main));
+            color: #fff;
+        }
+        .xhs-head h1 {
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+        .xhs-head h1 .iconfont { font-size: 21px; }
+        .xhs-head em { font-style: normal; color: #ffc46b; }
+        .xhs-api {
+            font-family: Consolas, Monaco, monospace;
+            font-size: 11px;
+            background: rgba(255, 255, 255, .13);
+            padding: 4px 10px;
+            border-radius: 4px;
+            max-width: 420px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ===== 工具栏 ===== */
+        .xhs-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: #fafbfc;
+            border-bottom: 1px solid var(--xhs-line);
+        }
+        .xhs-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 7px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all .18s;
+        }
+        .xhs-btn-main { background: var(--xhs-main); color: #fff; }
+        .xhs-btn-main:hover { background: #14509f; }
+        .xhs-btn-main:disabled { background: #a8c1de; cursor: not-allowed; }
+        .xhs-btn-ghost {
+            background: #fff;
+            color: var(--xhs-sub);
+            border: 1px solid var(--xhs-line);
+        }
+        .xhs-btn-ghost:hover { color: var(--xhs-main); border-color: var(--xhs-main); }
+        .xhs-count {
+            margin-left: auto;
+            font-size: 12px;
+            color: var(--xhs-sub);
+        }
+
+        /* ===== 状态条 ===== */
+        .xhs-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 24px;
+            font-size: 12px;
+            border-bottom: 1px solid var(--xhs-line);
+            line-height: 1.6;
+        }
+        .xhs-status.xhs-idle { color: var(--xhs-sub); }
+        .xhs-status.xhs-loading { background: #fffbe6; color: #b7791f; }
+        .xhs-status.xhs-ok { background: #eafaf1; color: #1e8449; }
+        .xhs-status.xhs-warn { background: #fff4e5; color: #b26a00; }
+        .xhs-status.xhs-err { background: #fdedec; color: #c0392b; }
+
+        /* ===== 列表 Grid ===== */
+        .xhs-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            padding: 22px 24px;
+            min-height: 320px;
+        }
+
+        .xhs-card {
+            border: 1px solid var(--xhs-line);
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            transition: box-shadow .2s, transform .2s;
+        }
+        .xhs-card:hover {
+            box-shadow: 0 6px 18px rgba(18, 40, 63, .1);
+            transform: translateY(-2px);
+        }
+
+        .xhs-thumb {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            background: #f7f9fb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .xhs-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 8px;
+        }
+        .xhs-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: var(--xhs-price);
+            color: #fff;
+            font-size: 11px;
+            padding: 2px 7px;
+            border-radius: 3px;
+        }
+
+        .xhs-info {
+            padding: 10px 12px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+        }
+        .xhs-cate {
+            font-size: 11px;
+            color: #8a97a6;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+        .xhs-title {
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.45;
+            height: 40px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        .xhs-star {
+            font-size: 12px;
+            color: #f5a623;
+            letter-spacing: 1px;
+        }
+        .xhs-star span { color: var(--xhs-sub); margin-left: 4px; letter-spacing: 0; }
+
+        .xhs-price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            margin-top: auto;
+        }
+        .xhs-price { font-size: 17px; font-weight: 700; color: var(--xhs-price); }
+        .xhs-price-old { font-size: 12px; color: #aab4c0; text-decoration: line-through; }
+        .xhs-stock { font-size: 11px; color: var(--xhs-sub); }
+
+        .xhs-detail-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin: 0 12px 12px;
+            padding: 7px 0;
+            border: 1px solid var(--xhs-main);
+            border-radius: 4px;
+            color: var(--xhs-main);
+            font-size: 12px;
+            text-decoration: none;
+            transition: all .18s;
+        }
+        .xhs-detail-btn:hover { background: var(--xhs-main); color: #fff; }
+
+        /* ===== 骨架屏 ===== */
+        .xhs-skeleton .xhs-thumb,
+        .xhs-skeleton .xhs-sk-line {
+            background: linear-gradient(90deg, #eef1f5 25%, #f7f9fb 50%, #eef1f5 75%);
+            background-size: 200% 100%;
+            animation: xhsShimmer 1.4s infinite;
+        }
+        .xhs-skeleton .xhs-sk-line {
+            height: 12px;
+            border-radius: 3px;
+            margin: 4px 12px;
+        }
+        .xhs-skeleton .xhs-sk-line.xhs-w60 { width: 60%; }
+        .xhs-skeleton .xhs-sk-line.xhs-w85 { width: 85%; }
+        @keyframes xhsShimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* ===== 页脚 ===== */
+        .xhs-foot {
+            padding: 16px 24px;
+            text-align: center;
+            font-size: 12px;
+            color: #b6bfca;
+            border-top: 1px solid var(--xhs-line);
+            letter-spacing: .5px;
+        }
+
+        @media (max-width: 900px) {
+            .xhs-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 680px) {
+            .xhs-grid { grid-template-columns: repeat(2, 1fr); }
+            .xhs-head h1 { font-size: 16px; }
+            .xhs-api { display: none; }
+        }
+    </style>
+</head>
+<body>
+<div class="xhs-wrap">
+
+    <header class="xhs-head">
+        <h1><i class="iconfont icon-shangcheng"></i>商品<em>列表</em> · fetch 接口</h1>
+        <span class="xhs-api" id="xhsApiUrl">https://dummyjson.com/products?limit=8</span>
+    </header>
+
+    <div class="xhs-toolbar">
+        <button class="xhs-btn xhs-btn-main" id="xhsBtnReload">
+            <i class="iconfont icon-zhongxinshengcheng"></i>重新请求接口
+        </button>
+        <button class="xhs-btn xhs-btn-ghost" id="xhsBtnMock">
+            <i class="iconfont icon-faxian"></i>本地演示数据
+        </button>
+        <span class="xhs-count" id="xhsCount">—</span>
+    </div>
+
+    <div class="xhs-status xhs-idle" id="xhsStatus">
+        正在准备请求 https://dummyjson.com/products?limit=8
+    </div>
+
+    <div class="xhs-grid" id="xhsGrid"></div>
+
+    <div class="xhs-foot">原生 HTML / CSS / JavaScript · fetch 获取服务端数据 · 解浩帅</div>
+</div>
+
+<script>
+    var xhsApiUrl = "https://dummyjson.com/products?limit=8";
+
+    /* ===== 本地演示数据（接口不可达时兜底，字段结构与 dummyjson 保持一致） ===== */
+    var xhsMockList = [
+        { id: 1, title: "Essence Mascara Lash Princess", category: "beauty", price: 9.99, discountPercentage: 10.48, rating: 4.94, stock: 5, brand: "Essence",
+          images: ["./img/a1.png", "./img/a2.jpg", "./img/a3.jpg", "./img/1.jpg"] },
+        { id: 2, title: "Eyeshadow Palette with Mirror", category: "beauty", price: 19.99, discountPercentage: 18.19, rating: 3.28, stock: 44, brand: "Glamour Beauty",
+          images: ["./img/a2.jpg", "./img/a3.jpg", "./img/a1.png", "./img/2.jpg"] },
+        { id: 3, title: "Powder Canister", category: "beauty", price: 14.99, discountPercentage: 9.84, rating: 3.82, stock: 59, brand: "Velvet Touch",
+          images: ["./img/a3.jpg", "./img/1.jpg", "./img/a1.png", "./img/3.jpg"] },
+        { id: 4, title: "Red Lipstick", category: "beauty", price: 12.99, discountPercentage: 12.99, rating: 2.51, stock: 68, brand: "Chic Cosmetics",
+          images: ["./img/1.jpg", "./img/2.jpg", "./img/3.jpg", "./img/a1.png"] },
+        { id: 5, title: "Red Nail Polish", category: "beauty", price: 8.99, discountPercentage: 11.44, rating: 3.91, stock: 71, brand: "Nail Couture",
+          images: ["./img/2.jpg", "./img/3.jpg", "./img/a2.jpg", "./img/1.jpg"] },
+        { id: 6, title: "Calvin Klein CK One", category: "fragrances", price: 49.99, discountPercentage: 5.88, rating: 4.35, stock: 29, brand: "Calvin Klein",
+          images: ["./img/3.jpg", "./img/a1.png", "./img/a2.jpg", "./img/a3.jpg"] },
+        { id: 7, title: "Chanel Coco Noir Eau De Parfum", category: "fragrances", price: 129.99, discountPercentage: 17.06, rating: 4.26, stock: 23, brand: "Chanel",
+          images: ["./img/a1.png", "./img/a3.jpg", "./img/1.jpg", "./img/2.jpg"] },
+        { id: 8, title: "Dior J'adore Eau de Parfume", category: "fragrances", price: 89.99, discountPercentage: 15.58, rating: 4.64, stock: 98, brand: "Dior",
+          images: ["./img/a2.jpg", "./img/1.jpg", "./img/2.jpg", "./img/a3.jpg"] }
+    ];
+
+    var xhsGrid = document.getElementById("xhsGrid");
+    var xhsStatus = document.getElementById("xhsStatus");
+    var xhsCount = document.getElementById("xhsCount");
+    var xhsBtnReload = document.getElementById("xhsBtnReload");
+
+    /* ===== 骨架屏 ===== */
+    function xhsSkeleton() {
+        var xhsHtml = "";
+        for (var i = 0; i < 8; i++) {
+            xhsHtml += '<div class="xhs-card xhs-skeleton">'
+                + '<div class="xhs-thumb"></div>'
+                + '<div class="xhs-sk-line xhs-w85"></div>'
+                + '<div class="xhs-sk-line xhs-w60"></div>'
+                + '<div class="xhs-sk-line xhs-w60"></div>'
+                + '</div>';
+        }
+        xhsGrid.innerHTML = xhsHtml;
+    }
+
+    /* ===== 星级 ===== */
+    function xhsStars(xhsScore) {
+        var xhsFull = Math.round(xhsScore);
+        var xhsStr = "";
+        for (var i = 1; i <= 5; i++) xhsStr += (i <= xhsFull ? "★" : "☆");
+        return '<div class="xhs-star">' + xhsStr + '<span>' + xhsScore.toFixed(2) + '</span></div>';
+    }
+
+    /* ===== 渲染列表 ===== */
+    function xhsRenderList(xhsList) {
+        var xhsHtml = "";
+        xhsList.forEach(function (xhsItem) {
+            var xhsImg = xhsItem.images && xhsItem.images.length ? xhsItem.images[0] : "./img/a1.png";
+            var xhsOld = (xhsItem.price / (1 - xhsItem.discountPercentage / 100)).toFixed(2);
+            xhsHtml += '<article class="xhs-card">'
+                + '<div class="xhs-thumb">'
+                + '<span class="xhs-badge">-' + Math.round(xhsItem.discountPercentage) + '%</span>'
+                + '<img src="' + xhsImg + '" alt="' + xhsItem.title + '" loading="lazy" onerror="xhsImgError(this)">'
+                + '</div>'
+                + '<div class="xhs-info">'
+                + '<span class="xhs-cate">' + xhsItem.category + '</span>'
+                + '<h2 class="xhs-title">' + xhsItem.title + '</h2>'
+                + xhsStars(xhsItem.rating)
+                + '<div class="xhs-price-row">'
+                + '<span class="xhs-price">$' + xhsItem.price.toFixed(2) + '</span>'
+                + '<span class="xhs-price-old">$' + xhsOld + '</span>'
+                + '</div>'
+                + '<span class="xhs-stock">库存：' + xhsItem.stock + ' 件</span>'
+                + '</div>'
+                + '<a class="xhs-detail-btn" href="./17-3-detail.html?id=' + xhsItem.id + '">'
+                + '<i class="iconfont icon-faxian"></i>查看详情</a>'
+                + '</article>';
+        });
+        xhsGrid.innerHTML = xhsHtml;
+        xhsCount.textContent = "共 " + xhsList.length + " 件商品";
+    }
+
+    /* ===== 图片加载失败兜底 ===== */
+    function xhsImgError(xhsImg) {
+        if (xhsImg.dataset.xhsFixed) return;
+        xhsImg.dataset.xhsFixed = "1";
+        xhsImg.src = "./img/a1.png";
+    }
+
+    /* ===== 真实接口：fetch + 8 秒超时 ===== */
+    function xhsLoadFromApi() {
+        xhsBtnReload.disabled = true;
+        xhsStatus.className = "xhs-status xhs-loading";
+        xhsStatus.textContent = "⏳ 正在 fetch " + xhsApiUrl + " ...";
+        xhsSkeleton();
+        xhsCount.textContent = "加载中…";
+
+        var xhsCtrl = new AbortController();
+        var xhsTimer = setTimeout(function () { xhsCtrl.abort(); }, 8000);
+        var xhsStart = performance.now();
+
+        fetch(xhsApiUrl, { signal: xhsCtrl.signal })
+            .then(function (xhsRes) {
+                clearTimeout(xhsTimer);
+                if (!xhsRes.ok) throw new Error("HTTP " + xhsRes.status);
+                return xhsRes.json();
+            })
+            .then(function (xhsData) {
+                if (!xhsData.products || !xhsData.products.length) throw new Error("接口返回无商品数据");
+                xhsRenderList(xhsData.products);
+                xhsStatus.className = "xhs-status xhs-ok";
+                xhsStatus.textContent = "✔ 接口请求成功：total=" + xhsData.total
+                    + "，本次返回 " + xhsData.products.length + " 件（耗时 "
+                    + Math.round(performance.now() - xhsStart) + "ms）";
+            })
+            .catch(function (xhsErr) {
+                clearTimeout(xhsTimer);
+                var xhsMsg = xhsErr.name === "AbortError" ? "请求超时 8 秒" : xhsErr.message;
+                // 自动降级到本地演示数据，保证课堂演示不中断
+                xhsRenderList(xhsMockList);
+                xhsStatus.className = "xhs-status xhs-warn";
+                xhsStatus.textContent = "⚠ 接口不可达（" + xhsMsg + "），已自动切换为本地演示数据"
+                    + "，共 " + xhsMockList.length + " 件";
+            })
+            .finally(function () { xhsBtnReload.disabled = false; });
+    }
+
+    /* ===== 本地演示数据 ===== */
+    function xhsLoadMock() {
+        xhsStatus.className = "xhs-status xhs-warn";
+        xhsStatus.textContent = "● 当前展示本地演示数据（字段结构与 dummyjson 接口一致，共 "
+            + xhsMockList.length + " 件）";
+        xhsRenderList(xhsMockList);
+    }
+
+    xhsBtnReload.addEventListener("click", xhsLoadFromApi);
+    document.getElementById("xhsBtnMock").addEventListener("click", xhsLoadMock);
+
+    /* ===== 进入页面即请求接口 ===== */
+    xhsSkeleton();
+    xhsLoadFromApi();
+</script>
+</body>
+</html>

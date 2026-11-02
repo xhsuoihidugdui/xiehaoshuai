@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<!-- 姓名：解浩帅，日期：2026-11-02，功能名称：17-2 fetch 获取随机狗狗图片（dog.ceo API） -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17-2 fetch 获取远程数据 — 解浩帅</title>
+    <link rel="stylesheet" href="./font/font_5244829_352pklrzxi1/iconfont.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+            background: #f0f2f5;
+            padding: 30px 20px;
+        }
+
+        /* ===== 容器 ===== */
+        .xhs-wrap {
+            max-width: 760px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 14px rgba(0, 0, 0, 0.06);
+        }
+
+        /* ===== 头部 ===== */
+        .xhs-head {
+            background: linear-gradient(135deg, #0b1f3a, #1e6fd9);
+            color: #fff;
+            padding: 16px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .xhs-head h1 {
+            font-size: 17px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .xhs-head h1 .iconfont { font-size: 20px; }
+        .xhs-head em { font-style: normal; color: #f5a623; }
+        .xhs-api {
+            font-size: 11px;
+            background: rgba(255,255,255,0.12);
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-family: Consolas, Monaco, monospace;
+            max-width: 340px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ===== 工具栏 ===== */
+        .xhs-toolbar {
+            display: flex;
+            gap: 8px;
+            padding: 12px 22px;
+            border-bottom: 1px solid #eee;
+            background: #fafbfc;
+        }
+        .xhs-btn {
+            padding: 7px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex; align-items: center; gap: 5px;
+            transition: all .15s;
+        }
+        .xhs-btn-primary {
+            background: #1e6fd9;
+            color: #fff;
+        }
+        .xhs-btn-primary:hover { background: #144f9e; }
+        .xhs-btn-primary:disabled {
+            background: #a0b8d6;
+            cursor: not-allowed;
+        }
+        .xhs-btn-secondary {
+            background: #fff;
+            color: #5a6b7c;
+            border: 1px solid #dcdfe6;
+        }
+        .xhs-btn-secondary:hover { color: #1e6fd9; border-color: #1e6fd9; }
+
+        /* ===== 状态条 ===== */
+        .xhs-status {
+            padding: 8px 22px;
+            font-size: 12px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 30px;
+        }
+        .xhs-status.xhs-idle { color: #999; }
+        .xhs-status.xhs-loading { background: #fffbe6; color: #b7791f; }
+        .xhs-status.xhs-ok { background: #eafaf1; color: #1e8449; }
+        .xhs-status.xhs-err { background: #fdedec; color: #c0392b; }
+
+        /* ===== 图片卡片 Grid ===== */
+        .xhs-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            padding: 20px 22px;
+            min-height: 320px;
+            background: #fafbfc;
+        }
+
+        .xhs-card {
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 占位：骨架屏 */
+        .xhs-card.xhs-skeleton .xhs-img-box {
+            background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+            background-size: 200% 100%;
+            animation: xhsShimmer 1.4s infinite;
+        }
+        .xhs-card.xhs-skeleton .xhs-caption {
+            height: 14px;
+            background: #f5f5f5;
+            border-radius: 3px;
+            width: 80%;
+        }
+        @keyframes xhsShimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .xhs-img-box {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            background: #f5f5f5;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .xhs-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .3s;
+            cursor: pointer;
+        }
+        .xhs-img-box img:hover { transform: scale(1.05); }
+
+        .xhs-caption {
+            padding: 8px 10px;
+            font-size: 11px;
+            color: #5a6b7c;
+            word-break: break-all;
+            text-align: center;
+            font-family: Consolas, Monaco, monospace;
+            line-height: 1.5;
+        }
+
+        /* ===== JSON 原始数据 ===== */
+        .xhs-json-box {
+            padding: 0 22px 20px;
+        }
+        .xhs-json-title {
+            font-size: 12px;
+            color: #5a6b7c;
+            margin-bottom: 6px;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .xhs-json-pre {
+            background: #f8f9fb;
+            border: 1px solid #e4e8ed;
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 12px;
+            color: #2b2b2b;
+            max-height: 140px;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        /* ===== 页脚 ===== */
+        .xhs-foot {
+            text-align: center;
+            font-size: 12px;
+            color: #bbb;
+            padding: 16px;
+            letter-spacing: 1px;
+            border-top: 1px solid #eee;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 600px) {
+            .xhs-grid { grid-template-columns: 1fr; }
+            .xhs-head { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+<div class="xhs-wrap">
+
+    <!-- 头部 -->
+    <header class="xhs-head">
+        <h1><i class="iconfont icon-pingguo"></i>fetch <em>远程数据</em> 展示</h1>
+        <div class="xhs-api" id="xhsApiUrl">https://dog.ceo/api/breed/hound/images/random/3</div>
+    </header>
+
+    <!-- 工具栏 -->
+    <div class="xhs-toolbar">
+        <button class="xhs-btn xhs-btn-primary" id="xhsBtnFetch">
+            <i class="iconfont icon-shouye-zhihui"></i>真实 fetch
+        </button>
+        <button class="xhs-btn xhs-btn-secondary" id="xhsBtnMock">
+            <i class="iconfont icon-a-fenxiang2"></i>离线演示
+        </button>
+        <button class="xhs-btn xhs-btn-secondary" id="xhsBtnClear">
+            <i class="iconfont icon-shanchu"></i>清空
+        </button>
+    </div>
+
+    <!-- 状态 -->
+    <div class="xhs-status xhs-idle" id="xhsStatus">
+        点击"获取数据"按钮，通过 fetch 从 dog.ceo API 拉取 3 张猎犬图片
+    </div>
+
+    <!-- 图片 Grid -->
+    <div class="xhs-grid" id="xhsGrid">
+        <!-- JS 动态填充 -->
+    </div>
+
+    <!-- 原始 JSON -->
+    <div class="xhs-json-box" id="xhsJsonBox" style="display:none;">
+        <div class="xhs-json-title"><i class="iconfont icon-bianji"></i>服务端返回的原始 JSON</div>
+        <pre class="xhs-json-pre" id="xhsJson"></pre>
+    </div>
+
+    <div class="xhs-foot">fetch + 原生 HTML/CSS/JS · 解浩帅</div>
+
+</div>
+
+<script>
+    const xhsAPI = "https://dog.ceo/api/breed/hound/images/random/3";
+    const xhsGrid = document.getElementById("xhsGrid");
+    const xhsStatus = document.getElementById("xhsStatus");
+    const xhsJson = document.getElementById("xhsJson");
+    const xhsJsonBox = document.getElementById("xhsJsonBox");
+    const xhsBtnFetch = document.getElementById("xhsBtnFetch");
+    let xhsStart = 0;
+
+    // ===== 先铺 3 张骨架占位 =====
+    function xhsShowSkeleton() {
+        let xhsHtml = "";
+        for (let i = 0; i < 3; i++) {
+            xhsHtml += '<div class="xhs-card xhs-skeleton">'
+                + '<div class="xhs-img-box"></div>'
+                + '<div class="xhs-caption"></div>'
+                + '</div>';
+        }
+        xhsGrid.innerHTML = xhsHtml;
+    }
+    xhsShowSkeleton();
+
+    // ===== fetch 获取数据（真实 API，带超时） =====
+    function xhsFetch() {
+        xhsBtnFetch.disabled = true;
+        xhsStatus.className = "xhs-status xhs-loading";
+        xhsStatus.textContent = "⏳ 正在 fetch " + xhsAPI + " (带 8s 超时) ...";
+        xhsShowSkeleton();
+        xhsJsonBox.style.display = "none";
+        xhsStart = performance.now();
+
+        // AbortController 实现超时
+        const xhsCtrl = new AbortController();
+        const xhsTimer = setTimeout(function () { xhsCtrl.abort(); }, 8000);
+
+        fetch(xhsAPI, { signal: xhsCtrl.signal })
+            .then(function (xhsRes) {
+                clearTimeout(xhsTimer);
+                if (!xhsRes.ok) throw new Error("HTTP " + xhsRes.status);
+                return xhsRes.json();
+            })
+            .then(function (xhsData) {
+                xhsJson.textContent = JSON.stringify(xhsData, null, 2);
+                xhsJsonBox.style.display = "block";
+                if (xhsData.status !== "success") throw new Error("接口异常");
+                xhsRender(xhsData.message);
+                xhsStatus.className = "xhs-status xhs-ok";
+                xhsStatus.textContent = "✔ 成功：共 " + xhsData.message.length + " 张 (耗时 " + (performance.now() - xhsStart).toFixed(0) + "ms)";
+            })
+            .catch(function (xhsErr) {
+                clearTimeout(xhsTimer);
+                xhsStatus.className = "xhs-status xhs-err";
+                const xhsMsg = xhsErr.name === "AbortError" ? "请求超时 8s（dog.ceo 境外接口可能被墙）" : xhsErr.message;
+                xhsStatus.textContent = "✗ " + xhsMsg + " → 点「离线演示」看效果";
+                xhsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:#c0392b;font-size:13px;">'
+                    + '❌ fetch 失败：' + xhsMsg + '<br><br>'
+                    + '<span style="color:#999;">（本环境对 dog.ceo 境外接口网络不通，点"离线演示"可在本地模拟完整 fetch 流程）</span>'
+                    + '</div>';
+            })
+            .finally(function () { xhsBtnFetch.disabled = false; });
+    }
+
+    // ===== 离线 mock（课堂演示用，模拟完整 fetch Promise 链） =====
+    function xhsMockFetch() {
+        xhsStatus.className = "xhs-status xhs-loading";
+        xhsStatus.textContent = "⏳ 模拟 fetch " + xhsAPI + " ...";
+        xhsShowSkeleton();
+        xhsJsonBox.style.display = "none";
+        xhsStart = performance.now();
+
+        // setTimeout 模拟网络延迟（2s），然后 resolve mock JSON
+        new Promise(function (resolve) { setTimeout(resolve, 1800); })
+            .then(function () {
+                // 模拟：fetch 返回 response.ok 后调 .json()
+                return {
+                    status: "success",
+                    message: [
+                        "./img/a1.png",
+                        "./img/a2.jpg",
+                        "./img/a3.jpg"
+                    ],
+                    code: 200,
+                    _mock: true
+                };
+            })
+            .then(function (xhsData) {
+                xhsJson.textContent = JSON.stringify(xhsData, null, 2);
+                xhsJsonBox.style.display = "block";
+                xhsRender(xhsData.message);
+                xhsStatus.className = "xhs-status xhs-ok";
+                xhsStatus.textContent = "✔ 离线演示：共 " + xhsData.message.length + " 张本地图片 (耗时 " + (performance.now() - xhsStart).toFixed(0) + "ms)";
+            })
+            .catch(function (xhsErr) {
+                xhsStatus.className = "xhs-status xhs-err";
+                xhsStatus.textContent = "✗ mock 失败：" + xhsErr.message;
+            });
+    }
+
+    // ===== 渲染图片卡片 =====
+    function xhsRender(xhsUrls) {
+        let xhsHtml = "";
+        xhsUrls.forEach(function (xhsUrl, xhsIdx) {
+            let xhsBreed = "图片 " + (xhsIdx + 1);
+            // 真实 API 路径：.../breeds/hound/bloodhound.jpg
+            const xhsMatch = xhsUrl.match(/\/breeds\/([^/]+)\/[^/]+\.jpg/);
+            if (xhsMatch) {
+                xhsBreed = decodeURIComponent(xhsMatch[1]).replace(/-/g, " ");
+            } else {
+                // 本地图片路径 ./img/a1.png
+                const xhsLocal = xhsUrl.match(/\/([a-zA-Z0-9_-]+)\.(png|jpg)$/);
+                if (xhsLocal) xhsBreed = "本地图 " + xhsLocal[1].toUpperCase();
+            }
+
+            xhsHtml += '<div class="xhs-card">'
+                + '<div class="xhs-img-box">'
+                + '<img src="' + xhsUrl + '" alt="' + xhsBreed + '" loading="lazy">'
+                + '</div>'
+                + '<div class="xhs-caption">' + (xhsIdx + 1) + '. ' + xhsBreed + '</div>'
+                + '</div>';
+        });
+        xhsGrid.innerHTML = xhsHtml;
+    }
+
+    // ===== 按钮绑定 =====
+    xhsBtnFetch.addEventListener("click", function () {
+        xhsStart = performance.now();
+        xhsFetch();
+    });
+    document.getElementById("xhsBtnMock").addEventListener("click", function () {
+        xhsStart = performance.now();
+        xhsMockFetch();
+    });
+    document.getElementById("xhsBtnClear").addEventListener("click", function () {
+        xhsGrid.innerHTML = "";
+        xhsJsonBox.style.display = "none";
+        xhsStatus.className = "xhs-status xhs-idle";
+        xhsStatus.textContent = "已清空";
+    });
+
+    // ===== 页面加载自动做离线演示 =====
+    window.addEventListener("load", function () {
+        xhsStart = performance.now();
+        xhsMockFetch();
+    });
+</script>
+</body>
+</html>
