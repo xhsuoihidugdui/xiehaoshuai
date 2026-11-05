@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<!-- 姓名：解浩帅，日期：2026-11-05，功能名称：18-6 Mermaid 智能客服系统流程图 + ER 图 -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>18-6 Mermaid 流程图 & ER 图 — 智能客服系统</title>
+<script src="./cdn/mermaid.min.js"></script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+        background: linear-gradient(135deg, #0c1220 0%, #151d35 100%);
+        color: #e2e8f0;
+        padding: 28px 20px 48px;
+        min-height: 100vh;
+    }
+    .xhs-page { max-width: 1340px; margin: 0 auto; }
+
+    .xhs-header { text-align: center; margin-bottom: 24px; }
+    .xhs-header h1 {
+        font-size: 24px; font-weight: 800; letter-spacing: 2px;
+        background: linear-gradient(90deg,#4a9af5,#a78bfa,#f472b6);
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .xhs-header p { font-size: 12px; color: rgba(255,255,255,.4); margin-top: 6px; letter-spacing: 1px; }
+
+    .xhs-card {
+        background: #0f1629;
+        border: 1px solid rgba(74,154,245,.2);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 22px;
+        box-shadow: 0 12px 40px rgba(0,0,0,.35);
+    }
+    .xhs-card-head {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 14px;
+        padding-bottom: 12px;
+        border-bottom: 1px dashed rgba(74,154,245,.2);
+    }
+    .xhs-card-head h2 {
+        font-size: 14px; color: #4a9af5; font-weight: 700;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .xhs-card-head h2::before {
+        content: ""; width: 6px; height: 6px; border-radius: 50%;
+        background: #4a9af5; box-shadow: 0 0 8px #4a9af5;
+    }
+    .xhs-tag {
+        font-size: 10px; color: rgba(255,255,255,.55);
+        background: rgba(167,139,250,.12);
+        border: 1px solid rgba(167,139,250,.3);
+        padding: 2px 10px; border-radius: 10px;
+        letter-spacing: .5px;
+    }
+
+    /* Mermaid 容器 */
+    .xhs-mermaid-wrap {
+        background: #0b1220;
+        border: 1px solid rgba(74,154,245,.1);
+        border-radius: 8px;
+        padding: 18px;
+        overflow-x: auto;
+    }
+    .xhs-mermaid-wrap svg {
+        display: block;
+        margin: 0 auto;
+        max-width: 100%;
+        height: auto;
+    }
+    /* Mermaid 内部文本颜色覆盖（深色主题） */
+    .xhs-mermaid-wrap .mermaid text { fill: rgba(255,255,255,.85) !important; }
+    .xhs-mermaid-wrap .mermaid .title-text { fill: rgba(255,255,255,.9) !important; }
+
+    .xhs-desc {
+        font-size: 11.5px; color: rgba(255,255,255,.5);
+        margin-top: 12px; line-height: 1.9;
+        padding: 10px 14px; background: rgba(74,154,245,.04);
+        border-left: 3px solid rgba(74,154,245,.4); border-radius: 0 6px 6px 0;
+    }
+    .xhs-desc b { color: #a78bfa; font-weight: 600; }
+
+    .xhs-footer {
+        margin-top: 10px; text-align: center;
+        font-size: 11px; color: rgba(255,255,255,.3); letter-spacing: 1px;
+    }
+</style>
+</head>
+<body>
+<div class="xhs-page">
+
+    <header class="xhs-header">
+        <h1>Mermaid 流程图 &amp; ER 图</h1>
+        <p>智能客服系统 · Mermaid 10.9.1 · 本地离线</p>
+    </header>
+
+    <!-- ========== 图 1：流程图 ========== -->
+    <div class="xhs-card">
+        <div class="xhs-card-head">
+            <h2>智能客服请求处理流程（RAG Pipeline）</h2>
+            <span class="xhs-tag">FLOWCHART TD</span>
+        </div>
+        <div class="xhs-mermaid-wrap">
+<div class="mermaid">
+flowchart TD
+    %% ===== 子图：用户输入 =====
+    subgraph SG_IN["① 用户输入"]
+        A[用户提问] --> B{输入类型}
+        B -->|文本| C1[直接透传]
+        B -->|语音| C2[ASR 语音识别\n转文本]
+        B -->|图片| C3[OCR / 多模态\n理解]
+    end
+
+    %% ===== 子图：NLU 理解 =====
+    subgraph SG_NLU["② NLU 对话理解"]
+        C1 --> D; C2 --> D; C3 --> D
+        D[Query 预处理\n归一化 / 纠错] --> E[意图识别]
+        E --> F{是否闲聊?}
+        F -->|是| G[闲聊回复\n小模型直出]
+        F -->|否| H[槽位提取\n实体识别 NER]
+    end
+
+    %% ===== 子图：RAG 检索 =====
+    subgraph SG_RAG["③ RAG 检索增强"]
+        H --> I[Query 改写\nHyDE / 子查询拆解]
+        I --> J[多路召回\n稠密向量 + BM25 + 图谱]
+        J --> K[Rerank 重排\nCross-Encoder]
+        K --> L{召回到\n有效片段?}
+        L -->|有| M[组装上下文\nPrompt 模板]
+        L -->|无| N[兜底策略\n转人工 / 通用回复]
+    end
+
+    %% ===== 子图：LLM 生成 =====
+    subgraph SG_GEN["④ LLM 生成与校验"]
+        M --> O{需要工具调用?}
+        O -->|是| P[Function Calling\n执行外部 API]
+        O -->|否| Q[直接生成]
+        P --> Q
+        Q --> R[幻觉检测\nFact-Check]
+        R --> S{可信?}
+        S -->|是| T[格式化输出]
+        S -->|否| U[降级 / 拒答]
+    end
+
+    %% ===== 子图：输出 =====
+    subgraph SG_OUT["⑤ 输出 & 反馈"]
+        G --> V; N --> V; T --> V; U --> V
+        V[封装回复] --> W[前端渲染\nMarkdown / 卡片]
+        W --> X[用户]
+        X -->|点赞/踩| Y[反馈回流\n优化检索权重]
+        Y -.-> J
+    end
+
+    %% ===== 样式 =====
+    classDef inp fill:#1e3a5f,stroke:#4a9af5,stroke-width:1.5px,color:#fff
+    classDef nlu fill:#2d2456,stroke:#a78bfa,stroke-width:1.5px,color:#fff
+    classDef rag fill:#0f3b2e,stroke:#10b981,stroke-width:1.5px,color:#fff
+    classDef gen fill:#3b1f2e,stroke:#f472b6,stroke-width:1.5px,color:#fff
+    classDef out fill:#3b2a0f,stroke:#f59e0b,stroke-width:1.5px,color:#fff
+    classDef dec fill:#3b240f,stroke:#f59e0b,stroke-width:1px,stroke-dasharray:4 2,color:#fff
+
+    class A,C1,C2,C3,B inp
+    class D,E,H nlu
+    class I,J,K,M,N,L rag
+    class O,P,Q,R,S,T,U gen
+    class V,W,X,Y out
+    class F,O,L,S dec
+</div>
+        </div>
+        <div class="xhs-desc">
+            <b>图表类型：</b>flowchart TD（自顶向下流程图）<br/>
+            <b>覆盖流程：</b>用户输入 → NLU 对话理解 → RAG 检索增强（HyDE 改写 / 多路召回 / Rerank）→ LLM 生成 + Function Calling + 幻觉检测 → 输出反馈回流<br/>
+            <b>配色：</b>5 个子图各一色，决策菱形用虚线边框；反馈回流用红色虚线箭头表示数据闭环
+        </div>
+    </div>
+
+    <!-- ========== 图 2：ER 图 ========== -->
+    <div class="xhs-card">
+        <div class="xhs-card-head">
+            <h2>知识库智能客服系统 ER 图</h2>
+            <span class="xhs-tag">ERDIAGRAM</span>
+        </div>
+        <div class="xhs-mermaid-wrap">
+<div class="mermaid">
+erDiagram
+    USER {
+        bigint user_id PK
+        varchar nickname
+        tinyint vip_level
+        datetime last_active
+    }
+    SESSION {
+        bigint session_id PK
+        bigint user_id FK
+        varchar status
+        int turn_count
+        datetime started_at
+        datetime ended_at
+    }
+    INTENT {
+        bigint intent_id PK
+        varchar name
+        varchar category
+        int hit_count
+    }
+    MESSAGE {
+        bigint message_id PK
+        bigint session_id FK
+        tinyint role
+        text content
+        float confidence
+        datetime created_at
+    }
+    FEEDBACK {
+        bigint feedback_id PK
+        bigint user_id FK
+        bigint message_id FK
+        tinyint rating
+        text comment
+        datetime created_at
+    }
+    DOC_KNOWLEDGE {
+        bigint doc_id PK
+        varchar title
+        varchar source
+        varchar type
+        datetime indexed_at
+        tinyint status
+    }
+    CHUNK {
+        bigint chunk_id PK
+        bigint doc_id FK
+        int chunk_index
+        text content
+        int token_count
+    }
+    EMBEDDING {
+        bigint embedding_id PK
+        bigint chunk_id FK
+        varchar model
+    }
+    RETRIEVAL {
+        bigint retrieval_id PK
+        bigint message_id FK
+        bigint chunk_id FK
+        float score
+        varchar strategy
+    }
+    MODEL {
+        bigint model_id PK
+        varchar name
+        varchar version
+        varchar provider
+        datetime created_at
+    }
+    GENERATION {
+        bigint gen_id PK
+        bigint message_id FK
+        bigint model_id FK
+        int prompt_tokens
+        int completion_tokens
+        float latency_ms
+    }
+
+    USER ||--o{ SESSION : starts
+    SESSION ||--o{ MESSAGE : contains
+    MESSAGE }o--|| INTENT : identified
+    MESSAGE ||--o{ RETRIEVAL : triggers
+    MESSAGE ||--o{ FEEDBACK : has
+    FEEDBACK }o--|| USER : from
+    FEEDBACK }o--|| MESSAGE : targets
+    DOC_KNOWLEDGE ||--o{ CHUNK : splits_into
+    CHUNK ||--o| EMBEDDING : vectorized
+    CHUNK ||--o{ RETRIEVAL : matched
+    RETRIEVAL }o--|| MESSAGE : serves
+    MESSAGE ||--o| GENERATION : produces
+    GENERATION }o--|| MODEL : uses
+</div>
+        </div>
+        <div class="xhs-desc">
+            <b>图表类型：</b>erDiagram（实体关系图）<br/>
+            <b>实体清单（10 张核心表）：</b>USER · SESSION · INTENT · MESSAGE · FEEDBACK · DOC_KNOWLEDGE · CHUNK · EMBEDDING · RETRIEVAL · MODEL · GENERATION<br/>
+            <b>关系：</b>用户—会话 1:N、会话—消息 1:N、知识文档—分块 1:N、分块—向量嵌入 1:1、检索—生成—模型链路、反馈闭环关联用户与消息
+        </div>
+    </div>
+
+    <div class="xhs-footer">Mermaid 10.9.1 · 本地 cdn/mermaid.min.js · 无外部网络依赖</div>
+</div>
+
+<script>
+/* ========== Mermaid 初始化 ========== */
+if (typeof mermaid !== "undefined") {
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: "dark",
+        securityLevel: "loose",
+        fontFamily: "'Microsoft YaHei','PingFang SC',Arial,sans-serif",
+        flowchart: {
+            htmlLabels: false,
+            curve: "basis",
+            nodeSpacing: 36,
+            rankSpacing: 48,
+            padding: 16
+        },
+        er: {
+            useMaxWidth: true
+        }
+    });
+    window.__xhsMermaidReady = true;
+} else {
+    console.error("[18-6] mermaid.min.js 加载失败，请检查 cdn/ 目录");
+}
+</script>
+</body>
+</html>

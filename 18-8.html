@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<!-- 姓名：解浩帅，日期：2026-11-05，功能名称：18-8 ECharts 数据大屏（三列 · 中间顶部地理图） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>18-8 电商全球数据大屏 — 解浩帅</title>
+<script src="./cdn/echarts.min.js"></script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+        width: 100%; height: 100%;
+        background: #050a16;
+        color: #c9d6e8;
+        font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+        overflow: hidden;
+    }
+
+    /* ===== 大屏容器 ===== */
+    .xhs-screen {
+        width: 100vw; height: 100vh;
+        display: flex; flex-direction: column;
+        padding: 10px 14px 12px;
+        background:
+            radial-gradient(ellipse at top center, rgba(74,154,245,.10), transparent 60%),
+            linear-gradient(180deg, #050a16 0%, #0a1020 100%);
+    }
+
+    /* ===== 顶部 Header ===== */
+    .xhs-head {
+        height: 48px;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0 12px;
+        border-bottom: 1px solid rgba(74,154,245,.2);
+        margin-bottom: 10px;
+        position: relative;
+    }
+    .xhs-head::before, .xhs-head::after {
+        content: ""; position: absolute; top: 50%;
+        width: 40%; height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(74,154,245,.4), transparent);
+    }
+    .xhs-head::before { left: 12px; }
+    .xhs-head::after { right: 12px; }
+    .xhs-head h1 {
+        font-size: 18px; font-weight: 800; letter-spacing: 6px;
+        background: linear-gradient(90deg,#4a9af5,#a78bfa,#f472b6);
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+        position: relative; z-index: 2;
+        padding: 0 16px;
+    }
+    .xhs-head .xhs-side {
+        font-size: 12px; color: #6ee7b7; font-family: Consolas, Monaco, monospace;
+        position: relative; z-index: 2;
+        padding: 0 16px;
+    }
+    .xhs-head .xhs-side span { color: rgba(255,255,255,.5); margin-right: 14px; }
+
+    /* ===== 主体：三列 ===== */
+    .xhs-body {
+        flex: 1; min-height: 0;
+        display: grid;
+        grid-template-columns: 1fr 1.5fr 1fr;
+        gap: 10px;
+    }
+    .xhs-col {
+        display: flex; flex-direction: column; gap: 10px;
+        min-height: 0;
+    }
+    .xhs-col .xhs-panel {
+        background: linear-gradient(180deg, rgba(22,34,64,.55), rgba(10,18,36,.6));
+        border: 1px solid rgba(74,154,245,.18);
+        border-radius: 8px;
+        flex: 1; min-height: 0;
+        display: flex; flex-direction: column;
+        position: relative;
+        overflow: hidden;
+    }
+    .xhs-col .xhs-panel::before {
+        content: ""; position: absolute;
+        top: 0; left: 10px; right: 10px; height: 2px;
+        background: linear-gradient(90deg, transparent, rgba(74,154,245,.6), transparent);
+    }
+    .xhs-panel-title {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 8px 12px 6px;
+        font-size: 12px; font-weight: 700;
+        color: #a78bfa; letter-spacing: 1px;
+        border-bottom: 1px solid rgba(74,154,245,.12);
+    }
+    .xhs-panel-title::before {
+        content: ""; width: 3px; height: 12px; border-radius: 2px;
+        background: linear-gradient(180deg,#4a9af5,#a78bfa); margin-right: 8px;
+    }
+    .xhs-panel-title .xhs-tip { font-size: 10px; color: rgba(255,255,255,.35); font-weight: normal; }
+    .xhs-chart-box { flex: 1; min-height: 0; padding: 4px 4px 4px 4px; }
+
+    /* ===== KPI 卡片 ===== */
+    .xhs-kpi-row { display: flex; gap: 10px; }
+    .xhs-kpi {
+        flex: 1;
+        background: linear-gradient(135deg, rgba(74,154,245,.10), rgba(167,139,250,.05));
+        border: 1px solid rgba(74,154,245,.25);
+        border-radius: 8px;
+        padding: 10px 14px;
+        display: flex; flex-direction: column; justify-content: center;
+        position: relative; overflow: hidden;
+    }
+    .xhs-kpi .xhs-kpi-label { font-size: 11px; color: rgba(255,255,255,.5); letter-spacing: 1px; }
+    .xhs-kpi .xhs-kpi-val { font-size: 26px; font-weight: 800; color: #4a9af5; font-family: Consolas, Monaco, monospace; margin-top: 2px; }
+    .xhs-kpi .xhs-kpi-val b { color: #60a5fa; font-size: 13px; font-weight: 500; margin-left: 4px; }
+    .xhs-kpi .xhs-kpi-sub { font-size: 10px; color: #6ee7b7; margin-top: 2px; }
+    .xhs-kpi::after {
+        content: ""; position: absolute;
+        right: -20px; top: -20px; width: 60px; height: 60px; border-radius: 50%;
+        background: radial-gradient(circle, rgba(74,154,245,.25), transparent 70%);
+    }
+
+    /* ===== 中间顶部大地图 ===== */
+    .xhs-panel.xhs-map-panel { flex: 1.25; }
+    .xhs-panel.xhs-chart-panel { flex: 1; }
+
+    /* ===== 右侧 Top 榜 ===== */
+    .xhs-top-table {
+        padding: 4px 10px 10px;
+        font-size: 12px;
+        overflow-y: auto;
+    }
+    .xhs-top-row {
+        display: flex; align-items: center; gap: 8px;
+        padding: 5px 0;
+        border-bottom: 1px dashed rgba(74,154,245,.1);
+    }
+    .xhs-top-row:last-child { border-bottom: none; }
+    .xhs-top-no {
+        width: 20px; height: 20px; border-radius: 50%;
+        background: rgba(74,154,245,.15); color: #4a9af5;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 10px; font-weight: 700;
+    }
+    .xhs-top-row:nth-child(1) .xhs-top-no { background: linear-gradient(135deg,#fbbf24,#f59e0b); color: #000; }
+    .xhs-top-row:nth-child(2) .xhs-top-no { background: linear-gradient(135deg,#94a3b8,#64748b); color: #000; }
+    .xhs-top-row:nth-child(3) .xhs-top-no { background: linear-gradient(135deg,#cd7f32,#a16207); color: #fff; }
+    .xhs-top-name { flex: 1; color: rgba(255,255,255,.75); }
+    .xhs-top-bar-wrap { width: 70px; height: 6px; background: rgba(255,255,255,.06); border-radius: 3px; overflow: hidden; }
+    .xhs-top-bar { height: 100%; background: linear-gradient(90deg,#4a9af5,#a78bfa); border-radius: 3px; }
+    .xhs-top-val { width: 56px; text-align: right; color: #4a9af5; font-family: Consolas, Monaco, monospace; font-size: 11px; }
+
+    /* ===== 右下角滚动公告 ===== */
+    .xhs-marquee-wrap {
+        padding: 6px 12px;
+        overflow: hidden; height: 22px;
+        border-top: 1px solid rgba(74,154,245,.08);
+    }
+    .xhs-marquee {
+        white-space: nowrap; color: #f59e0b; font-size: 11px;
+        animation: xhsScroll 28s linear infinite;
+        display: inline-block;
+    }
+    .xhs-marquee span { margin: 0 14px; }
+    @keyframes xhsScroll {
+        0% { transform: translateX(100%); }
+        100% { transform: translateX(-100%); }
+    }
+</style>
+</head>
+<body>
+<div class="xhs-screen">
+
+    <!-- ========== 顶部 ========== -->
+    <header class="xhs-head">
+        <div class="xhs-side"><span>系统时间</span><b id="xhsNow">--</b></div>
+        <h1>GLOBAL E-COMMERCE DATA CENTER</h1>
+        <div class="xhs-side"><span>在线节点</span><b id="xhsNodes">12 / 12</b></div>
+    </header>
+
+    <!-- ========== 主体三列 ========== -->
+    <div class="xhs-body">
+
+        <!-- ===== 左列 ===== -->
+        <div class="xhs-col">
+
+            <div class="xhs-kpi-row">
+                <div class="xhs-kpi">
+                    <div class="xhs-kpi-label">今日 GMV（USD）</div>
+                    <div class="xhs-kpi-val" id="xhsKpiGmv">--<b>万</b></div>
+                    <div class="xhs-kpi-sub">↑ 12.3% vs 昨日</div>
+                </div>
+                <div class="xhs-kpi">
+                    <div class="xhs-kpi-label">订单总量</div>
+                    <div class="xhs-kpi-val" id="xhsKpiOrders">--<b>单</b></div>
+                    <div class="xhs-kpi-sub">↑ 8.6% vs 昨日</div>
+                </div>
+            </div>
+
+            <div class="xhs-panel">
+                <div class="xhs-panel-title">月度销售趋势 <span class="xhs-tip">近 12 个月</span></div>
+                <div class="xhs-chart-box" id="xhsChartBar"></div>
+            </div>
+
+            <div class="xhs-panel">
+                <div class="xhs-panel-title">渠道占比 <span class="xhs-tip">流量来源</span></div>
+                <div class="xhs-chart-box" id="xhsChartPie"></div>
+            </div>
+
+        </div>
+
+
+        <!-- ===== 中列 ===== -->
+        <div class="xhs-col">
+
+            <!-- 中间顶部：地理图 -->
+            <div class="xhs-panel xhs-map-panel">
+                <div class="xhs-panel-title">全球订单实时分布 <span class="xhs-tip">Geo 世界地图</span></div>
+                <div class="xhs-chart-box" id="xhsChartMap"></div>
+            </div>
+
+            <div class="xhs-panel xhs-chart-panel">
+                <div class="xhs-panel-title">实时物流轨迹 <span class="xhs-tip">跨洋航线</span></div>
+                <div class="xhs-chart-box" id="xhsChartSankey"></div>
+            </div>
+
+        </div>
+
+
+        <!-- ===== 右列 ===== -->
+        <div class="xhs-col">
+
+            <div class="xhs-panel">
+                <div class="xhs-panel-title">实时在线趋势 <span class="xhs-tip">近 60 秒滚动</span></div>
+                <div class="xhs-chart-box" id="xhsChartRealtime"></div>
+            </div>
+
+            <div class="xhs-panel">
+                <div class="xhs-panel-title">订单类型漏斗</div>
+                <div class="xhs-chart-box" id="xhsChartFunnel"></div>
+            </div>
+
+            <div class="xhs-panel">
+                <div class="xhs-panel-title">热销商品 TOP 8</div>
+                <div class="xhs-top-table" id="xhsTopTable"></div>
+                <div class="xhs-marquee-wrap">
+                    <div class="xhs-marquee">
+                        <span>⚡ 北京下单 iPhone 16 Pro ×3</span>
+                        <span>🚀 深圳仓发出跨境包裹至美国</span>
+                        <span>💰 新加坡大额订单 ¥12,800</span>
+                        <span>📦 英国 30 件库存告警</span>
+                        <span>🎉 墨西哥新客注册 +280</span>
+                        <span>⚡ 上海直播间同时在线 12,480</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+/* ========== 检查 ECharts ========== */
+if (typeof echarts === "undefined") {
+    alert("[18-8] echarts.min.js 加载失败");
+    throw new Error("echarts not loaded");
+}
+
+/* ========== 时间更新 ========== */
+function xhsUpdateTime() {
+    var d = new Date();
+    var pad = function (n) { return n < 10 ? "0" + n : "" + n; };
+    document.getElementById("xhsNow").textContent =
+        d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + " " +
+        pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
+}
+xhsUpdateTime(); setInterval(xhsUpdateTime, 1000);
+
+/* ========== KPI 数字滚动 ========== */
+function xhsKpi(el, from, to, suffix) {
+    var dur = 1200, start = performance.now();
+    function step(t) {
+        var p = Math.min(1, (t - start) / dur);
+        var e = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(from + (to - from) * e).toLocaleString();
+        if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+}
+setTimeout(function () {
+    xhsKpi(document.getElementById("xhsKpiGmv"), 0, 8520);
+    xhsKpi(document.getElementById("xhsKpiOrders"), 0, 32864);
+}, 200);
+
+/* ========== 通用 ECharts 主题（深色） ========== */
+var XHS_DARK = {
+    textStyle: { color: "#c9d6e8", fontFamily: "'Microsoft YaHei',Arial,sans-serif" },
+    grid: { left: 38, right: 24, top: 24, bottom: 28, containLabel: true },
+    axisLine: { lineStyle: { color: "rgba(74,154,245,.3)" } },
+    axisLabel: { color: "rgba(255,255,255,.55)", fontSize: 11 },
+    splitLine: { lineStyle: { color: "rgba(74,154,245,.08)", type: "dashed" } },
+    tooltip: {
+        backgroundColor: "rgba(15,22,41,.95)",
+        borderColor: "rgba(74,154,245,.4)",
+        textStyle: { color: "#e2e8f0", fontSize: 12 }
+    }
+};
+function xhsInit(id) {
+    var el = document.getElementById(id);
+    var c = echarts.init(el);
+    c.setOption(XHS_DARK, true);
+    return c;
+}
+
+/* ========== 图 1：月度销售柱状图 ========== */
+(function () {
+    var c = xhsInit("xhsChartBar");
+    c.setOption({
+        grid: { left: 34, right: 12, top: 16, bottom: 26 },
+        tooltip: { trigger: "axis" },
+        xAxis: {
+            type: "category",
+            data: ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"],
+            axisTick: { show: false }
+        },
+        yAxis: { type: "value", axisLabel: { formatter: "{value}万" } },
+        series: [{
+            type: "bar",
+            data: [1820,1520,2080,2240,2650,3980,3120,2860,3020,3580,5260,4620],
+            barWidth: 14,
+            itemStyle: {
+                borderRadius: [3,3,0,0],
+                color: new echarts.graphic.LinearGradient(0,0,0,1,[
+                    { offset:0, color:"#4a9af5" }, { offset:1, color:"rgba(74,154,245,.15)" }
+                ])
+            },
+            emphasis: { itemStyle: { color: "#7db6fa" } }
+        }]
+    });
+    c.resize();
+})();
+
+/* ========== 图 2：渠道占比环形 ========== */
+(function () {
+    var c = xhsInit("xhsChartPie");
+    c.setOption({
+        grid: { left: 0, right: 0, top: 0, bottom: 0 },
+        tooltip: { trigger: "item", formatter: "{b}: {c} ({d}%)" },
+        legend: {
+            bottom: 4, left: "center",
+            textStyle: { color: "rgba(255,255,255,.55)", fontSize: 10 },
+            itemWidth: 8, itemHeight: 8, itemGap: 10
+        },
+        series: [{
+            type: "pie", radius: ["45%", "70%"], center: ["50%", "45%"],
+            avoidLabelOverlap: true,
+            label: { show: false },
+            data: [
+                { name: "搜索引擎", value: 4682, itemStyle: { color: "#4a9af5" } },
+                { name: "社交媒体", value: 2896, itemStyle: { color: "#a78bfa" } },
+                { name: "付费广告", value: 2134, itemStyle: { color: "#f472b6" } },
+                { name: "直接访问", value: 3215, itemStyle: { color: "#f59e0b" } },
+                { name: "其他", value: 1587, itemStyle: { color: "#06b6d4" } }
+            ]
+        }]
+    });
+    c.resize();
+})();
+
+/* ========== 图 3：全球地理图（中间顶部） ========== */
+(function () {
+    var c = xhsInit("xhsChartMap");
+    // 国家名 → 坐标（经纬度）+ 订单量
+    var xhsSales = [
+        { name: "China",        lng: 104.1, lat: 35.9,  v: 4520 },
+        { name: "United States",lng: -97.2, lat: 38.9,  v: 3280 },
+        { name: "United Kingdom",lng: -1.4,  lat: 53.6,  v: 1860 },
+        { name: "Japan",        lng: 138.2, lat: 36.2,  v: 1520 },
+        { name: "Germany",      lng: 10.5,  lat: 51.2,  v: 1340 },
+        { name: "France",       lng: 2.2,   lat: 46.2,  v: 1120 },
+        { name: "Australia",    lng: 133.8, lat: -25.3, v: 980  },
+        { name: "Brazil",       lng: -53.1, lat: -10.4, v: 760  },
+        { name: "India",        lng: 78.9,  lat: 20.6,  v: 680  },
+        { name: "Canada",       lng: -106.3,lat: 56.1,  v: 620  },
+        { name: "Singapore",    lng: 103.8, lat: 1.4,   v: 580  },
+        { name: "Russia",       lng: 105.3, lat: 61.5,  v: 490  },
+        { name: "Spain",        lng: -3.7,  lat: 40.5,  v: 440  },
+        { name: "Italy",        lng: 12.6,  lat: 41.9,  v: 380  },
+        { name: "Mexico",       lng: -102.6,lat: 23.6,  v: 320  },
+        { name: "South Africa", lng: 24.7,  lat: -30.6, v: 260  },
+        { name: "South Korea",  lng: 127.8, lat: 36.5,  v: 410  },
+        { name: "Netherlands",  lng: 5.3,   lat: 52.1,  v: 350  }
+    ];
+
+    function xhsLoadGeo() {
+        return fetch("./cdn/world.json").then(function (r) { return r.json(); });
+    }
+
+    xhsLoadGeo().then(function (geo) {
+        echarts.registerMap("world", geo);
+        // scatter 数据：[lng, lat, val, name]
+        var scData = xhsSales.map(function (s) { return [s.lng, s.lat, s.v, s.name]; });
+
+        c.setOption({
+            backgroundColor: "transparent",
+            tooltip: {
+                trigger: "item",
+                backgroundColor: "rgba(15,22,41,.95)",
+                borderColor: "rgba(74,154,245,.4)",
+                textStyle: { color: "#e2e8f0", fontSize: 12 },
+                formatter: function (p) {
+                    if (p.seriesType === "scatter" || p.seriesType === "effectScatter") {
+                        return "<b>" + p.data[3] + "</b><br/>订单量：<b style='color:#4a9af5'>" + p.data[2] + "</b>";
+                    }
+                    return p.name;
+                }
+            },
+            visualMap: {
+                show: true,
+                right: 10, bottom: 14,
+                textStyle: { color: "rgba(255,255,255,.45)", fontSize: 10 },
+                min: 200, max: 5000,
+                inRange: { color: ["#06b6d4", "#4a9af5", "#a78bfa", "#f472b6", "#ef4444"] },
+                calculable: true
+            },
+            geo: {
+                map: "world",
+                roam: true,
+                zoom: 1.25,
+                scaleLimit: { min: 0.8, max: 4 },
+                label: { show: false },
+                itemStyle: {
+                    areaColor: "#0c1a35",
+                    borderColor: "rgba(74,154,245,.35)",
+                    borderWidth: 0.6
+                },
+                emphasis: {
+                    label: { show: true, color: "#fff", fontSize: 11 },
+                    itemStyle: { areaColor: "#1a3362" }
+                }
+            },
+            series: [
+                // 涟漪特效（前 5 名）
+                {
+                    name: "Top 5",
+                    type: "effectScatter",
+                    coordinateSystem: "geo",
+                    zlevel: 2,
+                    rippleEffect: { brushType: "stroke", scale: 4 },
+                    symbolSize: function (val) { return Math.max(6, Math.sqrt(val[2])); },
+                    itemStyle: { color: "#ef4444" },
+                    data: scData.slice(0, 5)
+                },
+                // 其余普通散点
+                {
+                    name: "订单分布",
+                    type: "scatter",
+                    coordinateSystem: "geo",
+                    zlevel: 1,
+                    symbolSize: function (val) { return Math.max(4, Math.sqrt(val[2]) * 0.8); },
+                    itemStyle: { shadowBlur: 8, shadowColor: "rgba(74,154,245,.6)" },
+                    data: scData
+                }
+            ]
+        });
+        c.resize();
+    }).catch(function (err) {
+        console.error("[18-8] world.json 加载失败:", err);
+        c.setOption({
+            title: {
+                text: "world.json 加载失败", left: "center", top: "center",
+                textStyle: { color: "#ef4444", fontSize: 14 }
+            }
+        });
+    });
+})();
+
+/* ========== 图 4：实时物流轨迹（桑基/折线） ========== */
+(function () {
+    var c = xhsInit("xhsChartSankey");
+    // 简化版桑基：发货仓 → 中转 → 目的国
+    c.setOption({
+        grid: { left: 0, right: 0, top: 6, bottom: 6 },
+        tooltip: { trigger: "item" },
+        series: [{
+            type: "sankey",
+            layout: "none",
+            left: 20, right: 20, top: 10, bottom: 10,
+            nodeGap: 6,
+            nodeAlign: "left",
+            emphasis: { focus: "adjacency" },
+            label: { color: "rgba(255,255,255,.75)", fontSize: 10 },
+            lineStyle: { color: "gradient", curveness: 0.4, opacity: 0.5 },
+            data: [
+                { name: "上海仓",  itemStyle: { color: "#4a9af5" } },
+                { name: "深圳仓",  itemStyle: { color: "#4a9af5" } },
+                { name: "香港中转",itemStyle: { color: "#a78bfa" } },
+                { name: "迪拜中转",itemStyle: { color: "#a78bfa" } },
+                { name: "美国",    itemStyle: { color: "#f472b6" } },
+                { name: "欧洲",    itemStyle: { color: "#f472b6" } },
+                { name: "东南亚",  itemStyle: { color: "#f472b6" } },
+                { name: "澳洲",    itemStyle: { color: "#f472b6" } }
+            ],
+            links: [
+                { source: "上海仓",  target: "香港中转", value: 1280 },
+                { source: "上海仓",  target: "迪拜中转", value: 620 },
+                { source: "深圳仓",  target: "香港中转", value: 960 },
+                { source: "香港中转",target: "美国",     value: 1100 },
+                { source: "香港中转",target: "欧洲",     value: 580 },
+                { source: "香港中转",target: "东南亚",   value: 560 },
+                { source: "迪拜中转",target: "欧洲",     value: 340 },
+                { source: "迪拜中转",target: "澳洲",     value: 280 },
+                { source: "香港中转",target: "澳洲",     value: 400 }
+            ]
+        }]
+    });
+    c.resize();
+})();
+
+/* ========== 图 5：实时在线趋势（折线，动态滚动） ========== */
+(function () {
+    var c = xhsInit("xhsChartRealtime");
+    var base = 1200;
+    var xhsData = []; var xhsTs = [];
+    for (var i = 0; i < 40; i++) {
+        xhsData.push(base + Math.round(Math.random() * 200 - 100 + Math.sin(i * 0.3) * 60));
+        xhsTs.push((i - 39) + "s");
+    }
+    c.setOption({
+        grid: { left: 34, right: 14, top: 12, bottom: 24 },
+        tooltip: { trigger: "axis" },
+        xAxis: { type: "category", data: xhsTs, axisTick: { show: false }, axisLabel: { fontSize: 9 } },
+        yAxis: { type: "value", min: 800, max: 1800 },
+        series: [{
+            type: "line", smooth: true, showSymbol: false,
+            data: xhsData,
+            lineStyle: { color: "#06b6d4", width: 2 },
+            areaStyle: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    { offset: 0, color: "rgba(6,182,212,.45)" },
+                    { offset: 1, color: "rgba(6,182,212,0)" }
+                ])
+            }
+        }]
+    });
+    c.resize();
+    // 滚动更新
+    setInterval(function () {
+        xhsData.shift(); xhsTs.shift();
+        xhsData.push(base + Math.round(Math.random() * 200 - 100));
+        xhsTs.push("+" + xhsTs.length + "s");
+        c.setOption({ xAxis: { data: xhsTs }, series: [{ data: xhsData }] });
+    }, 1500);
+})();
+
+/* ========== 图 6：漏斗图 ========== */
+(function () {
+    var c = xhsInit("xhsChartFunnel");
+    c.setOption({
+        grid: { left: 0, right: 0, top: 0, bottom: 0 },
+        tooltip: { trigger: "item", formatter: "{b}: {c} ({d}%)" },
+        series: [{
+            type: "funnel",
+            left: "5%", right: "5%", top: 8, bottom: 8,
+            width: "90%",
+            label: { color: "rgba(255,255,255,.75)", fontSize: 10 },
+            itemStyle: { borderColor: "#0f1629", borderWidth: 1 },
+            data: [
+                { value: 32864, name: "访问首页",   itemStyle: { color: "#4a9af5" } },
+                { value: 18240, name: "浏览商品",   itemStyle: { color: "#6366f1" } },
+                { value: 9860,  name: "加入购物车", itemStyle: { color: "#a78bfa" } },
+                { value: 5420,  name: "提交订单",   itemStyle: { color: "#f472b6" } },
+                { value: 3280,  name: "完成支付",   itemStyle: { color: "#ef4444" } }
+            ]
+        }]
+    });
+    c.resize();
+})();
+
+/* ========== Top 8 商品 ========== */
+(function () {
+    var list = [
+        { n: "iPhone 16 Pro 256G", v: 8520, p: 100 },
+        { n: "MacBook Air M3",      v: 6240, p: 73  },
+        { n: "AirPods Pro 2",       v: 5180, p: 61  },
+        { n: "小米 15 Ultra",       v: 4320, p: 51  },
+        { n: "Switch OLED 日版",    v: 3680, p: 43  },
+        { n: "Dyson V15 吸尘器",    v: 2960, p: 35  },
+        { n: "Kindle Paperwhite",   v: 2410, p: 28  },
+        { n: "Nintendo Switch 2",   v: 1980, p: 23  }
+    ];
+    var box = document.getElementById("xhsTopTable");
+    var html = list.map(function (it, i) {
+        return '<div class="xhs-top-row">' +
+            '<div class="xhs-top-no">' + (i + 1) + '</div>' +
+            '<div class="xhs-top-name">' + it.n + '</div>' +
+            '<div class="xhs-top-bar-wrap"><div class="xhs-top-bar" style="width:' + it.p + '%"></div></div>' +
+            '<div class="xhs-top-val">' + it.v.toLocaleString() + '</div>' +
+            '</div>';
+    }).join("");
+    box.innerHTML = html;
+})();
+
+/* ========== resize ========== */
+var xhsCharts = [];
+function xhsCollect() {
+    var ids = ["xhsChartBar","xhsChartPie","xhsChartMap","xhsChartSankey","xhsChartRealtime","xhsChartFunnel"];
+    ids.forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el && el._echarts_instance) xhsCharts.push(el._echarts_instance);
+    });
+}
+// 等地图 init 完再收集
+setTimeout(xhsCollect, 800);
+window.addEventListener("resize", function () {
+    xhsCharts.forEach(function (c) { c && c.resize(); });
+});
+</script>
+</body>
+</html>

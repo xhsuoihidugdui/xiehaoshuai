@@ -121,3 +121,18 @@
 - model: Kimi-K3
 - prompt: 实现18-4.html，其中包括echarts的两个图：和，cdn文件下载到cdn目录下。
 
+
+## 2026-11-05-16-50
+- model: Kimi-K3
+- prompt: 实现18-6.html，实现基于mermaid的智能客服系统的流程图和er图，cdn文件下载到cdn目录下。
+
+
+## 2026-11-05-17-30
+- model: Kimi-K3
+- prompt: 实现18-7.html，实现基于three.js的两个图表，cdn文件下载到cdn目录下。
+
+
+## 2026-11-05-18-00
+- model: Kimi-K3
+- prompt: 实现18-8.html，实现基于three.js或echarts的数据大屏，大屏要求：三列，中间上面是某种地理信息的图，cdn文件下载到cdn目录下。
+
