@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<!-- 姓名：解浩帅，日期：2026-11-05，功能名称：18-1 Canvas 粒子动画（解浩帅文字） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>18-1 Canvas 粒子动画 — 解浩帅</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #0a0e1a; }
+    body {
+        font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+        color: #fff;
+    }
+    #xhsCanvas { display: block; width: 100%; height: 100%; cursor: crosshair; }
+
+    /* ===== 顶部信息栏 ===== */
+    .xhs-hud {
+        position: fixed; top: 0; left: 0; right: 0;
+        padding: 14px 24px;
+        display: flex; align-items: center; justify-content: space-between;
+        background: linear-gradient(180deg, rgba(10,14,26,.85), rgba(10,14,26,0));
+        pointer-events: none;
+        z-index: 10;
+    }
+    .xhs-hud .xhs-title {
+        font-size: 16px; font-weight: 700; letter-spacing: 3px;
+        background: linear-gradient(90deg,#4a9af5,#a78bfa,#f472b6);
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .xhs-hud .xhs-sub { font-size: 11px; color: rgba(255,255,255,.45); letter-spacing: 1px; }
+    .xhs-hud .xhs-fps {
+        font-family: Consolas, Monaco, monospace;
+        font-size: 12px; color: #6ee7b7;
+        background: rgba(110,231,183,.08);
+        border: 1px solid rgba(110,231,183,.3);
+        padding: 3px 10px; border-radius: 10px;
+    }
+
+    /* ===== 控制面板 ===== */
+    .xhs-panel {
+        position: fixed;
+        right: 20px; bottom: 20px;
+        width: 260px;
+        background: rgba(18,24,44,.88);
+        border: 1px solid rgba(74,154,245,.25);
+        border-radius: 14px;
+        padding: 16px 18px;
+        backdrop-filter: blur(10px);
+        z-index: 10;
+        box-shadow: 0 10px 40px rgba(0,0,0,.5);
+    }
+    .xhs-panel h3 {
+        font-size: 13px; color: #a78bfa;
+        margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+    }
+    .xhs-panel h3::before {
+        content: ""; width: 6px; height: 6px; border-radius: 50%;
+        background: #a78bfa; box-shadow: 0 0 8px #a78bfa;
+    }
+    .xhs-row { margin-bottom: 12px; }
+    .xhs-row:last-child { margin-bottom: 0; }
+    .xhs-row label {
+        display: block; font-size: 11px; color: rgba(255,255,255,.55);
+        margin-bottom: 6px; letter-spacing: .5px;
+    }
+    .xhs-row .xhs-row-val {
+        float: right; color: #4a9af5; font-family: Consolas, Monaco, monospace; font-size: 11px;
+    }
+    .xhs-row input[type="range"] {
+        width: 100%; height: 4px; -webkit-appearance: none;
+        background: linear-gradient(90deg,#4a9af5,#a78bfa);
+        border-radius: 2px; outline: none;
+    }
+    .xhs-row input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%;
+        background: #fff; cursor: pointer;
+        box-shadow: 0 0 8px rgba(167,139,250,.6);
+    }
+    .xhs-btns { display: flex; gap: 8px; }
+    .xhs-btn {
+        flex: 1;
+        padding: 8px 0;
+        border: 1px solid rgba(74,154,245,.4);
+        border-radius: 8px;
+        background: rgba(74,154,245,.1);
+        color: #fff;
+        font-size: 12px;
+        font-family: inherit;
+        cursor: pointer;
+        transition: all .18s;
+    }
+    .xhs-btn:hover { background: rgba(74,154,245,.25); border-color: #4a9af5; }
+    .xhs-btn.xhs-btn-pause.active { background: rgba(167,139,250,.25); border-color: #a78bfa; }
+    .xhs-btn.xhs-btn-reset { border-color: rgba(244,114,182,.4); background: rgba(244,114,182,.1); }
+    .xhs-btn.xhs-btn-reset:hover { background: rgba(244,114,182,.25); border-color: #f472b6; }
+
+    .xhs-tip {
+        position: fixed; left: 20px; bottom: 20px;
+        font-size: 11px; color: rgba(255,255,255,.4);
+        letter-spacing: .5px; z-index: 10;
+        line-height: 1.8;
+    }
+    .xhs-tip b { color: rgba(255,255,255,.65); font-weight: normal; }
+</style>
+</head>
+<body>
+
+<canvas id="xhsCanvas"></canvas>
+
+<div class="xhs-hud">
+    <div>
+        <div class="xhs-title">CANVAS · 粒子文字动画</div>
+        <div class="xhs-sub">移动鼠标与粒子互动 · 解浩帅</div>
+    </div>
+    <div class="xhs-fps" id="xhsFps">FPS --</div>
+</div>
+
+<div class="xhs-panel">
+    <h3>控制面板</h3>
+    <div class="xhs-row">
+        <label>粒子数量 <span class="xhs-row-val" id="xhsParticleVal">600</span></label>
+        <input type="range" id="xhsParticle" min="200" max="1500" step="50" value="600">
+    </div>
+    <div class="xhs-row">
+        <label>鼠标影响半径 <span class="xhs-row-val" id="xhsRadiusVal">120</span></label>
+        <input type="range" id="xhsRadius" min="40" max="280" step="10" value="120">
+    </div>
+    <div class="xhs-row">
+        <label>粒子大小 <span class="xhs-row-val" id="xhsSizeVal">2.2</span></label>
+        <input type="range" id="xhsSize" min="0.6" max="5" step="0.1" value="2.2">
+    </div>
+    <div class="xhs-row">
+        <label>动画速度 <span class="xhs-row-val" id="xhsSpeedVal">1.0</span></label>
+        <input type="range" id="xhsSpeed" min="0.2" max="3" step="0.1" value="1">
+    </div>
+    <div class="xhs-btns">
+        <button class="xhs-btn xhs-btn-pause" id="xhsBtnPause">⏸ 暂停</button>
+        <button class="xhs-btn xhs-btn-reset" id="xhsBtnReset">↻ 重置</button>
+    </div>
+</div>
+
+<div class="xhs-tip">
+    <b>操作提示</b><br>
+    移动鼠标：粒子被排斥散开<br>
+    静止/离开后：粒子自动归位组成文字<br>
+    双击画布：切换文字
+</div>
+
+<script>
+/* ========== 常量 ========== */
+var xhsCanvas = document.getElementById("xhsCanvas");
+var xhsCtx = xhsCanvas.getContext("2d");
+var xhsW = 0, xhsH = 0, xhsDPR = window.devicePixelRatio || 1;
+
+var XHS_TEXT_LIST = ["解浩帅", "Canvas", "18-1"];
+var xhsTextIdx = 0;
+
+/* ========== 可调参数 ========== */
+var xhsParticleCount = 600;
+var xhsMouseRadius = 120;
+var xhsParticleSize = 2.2;
+var xhsAnimSpeed = 1.0;
+var xhsPaused = false;
+
+/* ========== 粒子数组 ========== */
+var xhsParticles = [];
+var xhsTargets = [];          // 每个粒子的目标位置（从文字像素采样）
+var xhsMouse = { x: -9999, y: -9999, active: false };
+
+/* ========== 渐变颜色 ========== */
+var XHS_COLORS = [
+    [74, 154, 245],    // 蓝
+    [167, 139, 250],   // 紫
+    [244, 114, 182],   // 粉
+    [110, 231, 183]    // 青
+];
+
+/* ========== 粒子类 ========== */
+function XhsParticle(x, y) {
+    this.x = Math.random() * xhsW;
+    this.y = Math.random() * xhsH;
+    this.vx = 0;
+    this.vy = 0;
+    this.targetX = x;
+    this.targetY = y;
+    this.hue = Math.floor(Math.random() * XHS_COLORS.length);
+    this.alpha = 0.6 + Math.random() * 0.4;
+}
+XhsParticle.prototype.update = function () {
+    if (xhsPaused) return;
+
+    // 向目标位置吸附
+    var dx = this.targetX - this.x;
+    var dy = this.targetY - this.y;
+    var ax = dx * 0.04 * xhsAnimSpeed;
+    var ay = dy * 0.04 * xhsAnimSpeed;
+
+    // 鼠标排斥
+    if (xhsMouse.active) {
+        var mdx = this.x - xhsMouse.x;
+        var mdy = this.y - xhsMouse.y;
+        var md2 = mdx * mdx + mdy * mdy;
+        var r2 = xhsMouseRadius * xhsMouseRadius;
+        if (md2 < r2 && md2 > 0.01) {
+            var f = (1 - Math.sqrt(md2) / xhsMouseRadius) * 3.5;
+            ax += (mdx / Math.sqrt(md2)) * f;
+            ay += (mdy / Math.sqrt(md2)) * f;
+        }
+    }
+
+    this.vx = this.vx * 0.88 + ax;
+    this.vy = this.vy * 0.88 + ay;
+    this.x += this.vx;
+    this.y += this.vy;
+};
+XhsParticle.prototype.draw = function () {
+    var c = XHS_COLORS[this.hue];
+    xhsCtx.globalAlpha = this.alpha;
+    xhsCtx.fillStyle = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")";
+    xhsCtx.beginPath();
+    xhsCtx.arc(this.x * xhsDPR, this.y * xhsDPR, xhsParticleSize * xhsDPR, 0, Math.PI * 2);
+    xhsCtx.fill();
+};
+
+/* ========== 从 Canvas 采样文字像素 ========== */
+function xhsSampleText(text) {
+    // 用离屏 canvas 把文字画出来，再采样黑色像素
+    if (xhsW < 10 || xhsH < 10) return [];
+    var oc = document.createElement("canvas");
+    var octx = oc.getContext("2d");
+    oc.width = Math.max(1, Math.floor(xhsW));
+    oc.height = Math.max(1, Math.floor(xhsH));
+
+    // 字号自适应
+    var fontSize = Math.min(xhsW * 0.18, xhsH * 0.45);
+    octx.fillStyle = "#000";
+    octx.textAlign = "center";
+    octx.textBaseline = "middle";
+    octx.font = "bold " + fontSize + "px 'Microsoft YaHei', 'PingFang SC', Arial, sans-serif";
+    octx.fillText(text, xhsW / 2, xhsH / 2);
+
+    var imgData = octx.getImageData(0, 0, oc.width, oc.height);
+    var data = imgData.data;
+    var points = [];
+    var step = Math.max(3, Math.floor(600 / (fontSize * 0.4))); // 采样密度
+
+    for (var py = 0; py < oc.height; py += step) {
+        for (var px = 0; px < oc.width; px += step) {
+            var idx = (py * oc.width + px) * 4;
+            // alpha > 20 视作文字像素
+            if (data[idx + 3] > 20) {
+                points.push({ x: px, y: py });
+            }
+        }
+    }
+    return points;
+}
+
+/* ========== 重采样 / 重建粒子 ========== */
+function xhsRebuild() {
+    var points = xhsSampleText(XHS_TEXT_LIST[xhsTextIdx]);
+    var targetCount = xhsParticleCount;
+    var newParticles = [];
+
+    // 如果采样点少于目标数，循环复用；多于目标数则均匀选取
+    for (var i = 0; i < targetCount; i++) {
+        var p = points.length > 0
+            ? points[i % points.length]
+            : { x: xhsW / 2, y: xhsH / 2 };
+
+        if (xhsParticles[i]) {
+            // 复用旧粒子，只更新目标位置
+            xhsParticles[i].targetX = p.x;
+            xhsParticles[i].targetY = p.y;
+            // 给一点扰动让动画有过渡
+            xhsParticles[i].vx *= 0.3;
+            xhsParticles[i].vy *= 0.3;
+            newParticles.push(xhsParticles[i]);
+        } else {
+            newParticles.push(new XhsParticle(p.x, p.y));
+        }
+    }
+    xhsParticles = newParticles;
+}
+
+/* ========== 自适应尺寸 ========== */
+function xhsResize() {
+    xhsDPR = window.devicePixelRatio || 1;
+    xhsW = window.innerWidth;
+    xhsH = window.innerHeight;
+    xhsCanvas.width = xhsW * xhsDPR;
+    xhsCanvas.height = xhsH * xhsDPR;
+    xhsCanvas.style.width = xhsW + "px";
+    xhsCanvas.style.height = xhsH + "px";
+    xhsCtx.setTransform(xhsDPR, 0, 0, xhsDPR, 0, 0);
+    xhsRebuild();
+}
+
+/* ========== 动画循环 ========== */
+var xhsFpsFrames = 0;
+var xhsFpsLast = performance.now();
+var xhsFpsEl = document.getElementById("xhsFps");
+
+function xhsLoop() {
+    // 背景渐变 + 轻微残影
+    xhsCtx.fillStyle = "rgba(10,14,26,0.22)";
+    xhsCtx.fillRect(0, 0, xhsW, xhsH);
+
+    // 连线（距离近的粒子间画细线）
+    xhsCtx.lineWidth = 0.5;
+    var linkDist = 70;
+    var linkD2 = linkDist * linkDist;
+    for (var i = 0; i < xhsParticles.length; i++) {
+        var a = xhsParticles[i];
+        a.update();
+
+        for (var j = i + 1; j < xhsParticles.length; j++) {
+            var b = xhsParticles[j];
+            var dx = a.x - b.x, dy = a.y - b.y;
+            var d2 = dx * dx + dy * dy;
+            if (d2 < linkD2) {
+                var alpha = (1 - Math.sqrt(d2) / linkDist) * 0.18;
+                xhsCtx.strokeStyle = "rgba(74,154,245," + alpha + ")";
+                xhsCtx.beginPath();
+                xhsCtx.moveTo(a.x * xhsDPR, a.y * xhsDPR);
+                xhsCtx.lineTo(b.x * xhsDPR, b.y * xhsDPR);
+                xhsCtx.stroke();
+            }
+        }
+    }
+
+    // 画所有粒子
+    for (var k = 0; k < xhsParticles.length; k++) {
+        xhsParticles[k].draw();
+    }
+    xhsCtx.globalAlpha = 1;
+
+    // FPS
+    xhsFpsFrames++;
+    var now = performance.now();
+    if (now - xhsFpsLast >= 1000) {
+        xhsFpsEl.textContent = "FPS " + xhsFpsFrames;
+        xhsFpsFrames = 0;
+        xhsFpsLast = now;
+    }
+
+    requestAnimationFrame(xhsLoop);
+}
+
+/* ========== 事件绑定 ========== */
+window.addEventListener("resize", xhsResize);
+
+xhsCanvas.addEventListener("mousemove", function (e) {
+    xhsMouse.x = e.clientX;
+    xhsMouse.y = e.clientY;
+    xhsMouse.active = true;
+});
+xhsCanvas.addEventListener("mouseleave", function () { xhsMouse.active = false; });
+xhsCanvas.addEventListener("touchmove", function (e) {
+    if (e.touches[0]) {
+        xhsMouse.x = e.touches[0].clientX;
+        xhsMouse.y = e.touches[0].clientY;
+        xhsMouse.active = true;
+    }
+    e.preventDefault();
+}, { passive: false });
+xhsCanvas.addEventListener("touchend", function () { xhsMouse.active = false; });
+xhsCanvas.addEventListener("dblclick", function () {
+    xhsTextIdx = (xhsTextIdx + 1) % XHS_TEXT_LIST.length;
+    xhsRebuild();
+});
+
+/* 控制面板 */
+function bindRange(id, valId, onChange, fmt) {
+    var el = document.getElementById(id);
+    var valEl = document.getElementById(valId);
+    function sync() {
+        var v = parseFloat(el.value);
+        valEl.textContent = fmt ? fmt(v) : v;
+        onChange(v);
+    }
+    el.addEventListener("input", sync);
+    sync();
+}
+bindRange("xhsParticle", "xhsParticleVal", function (v) {
+    xhsParticleCount = v;
+    xhsRebuild();
+});
+bindRange("xhsRadius", "xhsRadiusVal", function (v) { xhsMouseRadius = v; });
+bindRange("xhsSize", "xhsSizeVal", function (v) { xhsParticleSize = v; }, function (v) { return v.toFixed(1); });
+bindRange("xhsSpeed", "xhsSpeedVal", function (v) { xhsAnimSpeed = v; }, function (v) { return v.toFixed(1); });
+
+document.getElementById("xhsBtnPause").addEventListener("click", function () {
+    xhsPaused = !xhsPaused;
+    this.textContent = xhsPaused ? "▶ 继续" : "⏸ 暂停";
+    this.classList.toggle("active", xhsPaused);
+});
+document.getElementById("xhsBtnReset").addEventListener("click", function () {
+    xhsTextIdx = 0;
+    xhsRebuild();
+});
+
+/* ========== 启动 ========== */
+xhsResize();
+xhsLoop();
+</script>
+</body>
+</html>

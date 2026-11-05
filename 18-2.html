@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<!-- 姓名：解浩帅，日期：2026-11-05，功能名称：18-2 Canvas 电商系统架构图 -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>18-2 Canvas 电商系统架构图 — 解浩帅</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+        background: linear-gradient(135deg, #0c1220 0%, #151d35 100%);
+        color: #e2e8f0;
+        min-height: 100vh;
+        padding: 28px 24px;
+    }
+    .xhs-page { max-width: 1280px; margin: 0 auto; }
+
+    /* ===== 头部 ===== */
+    .xhs-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .xhs-header h1 {
+        font-size: 26px; font-weight: 800; letter-spacing: 2px;
+        background: linear-gradient(90deg,#4a9af5,#a78bfa,#f472b6);
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .xhs-header p { font-size: 12px; color: rgba(255,255,255,.45); margin-top: 8px; letter-spacing: 1px; }
+
+    /* ===== 画布容器 ===== */
+    .xhs-canvas-wrap {
+        position: relative;
+        background: #0f1629;
+        border: 1px solid rgba(74,154,245,.2);
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0,0,0,.4);
+    }
+    #xhsCanvas { display: block; width: 100%; height: auto; }
+
+    /* ===== 右侧信息栏 ===== */
+    .xhs-side {
+        margin-top: 20px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+    .xhs-card {
+        background: rgba(18,24,44,.7);
+        border: 1px solid rgba(74,154,245,.2);
+        border-radius: 12px;
+        padding: 16px 18px;
+        backdrop-filter: blur(8px);
+    }
+    .xhs-card h3 {
+        font-size: 13px; color: #4a9af5;
+        margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+    }
+    .xhs-card h3::before {
+        content: ""; width: 5px; height: 5px; border-radius: 50%;
+        background: #4a9af5; box-shadow: 0 0 8px #4a9af5;
+    }
+    .xhs-legend { display: flex; flex-wrap: wrap; gap: 8px; }
+    .xhs-legend-item {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-size: 11px; color: rgba(255,255,255,.7);
+        background: rgba(255,255,255,.04);
+        padding: 4px 10px; border-radius: 6px;
+        border: 1px solid rgba(255,255,255,.08);
+    }
+    .xhs-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+    .xhs-list { font-size: 12px; color: rgba(255,255,255,.6); line-height: 2; }
+    .xhs-list li { list-style: none; padding-left: 16px; position: relative; }
+    .xhs-list li::before {
+        content: "▸"; position: absolute; left: 0; color: #a78bfa;
+    }
+
+    /* ===== 控制条 ===== */
+    .xhs-controls {
+        margin-top: 16px;
+        display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+    }
+    .xhs-btn {
+        padding: 8px 20px;
+        border: 1px solid rgba(74,154,245,.4);
+        background: rgba(74,154,245,.12);
+        color: #fff; font-size: 12px; font-family: inherit;
+        border-radius: 8px; cursor: pointer;
+        transition: all .18s;
+    }
+    .xhs-btn:hover { background: rgba(74,154,245,.28); border-color: #4a9af5; }
+    .xhs-btn.active { background: rgba(167,139,250,.2); border-color: #a78bfa; }
+
+    @media (max-width: 700px) {
+        .xhs-side { grid-template-columns: 1fr; }
+    }
+</style>
+</head>
+<body>
+<div class="xhs-page">
+
+    <header class="xhs-header">
+        <h1>电商系统全站架构图</h1>
+        <p>基于 Canvas 绘制 · 解浩帅 · 2026-11-05</p>
+    </header>
+
+    <div class="xhs-canvas-wrap">
+        <canvas id="xhsCanvas" width="1200" height="880"></canvas>
+    </div>
+
+    <div class="xhs-controls">
+        <button class="xhs-btn" id="xhsBtnAnim">⏸ 暂停动画</button>
+        <button class="xhs-btn" id="xhsBtnZoom">🔍 放大节点</button>
+        <button class="xhs-btn" id="xhsBtnExport">📥 导出图片</button>
+    </div>
+
+    <div class="xhs-side">
+        <div class="xhs-card">
+            <h3>图例</h3>
+            <div class="xhs-legend">
+                <div class="xhs-legend-item"><span class="xhs-dot" style="background:#3b82f6"></span>客户端层</div>
+                <div class="xhs-legend-item"><span class="xhs-dot" style="background:#8b5cf6"></span>网关/安全层</div>
+                <div class="xhs-legend-item"><span class="xhs-dot" style="background:#ec4899"></span>业务服务层</div>
+                <div class="xhs-legend-item"><span class="xhs-dot" style="background:#f59e0b"></span>中间件层</div>
+                <div class="xhs-legend-item"><span class="xhs-dot" style="background:#10b981"></span>数据存储层</div>
+                <div class="xhs-legend-item"><span class="xhs-dot" style="background:#06b6d4"></span>基础设施层</div>
+            </div>
+        </div>
+        <div class="xhs-card">
+            <h3>架构说明</h3>
+            <ul class="xhs-list">
+                <li>六层分层架构，自上而下调用</li>
+                <li>网关层负责鉴权、限流、路由转发</li>
+                <li>业务服务通过 MQ 异步解耦，Redis 缓存热点</li>
+                <li>多数据库读写分离，CDN 加速静态资源</li>
+                <li>悬停节点可高亮所属层级与数据流</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ========== Canvas 初始化 ========== */
+var xhsCanvas = document.getElementById("xhsCanvas");
+var xhsCtx = xhsCanvas.getContext("2d");
+var xhsW = xhsCanvas.width;
+var xhsH = xhsCanvas.height;
+var XHS_DPR = window.devicePixelRatio || 1;
+xhsCanvas.width = xhsW * XHS_DPR;
+xhsCanvas.height = xhsH * XHS_DPR;
+xhsCanvas.style.width = xhsW + "px";
+xhsCanvas.style.height = xhsH + "px";
+xhsCtx.setTransform(XHS_DPR, 0, 0, XHS_DPR, 0, 0);
+
+var xhsHoverIdx = -1;
+var xhsPaused = false;
+var xhsZoom = false;
+var xhsT = 0;          // 动画时间
+
+/* ========== 颜色方案 ========== */
+var XHS_LAYERS = [
+    { name: "客户端层",     color: "#3b82f6", items: ["Web 前端", "移动 App", "小程序", "桌面客户端"] },
+    { name: "网关 / 安全层", color: "#8b5cf6", items: ["CDN", "Nginx", "API 网关", "WAF 防火墙", "SSL 证书"] },
+    { name: "业务服务层",   color: "#ec4899", items: ["商品服务", "订单服务", "支付服务", "用户服务", "库存服务", "物流服务", "搜索服务", "营销服务"] },
+    { name: "中间件层",     color: "#f59e0b", items: ["Redis 缓存", "Kafka / RocketMQ", "ElasticSearch", "Nacos 注册中心", "Sentinel 限流"] },
+    { name: "数据存储层",   color: "#10b981", items: ["MySQL 主库", "MySQL 从库", "MongoDB", "Redis Cluster", "OSS / CDN"] },
+    { name: "基础设施层",   color: "#06b6d4", items: ["Kubernetes 集群", "Docker 容器", "Prometheus 监控", "ELK 日志", "GitLab CI/CD"] }
+];
+
+/* ========== 计算布局 ========== */
+var XHS_PAD = 60;
+var XHS_LAYER_GAP = 24;
+var XHS_NODE_H = 40;
+var xhsLayersLayout = [];   // 每层的 { y, nodes:[{text, x, w}] }
+
+function xhsCalcLayout() {
+    var availW = xhsW - XHS_PAD * 2;
+    var layerAreaH = (xhsH - XHS_PAD * 2 - XHS_LAYER_GAP * (XHS_LAYERS.length - 1)) / XHS_LAYERS.length;
+    var curY = XHS_PAD;
+    xhsLayersLayout = [];
+
+    for (var li = 0; li < XHS_LAYERS.length; li++) {
+        var layer = XHS_LAYERS[li];
+        var nodes = layer.items;
+        var nodeGap = 12;
+        // 每个节点宽度自适应
+        var nodeW = (availW - nodeGap * (nodes.length - 1)) / nodes.length;
+        var layoutNodes = [];
+        for (var ni = 0; ni < nodes.length; ni++) {
+            layoutNodes.push({
+                text: nodes[ni],
+                x: XHS_PAD + ni * (nodeW + nodeGap),
+                w: nodeW,
+                h: XHS_NODE_H,
+                fullIdx: li * 100 + ni   // 唯一标识
+            });
+        }
+        xhsLayersLayout.push({
+            y: curY,
+            h: layerAreaH,
+            color: layer.color,
+            name: layer.name,
+            nodes: layoutNodes,
+            layerIdx: li
+        });
+        curY += layerAreaH + XHS_LAYER_GAP;
+    }
+}
+xhsCalcLayout();
+
+/* ========== 绘制工具 ========== */
+function xhsRoundRect(ctx, x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+}
+
+function xhsDrawBackground() {
+    // 深色底
+    xhsCtx.fillStyle = "#0f1629";
+    xhsCtx.fillRect(0, 0, xhsW, xhsH);
+
+    // 网格线
+    xhsCtx.strokeStyle = "rgba(74,154,245,.05)";
+    xhsCtx.lineWidth = 1;
+    var grid = 40;
+    for (var x = 0; x < xhsW; x += grid) {
+        xhsCtx.beginPath(); xhsCtx.moveTo(x, 0); xhsCtx.lineTo(x, xhsH); xhsCtx.stroke();
+    }
+    for (var y = 0; y < xhsH; y += grid) {
+        xhsCtx.beginPath(); xhsCtx.moveTo(0, y); xhsCtx.lineTo(xhsW, y); xhsCtx.stroke();
+    }
+}
+
+function xhsDrawLayerBand(layer, alpha) {
+    var col = layer.color;
+    xhsCtx.fillStyle = col + "12";
+    xhsRoundRect(xhsCtx, XHS_PAD - 16, layer.y - 4, xhsW - XHS_PAD * 2 + 32, layer.h - 12, 10);
+    xhsCtx.fill();
+
+    // 左侧色条
+    xhsCtx.fillStyle = col;
+    xhsRoundRect(xhsCtx, XHS_PAD - 16, layer.y - 4, 5, layer.h - 12, 3);
+    xhsCtx.fill();
+
+    // 层标题
+    xhsCtx.font = "bold 13px 'Microsoft YaHei', Arial";
+    xhsCtx.textAlign = "left";
+    xhsCtx.textBaseline = "top";
+    xhsCtx.fillStyle = col;
+    xhsCtx.fillText(layer.name, XHS_PAD - 16, layer.y + 4);
+}
+
+function xhsDrawNode(node, layer, t, highlighted) {
+    var cx = node.x + node.w / 2;
+    var cy = layer.y + layer.h - 28;    // 节点在层底靠上位置
+    var h = XHS_NODE_H * (xhsZoom ? 1.15 : 1);
+
+    // 悬停或高亮时发光
+    if (highlighted) {
+        xhsCtx.shadowColor = layer.color;
+        xhsCtx.shadowBlur = 20;
+    } else {
+        xhsCtx.shadowBlur = 0;
+    }
+
+    // 节点主体：半透明填充 + 边框
+    var grd = xhsCtx.createLinearGradient(node.x, cy - h / 2, node.x, cy + h / 2);
+    grd.addColorStop(0, layer.color + "30");
+    grd.addColorStop(1, layer.color + "15");
+    xhsCtx.fillStyle = grd;
+    xhsRoundRect(xhsCtx, node.x, cy - h / 2, node.w, h, 8);
+    xhsCtx.fill();
+
+    xhsCtx.strokeStyle = highlighted ? layer.color : layer.color + "80";
+    xhsCtx.lineWidth = highlighted ? 2 : 1.2;
+    xhsCtx.stroke();
+    xhsCtx.shadowBlur = 0;
+
+    // 节点文字
+    xhsCtx.fillStyle = highlighted ? "#fff" : "rgba(255,255,255,.85)";
+    xhsCtx.font = "12px 'Microsoft YaHei', Arial";
+    xhsCtx.textAlign = "center";
+    xhsCtx.textBaseline = "middle";
+    xhsCtx.fillText(node.text, cx, cy);
+
+    // 呼吸小圆点（右上角）
+    var pulseR = 3 + Math.sin(t * 0.05 + node.fullIdx) * 1.5;
+    xhsCtx.fillStyle = layer.color;
+    xhsCtx.beginPath();
+    xhsCtx.arc(node.x + node.w - 10, cy - h / 2 + 8, pulseR, 0, Math.PI * 2);
+    xhsCtx.fill();
+}
+
+function xhsDrawArrows(t) {
+    // 在相邻层之间画箭头，表示数据流方向
+    for (var li = 0; li < xhsLayersLayout.length - 1; li++) {
+        var a = xhsLayersLayout[li];
+        var b = xhsLayersLayout[li + 1];
+
+        // 连接线：从上一层所有节点底部指向下一层所有节点顶部（简化：画几条代表性的）
+        var aMidY = a.y + a.h - 28 + XHS_NODE_H / 2;
+        var bTopY = b.y + b.h - 28 - XHS_NODE_H / 2;
+        var midY = (aMidY + bTopY) / 2;
+
+        // 只画 3 条代表连线
+        var count = 3;
+        for (var i = 0; i < count; i++) {
+            var ax = XHS_PAD + (xhsW - XHS_PAD * 2) * (i + 0.5) / count;
+            var bx = ax;
+
+            // 虚线
+            xhsCtx.strokeStyle = "rgba(167,139,250,.35)";
+            xhsCtx.lineWidth = 1.2;
+            xhsCtx.setLineDash([6, 4]);
+            xhsCtx.beginPath();
+            xhsCtx.moveTo(ax, aMidY + 10);
+            xhsCtx.lineTo(ax, midY);
+            xhsCtx.lineTo(bx, bTopY - 10);
+            xhsCtx.stroke();
+            xhsCtx.setLineDash([]);
+
+            // 流动光点
+            var progress = ((t * 0.02 + i * 0.33) % 1);
+            var dotY = aMidY + 10 + (bTopY - 10 - aMidY - 10) * progress;
+            xhsCtx.fillStyle = "#a78bfa";
+            xhsCtx.shadowColor = "#a78bfa";
+            xhsCtx.shadowBlur = 10;
+            xhsCtx.beginPath();
+            xhsCtx.arc(ax, dotY, 3, 0, Math.PI * 2);
+            xhsCtx.fill();
+            xhsCtx.shadowBlur = 0;
+
+            // 箭头（在下一层顶部）
+            xhsCtx.fillStyle = "rgba(167,139,250,.5)";
+            xhsCtx.beginPath();
+            xhsCtx.moveTo(bx, bTopY - 10);
+            xhsCtx.lineTo(bx - 5, bTopY - 3);
+            xhsCtx.lineTo(bx + 5, bTopY - 3);
+            xhsCtx.closePath();
+            xhsCtx.fill();
+        }
+    }
+}
+
+function xhsDrawFooter() {
+    // 标题水印
+    xhsCtx.fillStyle = "rgba(255,255,255,.03)";
+    xhsCtx.font = "bold 60px 'Microsoft YaHei', Arial";
+    xhsCtx.textAlign = "center";
+    xhsCtx.textBaseline = "middle";
+    xhsCtx.fillText("电商系统架构", xhsW / 2, xhsH / 2);
+}
+
+/* ========== 主绘制循环 ========== */
+function xhsDraw() {
+    xhsCtx.clearRect(0, 0, xhsW, xhsH);
+    xhsDrawBackground();
+    xhsDrawFooter();
+
+    // 画每层背景条
+    for (var li = 0; li < XHS_LAYERS.length; li++) {
+        xhsDrawLayerBand(xhsLayersLayout[li], 1);
+    }
+
+    // 画箭头（在节点下面）
+    xhsDrawArrows(xhsT);
+
+    // 画节点
+    var anyHover = xhsHoverIdx >= 0;
+    var hoverLayer = -1;
+    if (anyHover) hoverLayer = Math.floor(xhsHoverIdx / 100);
+
+    for (var li2 = 0; li2 < XHS_LAYERS.length; li2++) {
+        var layer2 = xhsLayersLayout[li2];
+        for (var ni = 0; ni < layer2.nodes.length; ni++) {
+            var node = layer2.nodes[ni];
+            var isHover = node.fullIdx === xhsHoverIdx;
+            var isSameLayer = anyHover && li2 === hoverLayer;
+            xhsDrawNode(node, layer2, xhsT, isHover || isSameLayer);
+        }
+    }
+
+    if (!xhsPaused) xhsT++;
+    requestAnimationFrame(xhsDraw);
+}
+xhsDraw();
+
+/* ========== 鼠标交互 ========== */
+function xhsHitTest(mx, my) {
+    for (var li = 0; li < xhsLayersLayout.length; li++) {
+        var layer = xhsLayersLayout[li];
+        var cy = layer.y + layer.h - 28;
+        for (var ni = 0; ni < layer.nodes.length; ni++) {
+            var node = layer.nodes[ni];
+            var h = XHS_NODE_H * (xhsZoom ? 1.15 : 1);
+            if (mx >= node.x && mx <= node.x + node.w &&
+                my >= cy - h / 2 && my <= cy + h / 2) {
+                return node.fullIdx;
+            }
+        }
+    }
+    return -1;
+}
+xhsCanvas.addEventListener("mousemove", function (e) {
+    var rect = xhsCanvas.getBoundingClientRect();
+    var mx = (e.clientX - rect.left) * (xhsW / rect.width);
+    var my = (e.clientY - rect.top) * (xhsH / rect.height);
+    var idx = xhsHitTest(mx, my);
+    xhsHoverIdx = idx;
+    xhsCanvas.style.cursor = idx >= 0 ? "pointer" : "default";
+});
+xhsCanvas.addEventListener("mouseleave", function () {
+    xhsHoverIdx = -1;
+});
+
+/* ========== 按钮 ========== */
+document.getElementById("xhsBtnAnim").addEventListener("click", function () {
+    xhsPaused = !xhsPaused;
+    this.textContent = xhsPaused ? "▶ 继续动画" : "⏸ 暂停动画";
+    this.classList.toggle("active", xhsPaused);
+});
+document.getElementById("xhsBtnZoom").addEventListener("click", function () {
+    xhsZoom = !xhsZoom;
+    this.classList.toggle("active", xhsZoom);
+    xhsDraw();
+});
+document.getElementById("xhsBtnExport").addEventListener("click", function () {
+    var url = xhsCanvas.toDataURL("image/png");
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "电商系统架构图-解浩帅.png";
+    a.click();
+});
+</script>
+</body>
+</html>

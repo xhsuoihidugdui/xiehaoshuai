@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<!-- 姓名：解浩帅，日期：2026-11-05，功能名称：18-4 ECharts 双图展示（柱状图+折线图叠加 / 南丁格尔玫瑰图） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>18-4 ECharts 图表展示 — 解浩帅</title>
+<script src="./cdn/echarts.min.js"></script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+        background: linear-gradient(135deg, #0c1220 0%, #151d35 100%);
+        color: #e2e8f0;
+        padding: 28px 20px 48px;
+        min-height: 100vh;
+    }
+    .xhs-page { max-width: 1340px; margin: 0 auto; }
+
+    .xhs-header { text-align: center; margin-bottom: 24px; }
+    .xhs-header h1 {
+        font-size: 24px; font-weight: 800; letter-spacing: 2px;
+        background: linear-gradient(90deg,#4a9af5,#a78bfa,#f472b6);
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .xhs-header p { font-size: 12px; color: rgba(255,255,255,.4); margin-top: 6px; letter-spacing: 1px; }
+
+    .xhs-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    .xhs-card {
+        background: #0f1629;
+        border: 1px solid rgba(74,154,245,.2);
+        border-radius: 12px;
+        padding: 18px;
+        box-shadow: 0 12px 40px rgba(0,0,0,.35);
+    }
+    .xhs-card-head {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px dashed rgba(74,154,245,.2);
+    }
+    .xhs-card-head h2 {
+        font-size: 14px; color: #4a9af5; font-weight: 700;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .xhs-card-head h2::before {
+        content: ""; width: 6px; height: 6px; border-radius: 50%;
+        background: #4a9af5; box-shadow: 0 0 8px #4a9af5;
+    }
+    .xhs-card-head .xhs-type {
+        font-size: 10px; color: rgba(255,255,255,.4);
+        background: rgba(74,154,245,.08);
+        padding: 2px 10px; border-radius: 10px;
+        letter-spacing: .5px;
+    }
+    .xhs-chart { width: 100%; height: 440px; }
+    .xhs-desc {
+        font-size: 11.5px; color: rgba(255,255,255,.5);
+        margin-top: 10px; line-height: 1.8;
+        padding: 8px 12px; background: rgba(74,154,245,.04);
+        border-left: 3px solid rgba(74,154,245,.4); border-radius: 0 6px 6px 0;
+    }
+    .xhs-desc b { color: #a78bfa; font-weight: 600; }
+
+    .xhs-footer {
+        margin-top: 22px; text-align: center;
+        font-size: 11px; color: rgba(255,255,255,.3); letter-spacing: 1px;
+    }
+
+    @media (max-width: 900px) {
+        .xhs-grid { grid-template-columns: 1fr; }
+        .xhs-chart { height: 360px; }
+    }
+</style>
+</head>
+<body>
+<div class="xhs-page">
+
+    <header class="xhs-header">
+        <h1>ECharts 图表展示</h1>
+        <p>解浩帅 · 2026-11-05 · 本地离线 ECharts 5.5.1</p>
+    </header>
+
+    <div class="xhs-grid">
+
+        <!-- ========== 图 1：柱状图 + 折线图叠加 ========== -->
+        <div class="xhs-card">
+            <div class="xhs-card-head">
+                <h2>电商平台 2026 年月度销售数据</h2>
+                <span class="xhs-type">BAR · LINE · 双 Y 轴</span>
+            </div>
+            <div id="xhsChartBar" class="xhs-chart"></div>
+            <div class="xhs-desc">
+                <b>图表类型：</b>柱状图 + 折线图叠加（双 Y 轴）<br/>
+                <b>左轴：</b>月度销售额（单位：万元）；<b>右轴：</b>环比增长率（单位：%）<br/>
+                <b>特点：</b>柱形直观展示绝对量，折线刻画增长趋势；支持 tooltip 联动、数据缩放、图例切换
+            </div>
+        </div>
+
+        <!-- ========== 图 2：南丁格尔玫瑰图 ========== -->
+        <div class="xhs-card">
+            <div class="xhs-card-head">
+                <h2>平台流量来源分布</h2>
+                <span class="xhs-type">NIGHTINGALE ROSE</span>
+            </div>
+            <div id="xhsChartRose" class="xhs-chart"></div>
+            <div class="xhs-desc">
+                <b>图表类型：</b>南丁格尔玫瑰图（极坐标下的圆形柱状图）<br/>
+                <b>特点：</b>每个扇区角度相同，半径长度映射数值大小；相比饼图更适合多类别、数值差异明显的占比数据<br/>
+                <b>数据源：</b>2026 年 10 月平台各渠道 UV 占比（模拟数据）
+            </div>
+        </div>
+
+    </div>
+
+    <div class="xhs-footer">ECharts 5.5.1 · 本地 cdn/echarts.min.js · 无外部网络依赖</div>
+</div>
+
+<script>
+/* ========== 通用：深色主题样式 ========== */
+var XHS_TEXT = "rgba(255,255,255,.8)";
+var XHS_TEXT_SUB = "rgba(255,255,255,.5)";
+var XHS_LINE = "rgba(74,154,245,.18)";
+var XHS_AXIS_LINE = "rgba(74,154,245,.25)";
+
+/* ========== 图 1：柱状 + 折线（双 Y 轴） ========== */
+(function () {
+    var chart = echarts.init(document.getElementById("xhsChartBar"));
+
+    var months = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
+    // 销售额（万元）：旺季 618、双 11、双 12 峰值
+    var sales = [1820, 1520, 2080, 2240, 2650, 3980, 3120, 2860, 3020, 3580, 5260, 4620];
+    // 环比增长率（%）
+    var growth = [8.5, -16.5, 36.8, 7.7, 18.3, 50.2, -21.6, -8.3, 5.6, 18.5, 46.9, -12.2];
+
+    var option = {
+        backgroundColor: "transparent",
+        tooltip: {
+            trigger: "axis",
+            axisPointer: { type: "cross", crossStyle: { color: "#a78bfa" } },
+            backgroundColor: "rgba(15,22,41,.95)",
+            borderColor: "rgba(74,154,245,.35)",
+            textStyle: { color: XHS_TEXT }
+        },
+        legend: {
+            data: ["销售额", "环比增长率"],
+            textStyle: { color: XHS_TEXT_SUB, fontSize: 12 },
+            top: 4
+        },
+        grid: {
+            left: "5%", right: "6%", bottom: "14%", top: 52,
+            containLabel: true
+        },
+        xAxis: {
+            type: "category",
+            data: months,
+            axisLine: { lineStyle: { color: XHS_AXIS_LINE } },
+            axisLabel: { color: XHS_TEXT_SUB, fontSize: 11 },
+            axisTick: { show: false }
+        },
+        yAxis: [
+            {
+                type: "value", name: "销售额（万元）",
+                nameTextStyle: { color: XHS_TEXT_SUB, fontSize: 11 },
+                axisLine: { show: true, lineStyle: { color: XHS_AXIS_LINE } },
+                axisLabel: { color: XHS_TEXT_SUB, fontSize: 11 },
+                splitLine: { lineStyle: { color: XHS_LINE, type: "dashed" } }
+            },
+            {
+                type: "value", name: "增长率（%）",
+                nameTextStyle: { color: "#f472b6", fontSize: 11 },
+                axisLine: { show: true, lineStyle: { color: "rgba(244,114,182,.35)" } },
+                axisLabel: { color: XHS_TEXT_SUB, fontSize: 11, formatter: "{value}%" },
+                splitLine: { show: false }
+            }
+        ],
+        dataZoom: [
+            { type: "inside", start: 0, end: 100 },
+            { type: "slider", height: 16, bottom: 6,
+              borderColor: XHS_LINE,
+              backgroundColor: "rgba(74,154,245,.06)",
+              fillerColor: "rgba(74,154,245,.18)",
+              handleStyle: { color: "#4a9af5" },
+              textStyle: { color: XHS_TEXT_SUB, fontSize: 10 } }
+        ],
+        series: [
+            {
+                name: "销售额",
+                type: "bar",
+                data: sales,
+                barWidth: "46%",
+                itemStyle: {
+                    borderRadius: [4, 4, 0, 0],
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: "#4a9af5" },
+                        { offset: 1, color: "rgba(74,154,245,.2)" }
+                    ])
+                },
+                emphasis: {
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: "#7db6fa" },
+                            { offset: 1, color: "#4a9af5" }
+                        ])
+                    }
+                }
+            },
+            {
+                name: "环比增长率",
+                type: "line",
+                yAxisIndex: 1,
+                data: growth,
+                smooth: true,
+                symbol: "circle",
+                symbolSize: 7,
+                lineStyle: { color: "#f472b6", width: 2.5 },
+                itemStyle: { color: "#f472b6", borderColor: "#fff", borderWidth: 2 },
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: "rgba(244,114,182,.35)" },
+                        { offset: 1, color: "rgba(244,114,182,0)" }
+                    ])
+                },
+                label: {
+                    show: true, position: "top", fontSize: 10, color: "#f472b6",
+                    formatter: "{c}%"
+                }
+            }
+        ]
+    };
+
+    chart.setOption(option);
+    window.addEventListener("resize", function () { chart.resize(); });
+})();
+
+/* ========== 图 2：南丁格尔玫瑰图 ========== */
+(function () {
+    var chart = echarts.init(document.getElementById("xhsChartRose"));
+
+    var sources = [
+        { name: "搜索引擎",   value: 46820 },
+        { name: "直接访问",   value: 32150 },
+        { name: "社交媒体",   value: 28960 },
+        { name: "付费广告",   value: 21340 },
+        { name: "邮件推送",   value: 15870 },
+        { name: "联盟推广",   value: 12430 },
+        { name: "线下扫码",   value: 8620  },
+        { name: "其他渠道",   value: 5480  }
+    ];
+
+    // 渐变调色板
+    var palette = [
+        ["#4a9af5", "#2f6fd8"],
+        ["#a78bfa", "#7c5ce0"],
+        ["#f472b6", "#cc4f93"],
+        ["#f59e0b", "#c77d00"],
+        ["#10b981", "#06966a"],
+        ["#06b6d4", "#058ea6"],
+        ["#818cf8", "#5e62d4"],
+        ["#f87171", "#d94848"]
+    ];
+    var roseData = sources.map(function (s, i) {
+        return {
+            name: s.name,
+            value: s.value,
+            itemStyle: {
+                color: new echarts.graphic.LinearGradient(0, 0, 1, 1, [
+                    { offset: 0, color: palette[i][0] },
+                    { offset: 1, color: palette[i][1] }
+                ])
+            }
+        };
+    });
+
+    var option = {
+        backgroundColor: "transparent",
+        tooltip: {
+            trigger: "item",
+            backgroundColor: "rgba(15,22,41,.95)",
+            borderColor: "rgba(167,139,250,.35)",
+            textStyle: { color: XHS_TEXT },
+            formatter: function (p) {
+                var total = sources.reduce(function (a, b) { return a + b.value; }, 0);
+                var pct = (p.value / total * 100).toFixed(1);
+                return "<b>" + p.name + "</b><br/>UV：" + p.value.toLocaleString() + "<br/>占比：" + pct + "%";
+            }
+        },
+        legend: {
+            orient: "vertical",
+            right: 10, top: "middle",
+            itemWidth: 10, itemHeight: 10, itemGap: 8,
+            textStyle: { color: XHS_TEXT_SUB, fontSize: 11 }
+        },
+        series: [
+            {
+                name: "流量来源",
+                type: "pie",
+                radius: ["12%", "70%"],
+                center: ["42%", "50%"],
+                roseType: "area",        // 南丁格尔玫瑰图
+                barWidth: 18,
+                avoidLabelOverlap: true,
+                itemStyle: {
+                    borderRadius: 6,
+                    borderColor: "#0f1629",
+                    borderWidth: 2
+                },
+                label: {
+                    show: true,
+                    color: XHS_TEXT,
+                    fontSize: 11,
+                    formatter: "{b}\n{d}%"
+                },
+                labelLine: {
+                    lineStyle: { color: "rgba(255,255,255,.3)" }
+                },
+                emphasis: {
+                    label: { fontSize: 13, fontWeight: "bold" },
+                    itemStyle: { shadowBlur: 20, shadowColor: "rgba(167,139,250,.6)" }
+                },
+                data: roseData
+            }
+        ]
+    };
+
+    chart.setOption(option);
+    window.addEventListener("resize", function () { chart.resize(); });
+})();
+</script>
+</body>
+</html>
