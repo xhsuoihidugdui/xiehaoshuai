@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<!-- 姓名：解浩帅，日期：2026-11-05，功能名称：19-1 参考电商移动端下导航（iconfont字体图标版 + SVG版，自适应宽度固定下导航） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>19-1 下导航 · 图像解决方案 — 解浩帅</title>
+<link rel="stylesheet" href="./font/font_5244829_352pklrzxi1/iconfont.css">
+<style>
+    :root {
+        --xhs-primary: #ff5000;       /* 淘宝橙 */
+        --xhs-primary-dark: #e64800;
+        --xhs-ink: #262626;
+        --xhs-muted: #999;
+        --xhs-line: #eee;
+        --xhs-badge: #ff2e4d;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+        font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+        background: linear-gradient(135deg, #0c1220, #1a2440);
+        min-height: 100vh;
+        display: flex; align-items: center; justify-content: center;
+        padding: 24px 12px;
+    }
+
+    /* ===== 桌面端手机壳预览 ===== */
+    .xhs-phone {
+        width: 100%; max-width: 400px;
+        height: min(820px, calc(100vh - 48px));
+        background: #f7f8fa;
+        border-radius: 28px;
+        box-shadow: 0 30px 80px rgba(0,0,0,.55), 0 0 0 10px #1b2233, 0 0 0 12px #333c55;
+        overflow: hidden;
+        position: relative;
+        display: flex; flex-direction: column;
+    }
+    @media (max-width: 480px) {
+        body { padding: 0; }
+        .xhs-phone { max-width: none; height: 100vh; height: 100dvh; border-radius: 0; box-shadow: none; }
+    }
+
+    /* ===== 顶部说明区 ===== */
+    .xhs-doc {
+        padding: 18px 18px 12px;
+        background: linear-gradient(150deg, #ff6a1f, #ff5000 55%, #e64800);
+        color: #fff;
+    }
+    .xhs-doc h1 { font-size: 17px; letter-spacing: 1px; }
+    .xhs-doc .xhs-ref {
+        font-size: 11.5px; opacity: .92; margin-top: 6px; line-height: 1.7;
+    }
+    .xhs-doc .xhs-ref b { color: #ffe3a3; font-weight: 600; }
+    .xhs-switch {
+        margin-top: 12px;
+        display: flex; background: rgba(255,255,255,.18);
+        border: 1px solid rgba(255,255,255,.35);
+        border-radius: 999px; padding: 3px; width: max-content;
+    }
+    .xhs-switch button {
+        border: 0; background: transparent; color: rgba(255,255,255,.85);
+        font-size: 12px; padding: 6px 16px; border-radius: 999px; cursor: pointer;
+        font-family: inherit; transition: all .25s ease;
+    }
+    .xhs-switch button.xhs-on { background: #fff; color: var(--xhs-primary-dark); font-weight: 700; }
+
+    /* ===== 模拟商品内容区 ===== */
+    .xhs-content {
+        flex: 1; overflow-y: auto;
+        padding: 14px 14px 20px;
+        background: #f7f8fa;
+    }
+    .xhs-goods {
+        background: #fff; border-radius: 12px; padding: 12px;
+        display: flex; gap: 12px; margin-bottom: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,.04);
+    }
+    .xhs-goods .xhs-pic {
+        width: 76px; height: 76px; border-radius: 8px; flex: none;
+        background: linear-gradient(135deg, #ffd8a8, #ffb36b);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 26px; color: #b25e00;
+    }
+    .xhs-goods .xhs-info { flex: 1; min-width: 0; }
+    .xhs-goods h3 {
+        font-size: 13.5px; color: var(--xhs-ink); font-weight: 600;
+        line-height: 1.45;
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .xhs-goods .xhs-price { color: var(--xhs-primary); font-size: 17px; font-weight: 800; margin-top: 8px; font-family: Consolas, Arial; }
+    .xhs-goods .xhs-price i { font-style: normal; font-size: 11px; }
+    .xhs-goods .xhs-meta { font-size: 10.5px; color: var(--xhs-muted); margin-top: 4px; }
+    .xhs-note {
+        font-size: 11px; color: #8a94a6; text-align: center; padding: 10px 0 4px; line-height: 1.8;
+    }
+    .xhs-note b { color: var(--xhs-primary); }
+
+    /* ===== 固定下导航（核心） ===== */
+    .xhs-tabbar {
+        flex: none;
+        position: relative;
+        display: flex;                 /* 自适应宽度：等分 */
+        background: #fff;
+        border-top: 1px solid var(--xhs-line);
+        padding-bottom: env(safe-area-inset-bottom);   /* iPhone 底部安全区 */
+        z-index: 10;
+    }
+    .xhs-tabbar a {
+        flex: 1 1 0;                   /* 自适应宽度核心：均分 */
+        min-width: 0;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 3px;
+        height: 56px;
+        text-decoration: none;
+        color: var(--xhs-muted);
+        font-size: 10.5px;
+        position: relative;
+        transition: color .2s ease;
+    }
+    .xhs-tabbar a.xhs-active { color: var(--xhs-primary); font-weight: 700; }
+    .xhs-tabbar a:active { background: #fff3ec; }
+
+    /* 字体图标尺寸 */
+    .xhs-tabbar .iconfont { font-size: 22px; line-height: 1; }
+    /* SVG 图标尺寸（CSS 修饰 SVG） */
+    .xhs-tabbar svg.xhs-svg { width: 22px; height: 22px; display: block; }
+    .xhs-tabbar svg.xhs-svg .xhs-st { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .xhs-tabbar svg.xhs-svg .xhs-fill { fill: currentColor; stroke: none; }
+
+    /* 徽章与红点（两种版式通用，绝对定位于图标右上角） */
+    .xhs-ico-wrap { position: relative; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; }
+    .xhs-dot {
+        position: absolute; top: -2px; right: -4px;
+        width: 8px; height: 8px; border-radius: 50%;
+        background: var(--xhs-badge);
+        border: 1.5px solid #fff;
+    }
+    .xhs-badge {
+        position: absolute; top: -7px; right: -10px;
+        min-width: 16px; height: 16px; padding: 0 4px;
+        border-radius: 999px;
+        background: var(--xhs-badge); color: #fff;
+        font-size: 9.5px; font-weight: 700; line-height: 16px; text-align: center;
+        border: 1.5px solid #fff;
+        font-style: normal;
+    }
+
+    /* 窄屏时隐藏文字仅留图标（自适应策略） */
+    @media (max-width: 340px) {
+        .xhs-tabbar a span.xhs-txt { display: none; }
+        .xhs-tabbar a { height: 52px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="xhs-phone">
+
+    <!-- 顶部说明 -->
+    <div class="xhs-doc">
+        <h1>下导航 · 图像解决方案</h1>
+        <p class="xhs-ref">
+            参考 <b>淘宝 / 京东移动端</b> 底部导航（首页 · 分类 · 发布 · 消息 · 我的）<br/>
+            两套实现：<b>iconfont 字体图标</b> 与 <b>内联 SVG</b>，均用 CSS 修饰，<b>flex 自适应宽度</b> + <b>position: sticky 固定底部</b>
+        </p>
+        <div class="xhs-switch" role="tablist">
+            <button id="xhsBtnFont" class="xhs-on" type="button">字体图标版</button>
+            <button id="xhsBtnSvg" type="button">SVG 版</button>
+        </div>
+    </div>
+
+    <!-- 模拟商品列表 -->
+    <div class="xhs-content">
+        <div class="xhs-note">👇 下方为<b>固定下导航</b>（滚动内容区不会移动），共 5 项 · 含<b>数字徽章</b>与<b>红点</b></div>
+
+        <div class="xhs-goods">
+            <div class="xhs-pic">👗</div>
+            <div class="xhs-info">
+                <h3>2026 秋冬新款羊毛大衣 女士中长款双面呢外套 气质通勤</h3>
+                <div class="xhs-price"><i>¥</i>399<del style="font-size:11px;color:#bbb;margin-left:6px;">¥899</del></div>
+                <div class="xhs-meta">已售 2.3 万 · 杭州仓</div>
+            </div>
+        </div>
+        <div class="xhs-goods">
+            <div class="xhs-pic">📱</div>
+            <div class="xhs-info">
+                <h3>智能手机旗舰版 16GB+512GB 骁龙芯片 120W 快充 5G 双卡</h3>
+                <div class="xhs-price"><i>¥</i>4599</div>
+                <div class="xhs-meta">已售 8.6 万 · 深圳仓</div>
+            </div>
+        </div>
+        <div class="xhs-goods">
+            <div class="xhs-pic">🎧</div>
+            <div class="xhs-info">
+                <h3>真无线蓝牙耳机 主动降噪 40h 续航 IPX5 防水 入耳式</h3>
+                <div class="xhs-price"><i>¥</i>249</div>
+                <div class="xhs-meta">已售 15 万 · 上海仓</div>
+            </div>
+        </div>
+        <div class="xhs-goods">
+            <div class="xhs-pic">👟</div>
+            <div class="xhs-info">
+                <h3>轻便跑步鞋男女同款 缓震回弹透气网面 运动休闲鞋</h3>
+                <div class="xhs-price"><i>¥</i>189<del style="font-size:11px;color:#bbb;margin-left:6px;">¥329</del></div>
+                <div class="xhs-meta">已售 5.1 万 · 晋江仓</div>
+            </div>
+        </div>
+        <div class="xhs-goods">
+            <div class="xhs-pic">☕</div>
+            <div class="xhs-info">
+                <h3>便携咖啡机手动研磨家用小型 手冲壶套装 礼盒装</h3>
+                <div class="xhs-price"><i>¥</i>129</div>
+                <div class="xhs-meta">已售 9800 · 广州仓</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 固定下导航：字体图标版 ========== -->
+    <nav class="xhs-tabbar" id="xhsBarFont" aria-label="底部导航（字体图标版）">
+        <a href="javascript:;" class="xhs-active">
+            <span class="xhs-ico-wrap"><i class="iconfont icon-shouye-zhihui"></i></span>
+            <span class="xhs-txt">首页</span>
+        </a>
+        <a href="javascript:;">
+            <span class="xhs-ico-wrap"><i class="iconfont icon-shangcheng"></i></span>
+            <span class="xhs-txt">分类</span>
+        </a>
+        <a href="javascript:;">
+            <span class="xhs-ico-wrap"><i class="iconfont icon-xinzeng"></i></span>
+            <span class="xhs-txt">发布</span>
+        </a>
+        <a href="javascript:;">
+            <span class="xhs-ico-wrap"><i class="iconfont icon-xiaoxi-zhihui"></i><span class="xhs-dot"></span></span>
+            <span class="xhs-txt">消息</span>
+        </a>
+        <a href="javascript:;">
+            <span class="xhs-ico-wrap"><i class="iconfont icon-wode"></i><i class="xhs-badge">6</i></span>
+            <span class="xhs-txt">我的</span>
+        </a>
+    </nav>
+
+    <!-- ========== 固定下导航：SVG 版 ========== -->
+    <nav class="xhs-tabbar" id="xhsBarSvg" aria-label="底部导航（SVG 版）" style="display:none;">
+        <a href="javascript:;" class="xhs-active">
+            <span class="xhs-ico-wrap">
+                <!-- 首页：房子 -->
+                <svg class="xhs-svg" viewBox="0 0 24 24" aria-hidden="true">
+                    <path class="xhs-st" d="M4 11.2 12 4l8 7.2"/>
+                    <path class="xhs-st" d="M6 10v9.2h12V10"/>
+                    <path class="xhs-st" d="M10 19.2v-5h4v5"/>
+                </svg>
+            </span>
+            <span class="xhs-txt">首页</span>
+        </a>
+        <a href="javascript:;">
+            <span class="xhs-ico-wrap">
+                <!-- 分类：四宫格 -->
+                <svg class="xhs-svg" viewBox="0 0 24 24" aria-hidden="true">
+                    <rect class="xhs-st" x="4" y="4" width="6.6" height="6.6" rx="1.5"/>
+                    <rect class="xhs-st" x="13.4" y="4" width="6.6" height="6.6" rx="1.5"/>
+                    <rect class="xhs-st" x="4" y="13.4" width="6.6" height="6.6" rx="1.5"/>
+                    <rect class="xhs-st" x="13.4" y="13.4" width="6.6" height="6.6" rx="1.5"/>
+                </svg>
+            </span>
+            <span class="xhs-txt">分类</span>
+        </a>
+        <a href="javascript:;">
+            <span class="xhs-ico-wrap">
+                <!-- 发布：加号圆 -->
+                <svg class="xhs-svg" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle class="xhs-st" cx="12" cy="12" r="8.2"/>
+                    <path class="xhs-st" d="M12 8.4v7.2M8.4 12h7.2"/>
+                </svg>
+            </span>
+            <span class="xhs-txt">发布</span>
+        </a>
+        <a href="javascript:;">
+            <span class="xhs-ico-wrap">
+                <!-- 消息：铃铛 -->
+                <svg class="xhs-svg" viewBox="0 0 24 24" aria-hidden="true">
+                    <path class="xhs-st" d="M6.2 16.5c1-1.2 1.3-2.6 1.3-4.6 0-3 2-5.4 4.5-5.4s4.5 2.4 4.5 5.4c0 2 .3 3.4 1.3 4.6"/>
+                    <path class="xhs-st" d="M4.8 16.5h14.4"/>
+                    <path class="xhs-st" d="M10.2 19a1.9 1.9 0 0 0 3.6 0"/>
+                </svg>
+                <span class="xhs-dot"></span>
+            </span>
+            <span class="xhs-txt">消息</span>
+        </a>
+        <a href="javascript:;">
+            <span class="xhs-ico-wrap">
+                <!-- 我的：人像 -->
+                <svg class="xhs-svg" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle class="xhs-st" cx="12" cy="8.4" r="3.6"/>
+                    <path class="xhs-st" d="M5 19.4c1.2-3 3.9-4.6 7-4.6s5.8 1.6 7 4.6"/>
+                </svg>
+                <i class="xhs-badge">6</i>
+            </span>
+            <span class="xhs-txt">我的</span>
+        </a>
+    </nav>
+
+</div>
+
+<script>
+/* ===== 版式切换：字体图标 <-> SVG ===== */
+var xhsBarFont = document.getElementById("xhsBarFont");
+var xhsBarSvg  = document.getElementById("xhsBarSvg");
+var xhsBtnFont = document.getElementById("xhsBtnFont");
+var xhsBtnSvg  = document.getElementById("xhsBtnSvg");
+
+function xhsShowSvg(show) {
+    xhsBarSvg.style.display  = show ? "flex" : "none";
+    xhsBarFont.style.display = show ? "none" : "flex";
+    xhsBtnSvg.classList.toggle("xhs-on", show);
+    xhsBtnFont.classList.toggle("xhs-on", !show);
+}
+xhsBtnFont.addEventListener("click", function () { xhsShowSvg(false); });
+xhsBtnSvg.addEventListener("click",  function () { xhsShowSvg(true); });
+
+/* ===== 点击切换高亮（两个导航同步） ===== */
+function xhsBindTab(xhsBar) {
+    xhsBar.addEventListener("click", function (e) {
+        var a = e.target.closest("a");
+        if (!a) return;
+        xhsBar.querySelectorAll("a").forEach(function (x) { x.classList.remove("xhs-active"); });
+        a.classList.add("xhs-active");
+        // 同步另一套导航的选中项（按序号）
+        var idx = Array.prototype.indexOf.call(xhsBar.children, a);
+        var other = xhsBar === xhsBarFont ? xhsBarSvg : xhsBarFont;
+        other.querySelectorAll("a").forEach(function (x, i) {
+            x.classList.toggle("xhs-active", i === idx);
+        });
+    });
+}
+xhsBindTab(xhsBarFont);
+xhsBindTab(xhsBarSvg);
+</script>
+</body>
+</html>

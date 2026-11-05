@@ -136,3 +136,7 @@
 - model: Kimi-K3
 - prompt: 实现18-8.html，实现基于three.js或echarts的数据大屏，大屏要求：三列，中间上面是某种地理信息的图，cdn文件下载到cdn目录下。
 
+
+## 2026-11-05-19-00
+- model: GLM-5.3-Flash
+- prompt: 根据指导书（图像解决方案）完成代码：参考一个网页的下导航，并把网页发送给我（iconfont字体图标+SVG，自适应宽度固定下导航）
